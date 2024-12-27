@@ -1,4 +1,10 @@
-import { rayCasting, movimentoValido } from '../functions.js';
+import { 
+    ALT_TILE, 
+    LARG_TILE, 
+    COMP_SALA, 
+    LARG_SALA, 
+} from '../config.js';
+import { rayCasting } from '../rayCasting.js';
 import { Posicao } from './Posicao.js';
 
 export class  GameObject{
@@ -9,6 +15,11 @@ export class  GameObject{
         this.turnSpeed = 5
     }
     normalizarAngulo = angulo => (angulo % 360 + 360) % 360;
+
+    movimentoValido(stroke){
+        return stroke.x>0 && stroke.x< LARG_TILE*LARG_SALA &&
+                        stroke.y>0 && stroke.y< ALT_TILE*COMP_SALA
+    }
 
     girarDireita(){
         let newAngle = this.normalizarAngulo(this.angle+this.turnSpeed)
@@ -21,7 +32,7 @@ export class  GameObject{
             this.angle,
             this.speed
             )
-        if(movimentoValido(stroke)){
+        if(this.movimentoValido(stroke)){
             this.posicao.x = stroke.x
             this.posicao.y = stroke.y
         } 
@@ -38,7 +49,7 @@ export class  GameObject{
             this.speed
             )
             
-            if(movimentoValido(stroke)){
+            if(this.movimentoValido(stroke)){
                 this.posicao.x = stroke.x
                 this.posicao.y = stroke.y
             }     

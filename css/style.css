@@ -1,0 +1,9 @@
+body{
+    background-color: rgba(0,0,0,0.2)
+}
+canvas{
+    border-style: none;
+    border-color: rgba(0,0,0,0.1);
+    border-width: 3px;
+    
+}

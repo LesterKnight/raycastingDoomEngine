@@ -63,4 +63,21 @@ export function renderPlayer2D(player){
     CTX_2D.lineWidth = 1
 }
 
-export default {renderMap2D, renderTiles, renderPlayer2D}
+export function renderColisao(colisao){
+        CTX_2D.fillStyle = "rgba(218, 28, 7, 2)";
+        CTX_2D.beginPath();
+        CTX_2D.arc(colisao.x, colisao.y, 1, 0, 2 * Math.PI, false);
+        CTX_2D.fill();
+        CTX_2D.closePath()
+    }
+
+export function renderRay(a,b){
+        CTX_2D.strokeStyle = "rgb(255, 123, 0)"
+        CTX_2D.beginPath();
+        CTX_2D.moveTo(a.x, a.y);
+        CTX_2D.lineTo(b.x, b.y);
+        CTX_2D.stroke();
+        CTX_2D.closePath()
+    }
+
+export default {renderMap2D, renderTiles, renderPlayer2D, renderColisao, renderRay}

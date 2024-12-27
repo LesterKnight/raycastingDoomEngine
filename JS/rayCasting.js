@@ -2,7 +2,7 @@ import {
     CTX_2D, 
 } from './config.js';
 import { Posicao } from './Classes/Posicao.js';
-
+import { renderColisao,renderRay } from './render2d.js';
 export function rayCasting(x0, y0, anguloEmGraus, raio) {
     const anguloEmRadianos = anguloEmGraus * (Math.PI / 180);
     const x = x0 + raio * Math.cos(anguloEmRadianos);
@@ -14,31 +14,11 @@ export function calculateRaycastingPOV(player,gameMap){
    
     const rayCastStep = 1
     const maxRayCastingSize = player.maxRayCastingSize
-
-    //const rayCastPov = 60
     const rayCastingAmmount = 60
-
     const collisionList = new Map()
-
     let stroke
 
     //criar a logica que ira disparar N raios, adiciona-los a coleçao e renderiza-los no fim
-    function renderColisao(colisao){
-        CTX_2D.fillStyle = "rgba(218, 28, 7, 2)";
-        CTX_2D.beginPath();
-        CTX_2D.arc(colisao.x, colisao.y, 1, 0, 2 * Math.PI, false);
-        CTX_2D.fill();
-        CTX_2D.closePath()
-    }
-
-    function renderRay(a,b){
-        CTX_2D.strokeStyle = "rgb(255, 123, 0)"
-        CTX_2D.beginPath();
-        CTX_2D.moveTo(a.x, a.y);
-        CTX_2D.lineTo(b.x, b.y);
-        CTX_2D.stroke();
-        CTX_2D.closePath()
-    }
     
     function calcularIntersecaoLateral(tile, pontoColidido, angle, ladoEsquerdo) {
         const anguloRaioEmRadianos = angle * (Math.PI / 180);
@@ -157,8 +137,8 @@ export function calculateRaycastingPOV(player,gameMap){
     }
 
     calcularLoopdeRaios(player,maxRayCastingSize,rayCastingAmmount)
-
         for ( const [angle, collision] of collisionList.entries()) {
+            //REMOVER
             renderRay(player.posicao,collision)
             renderColisao(collision)
         }  

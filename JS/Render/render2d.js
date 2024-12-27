@@ -4,8 +4,8 @@ import {
     ALT_TILE,
     LARG_TILE,
     CTX_2D
-} from './config.js';
-import { rayCasting } from './rayCasting.js';
+} from '../config.js';
+import { rayCasting } from '../rayCasting.js';
 
 export function renderMap2D(){  
 

@@ -1,11 +1,13 @@
 export class  GameMap {
-    constructor(largura, comprimento, distanciaTeto, distanciaPiso){
+    static gameMapCollection = new Map()
+    constructor(largura, comprimento, distanciaTeto, distanciaPiso,mapName){
         this.largura = largura,
         this.comprimento = comprimento,
         this.distanciaTeto = distanciaTeto,
         this.distanciaPiso = distanciaPiso,
         this.tiles = new Map(),
         this.gameObjects = new Map()
+        GameMap.gameMapCollection.set(mapName,this)
     }
     checkTileCollision(posicao){
         for ( let [tilePos, tile] of this.tiles) {
@@ -28,9 +30,6 @@ export class  GameMap {
                 tile.cor = "pink"
             }
         }
-    }
-    checkPreciseTileCollision(posicaoFinal, posicaoOrigem, posicao){
-
     }
     addTile(tile){
         this.tiles.set(tile.posicao,tile)

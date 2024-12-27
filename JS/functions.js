@@ -3,7 +3,8 @@ import {
     CTX_2D, 
 } from './config.js';
 import { calculateRaycastingPOV } from './rayCasting.js';
-import {renderMap2D, renderTiles, renderPlayer2D} from './render2d.js'
+import {renderMap2D, renderTiles, renderPlayer2D} from './Render/render2d.js'
+
 export function renderGame(player,gameMap){
     CTX_2D.clearRect(0,0,CANVAS2D.width,CANVAS2D.height)
     renderMap2D()
@@ -15,7 +16,6 @@ export function renderGame(player,gameMap){
     CTX_2D.fillText(texto, x, y);
 
     renderTiles(gameMap)
-    
     calculateRaycastingPOV(player,gameMap)
     renderPlayer2D(player)
     

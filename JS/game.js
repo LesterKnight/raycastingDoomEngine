@@ -10,8 +10,9 @@ import { GameMap } from './Classes/GameMap.js';
 import { calculateRaycastingPOV } from './rayCasting.js';
 import { renderGame } from './functions.js';
 
-let gameMap = new GameMap(LARG_SALA,COMP_SALA,DIST_TETO,DIST_PISO)
-let player = new Player(132,286)
+const gameMap = new GameMap(LARG_SALA,COMP_SALA,DIST_TETO,DIST_PISO, 'mapainicial')
+console.log(GameMap.gameMapCollection)
+const player = new Player(132,286)
 gameMap.addTile(new Tile(0,0))
 gameMap.addTile(new Tile(0,96,2,2))
 gameMap.addTile(new Tile(0,160))
@@ -28,7 +29,6 @@ function f()
     renderGame(player,gameMap)
     requestAnimationFrame(f);
 }
-
 document.addEventListener('keydown', (event) => {
     const key = event.key;
 

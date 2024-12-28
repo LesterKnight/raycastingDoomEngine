@@ -1,6 +1,23 @@
 
 import { Posicao } from './Classes/Posicao.js';
 import { renderColisao,renderRay } from './Render/render2d.js';
+import { renderRay3D } from './Render/render3d.js';
+import { 
+    ALT_TILE,
+    LARG_TILE,
+    COMP_SALA,
+    LARG_SALA,
+    DIST_TETO,
+    DIST_PISO,
+    CANVAS2D,
+    CTX_2D,
+    CANVAS3D,
+    CTX_3D,
+    ALT_CANVAS,
+    LARG_CANVAS,
+    DIST_FOCAL,
+    RAYCASTING_RES
+}from './config.js';
 
 export function rayCasting(x0, y0, anguloEmGraus, raio) {
     const anguloEmRadianos = anguloEmGraus * (Math.PI / 180);
@@ -8,11 +25,9 @@ export function rayCasting(x0, y0, anguloEmGraus, raio) {
     const y = y0 + raio * Math.sin(anguloEmRadianos);
     return { x, y };
 }
-
 export function calculateRaycastingPOV(player,gameMap){  
     const rayCastStep = 1
     const maxRayCastingSize = player.maxRayCastingSize
-    const rayCastingAmmount = 60
     const collisionList = new Map()
     let stroke
 
@@ -52,13 +67,13 @@ export function calculateRaycastingPOV(player,gameMap){
         }
     }
 
-    function calcularLoopdeRaios(player,rayCastingSizeLimit,rayCastingAmmount){
+    function calcularLoopdeRaios(player,rayCastingSizeLimit){
         let rayCastingSize = 0
         let angle = player.angle
 
-        for(let i=0;i<rayCastingAmmount;i++){
+        for(let i=0;i<RAYCASTING_RES;i++){
             rayCastingSize = 0
-            angle = normalizarAngulo(player.angle-(rayCastingAmmount/2)+i)
+            angle = normalizarAngulo(player.angle-(RAYCASTING_RES/2)+i)
             while(rayCastingSize<rayCastingSizeLimit){
                 //lança o primeiro raio
                 stroke = rayCasting
@@ -134,12 +149,46 @@ export function calculateRaycastingPOV(player,gameMap){
         }
     }
 
-    calcularLoopdeRaios(player,maxRayCastingSize,rayCastingAmmount)
+    calcularLoopdeRaios(player,maxRayCastingSize)
+    let index = 0
         for ( const [angle, collision] of collisionList.entries()) {
             //REMOVER
             renderRay(player.posicao,collision)
             renderColisao(collision)
+
+
+            let pos = calculatePOV3d(player, collision, angle, index++)
+
+
+            renderRay3D(pos.superior, pos.inferior,)
         }  
 }
 
+
+export function calculatePOV3d(player, colisao, angle, index){
+    function calcularDistanciaReal(ponto1, ponto2) {
+        const deltaX = ponto2.x - ponto1.x; // Diferença em x
+        const deltaY = ponto2.y - ponto1.y; // Diferença em y
+        return Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Fórmula da distância
+    }
+    function calcularDistanciaProjetada( distanciaReal, anguloRaio, anguloCentral) {
+    const anguloRelativo = (anguloRaio - anguloCentral) * (Math.PI / 180); // Convertendo para radianos
+        const distanciaProjetada = distanciaReal * Math.cos(anguloRelativo);
+        return distanciaProjetada;
+    }
+
+    let distanciaReal = calcularDistanciaReal(player.posicao,colisao)
+    let distanciaProjetada = calcularDistanciaProjetada(distanciaReal,angle,player.angle)
+    let RAIOposX, RAIOposYSup,RAIOposYinf
+    //altura total do palito
+    let alturaRenderizada = (ALT_TILE*DIST_FOCAL)/distanciaProjetada
+    RAIOposX = (index/RAYCASTING_RES)*LARG_CANVAS
+    RAIOposYSup = ALT_CANVAS/2 - alturaRenderizada
+    RAIOposYinf = ALT_CANVAS/2 + alturaRenderizada
+
+    return {
+        superior: {x:RAIOposX, y: RAIOposYSup},
+        inferior: {x:RAIOposX, y: RAIOposYinf}
+    }
+}
 export default {rayCasting, calculateRaycastingPOV}

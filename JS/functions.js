@@ -1,12 +1,15 @@
 import { 
     CANVAS2D, 
-    CTX_2D, 
+    CTX_2D,
+    CTX_3D 
 } from './config.js';
 import { calculateRaycastingPOV } from './rayCasting.js';
 import {renderMap2D, renderTiles, renderPlayer2D} from './Render/render2d.js'
-
+import {renderPlayer3D} from './Render/render3d.js'
 export function renderGame(player,gameMap){
     CTX_2D.clearRect(0,0,CANVAS2D.width,CANVAS2D.height)
+    CTX_3D.clearRect(0,0,CANVAS2D.width,CANVAS2D.height)
+
     renderMap2D()
     CTX_2D.font = '20px Arial';
     CTX_2D.fillStyle = 'black';
@@ -18,5 +21,6 @@ export function renderGame(player,gameMap){
     renderTiles(gameMap)
     calculateRaycastingPOV(player,gameMap)
     renderPlayer2D(player)
+    renderPlayer3D()
     
 }

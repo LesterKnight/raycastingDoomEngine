@@ -29,10 +29,17 @@ export function renderMap2D(){
 }
 
 export function renderTiles(gameMap){
+    for ( let [pos, tile] of gameMap.ground) {
+        
+        CTX_2D.fillStyle = tile.cor;
+        CTX_2D.fillRect(pos.x, pos.y, tile.largura,tile.altura);
+    }
+
     for ( let [pos, tile] of gameMap.tiles) {
         CTX_2D.fillStyle = tile.cor;
         CTX_2D.fillRect(pos.x, pos.y, tile.largura,tile.altura);
     }
+
 }
 
 export function renderPlayer2D(player){
@@ -71,8 +78,9 @@ export function renderColisao(colisao){
         CTX_2D.closePath()
     }
 
-export function renderRay(a,b){
-        CTX_2D.strokeStyle = "rgb(255, 123, 0)"
+export function renderRay(a,b,color ="rgb(255, 123, 0)"){
+
+        CTX_2D.strokeStyle = color
         CTX_2D.beginPath();
         CTX_2D.moveTo(a.x, a.y);
         CTX_2D.lineTo(b.x, b.y);

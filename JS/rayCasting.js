@@ -28,7 +28,8 @@ export function rayCasting(x0, y0, anguloEmGraus, raio) {
 export function calculateRaycastingPOV(player,gameMap){  
     const rayCastStep = 1
     const maxRayCastingSize = player.maxRayCastingSize
-    const collisionList = new Map()
+    const wallCollisionList = new Map()
+    const GroundCollisionList = new Map()
     let stroke
 
     //criar a logica que ira disparar N raios, adiciona-los a coleçao e renderiza-los no fim
@@ -67,7 +68,7 @@ export function calculateRaycastingPOV(player,gameMap){
         }
     }
 
-    function calcularLoopdeRaios(player,rayCastingSizeLimit){
+    function calcularLoopdeRaiosParede(player,rayCastingSizeLimit){
         let rayCastingSize = 0
         let angle = player.angle
 
@@ -91,20 +92,20 @@ export function calculateRaycastingPOV(player,gameMap){
                     if(angle % 90 == 0){
                         if(angle==0)//o ponto é a direita
                         {
-                            collisionList.set(player.angle, new Posicao(tileColidido.posicao.x, player.posicao.y))
+                            wallCollisionList.set(player.angle, new Posicao(tileColidido.posicao.x, player.posicao.y))
                             break
                         }
                         else if(angle == 90)
                         {
-                            collisionList.set(player.angle, new Posicao(player.posicao.x, tileColidido.posicao.y))
+                            wallCollisionList.set(player.angle, new Posicao(player.posicao.x, tileColidido.posicao.y))
                             break
                         }
                         else if(angle == 180){
-                            collisionList.set(player.angle, new Posicao(tileColidido.posicao.x + tileColidido.largura , player.posicao.y))
+                            wallCollisionList.set(player.angle, new Posicao(tileColidido.posicao.x + tileColidido.largura , player.posicao.y))
                             break
                         }
                         else if(angle == 270){
-                            collisionList.set(player.angle,  new Posicao(player.posicao.x, tileColidido.posicao.y+ tileColidido.altura))
+                            wallCollisionList.set(player.angle,  new Posicao(player.posicao.x, tileColidido.posicao.y+ tileColidido.altura))
                             break
                         }
                         break
@@ -127,11 +128,11 @@ export function calculateRaycastingPOV(player,gameMap){
                         let colisao
                     if(esquerda||direita){
                         colisao = calcularIntersecaoLateral(tileColidido, stroke, angle, esquerda)
-                        collisionList.set(angle, colisao)
+                        wallCollisionList.set(angle, colisao)
                         }
                     if(!colisao && (cima||baixo)){
                         colisao =   calcularIntersecaoVertical(tileColidido, stroke, angle, cima)
-                        collisionList.set(angle, colisao)
+                        wallCollisionList.set(angle, colisao)
                         }
                         break
                     }
@@ -149,22 +150,114 @@ export function calculateRaycastingPOV(player,gameMap){
         }
     }
 
-    calcularLoopdeRaios(player,maxRayCastingSize)
+   function calcularLoopdeRaiosPiso(player,rayCastingSizeLimit){
+        let rayCastingSize = 0
+        let angle = player.angle
+
+        for(let i=0;i<RAYCASTING_RES;i++){
+            rayCastingSize = 0
+            angle = normalizarAngulo(player.angle-(RAYCASTING_RES/2)+i)
+            while(rayCastingSize<rayCastingSizeLimit){
+                //lança o primeiro raio
+                stroke = rayCasting
+                (
+                    player.posicao.x,
+                    player.posicao.y,
+                    angle,
+                    rayCastingSize
+                )
+                //verifica se houve colisao
+                let tileColidido = gameMap.checkGroundCollision(stroke)
+                //se houve colisao obtem a colisao precisa
+    
+                if(tileColidido){
+                    if(angle % 90 == 0){
+                        if(angle==0)//o ponto é a direita
+                        {
+                            wallCollisionList.set(player.angle, new Posicao(tileColidido.posicao.x, player.posicao.y))
+                            break
+                        }
+                        else if(angle == 90)
+                        {
+                            wallCollisionList.set(player.angle, new Posicao(player.posicao.x, tileColidido.posicao.y))
+                            break
+                        }
+                        else if(angle == 180){
+                            wallCollisionList.set(player.angle, new Posicao(tileColidido.posicao.x + tileColidido.largura , player.posicao.y))
+                            break
+                        }
+                        else if(angle == 270){
+                            wallCollisionList.set(player.angle,  new Posicao(player.posicao.x, tileColidido.posicao.y+ tileColidido.altura))
+                            break
+                        }
+                        break
+                    }
+                    else{ //calcular colisao nas laterais dos blocos
+    
+                        let esquerda = false, direita = false, cima = false, baixo = false
+                        if(player.posicao.y < tileColidido.posicao.y )
+                            cima = true
+                        
+                        if(player.posicao.y > tileColidido.posicao.y+tileColidido.altura)
+                            baixo = true
+    
+                        if(player.posicao.x < tileColidido.posicao.x)
+                            esquerda = true
+    
+                        if(player.posicao.x > tileColidido.posicao.x +tileColidido.largura )
+                            direita = true
+                        
+                        let colisao
+                    if(esquerda||direita){
+                        colisao = calcularIntersecaoLateral(tileColidido, stroke, angle, esquerda)
+                        wallCollisionList.set(angle, colisao)
+                        }
+                    if(!colisao && (cima||baixo)){
+                        colisao =   calcularIntersecaoVertical(tileColidido, stroke, angle, cima)
+                        wallCollisionList.set(angle, colisao)
+                        }
+                        break
+                    }
+                }
+    
+                else{//se o raio nao colidiu, continuar o loop
+    
+                    if(rayCastingSize < rayCastingSizeLimit){
+                        rayCastingSize+=rayCastStep
+                        continue
+                    }
+                    else break
+                }
+            }
+        }
+    }
+
+
+
+    //inicio do desenvolvimento
+    calcularLoopdeRaiosParede(player,maxRayCastingSize)
     let index = 0
-        for ( const [angle, collision] of collisionList.entries()) {
-            //REMOVER
-            renderRay(player.posicao,collision)
-            renderColisao(collision)
+        for ( const [angle, collision] of wallCollisionList.entries()) {
 
-
+            //renderRay(player.posicao,collision)
+            //renderColisao(collision)
             let pos = calculatePOV3d(player, collision, angle, index++)
-
-
             renderRay3D(pos.superior, pos.inferior,)
+        } 
+
+        calcularLoopdeRaiosPiso(player,maxRayCastingSize)
+        index = 0
+        for ( const [angle, collision] of GroundCollisionList.entries()) {
+            renderRay(player.posicao,collision,"rgb(0, 255, 0)")//2D
+            renderColisao(collision)
+            //let pos = calculatePOV3d(player, collision, angle, index++)
+            //renderRay3D(pos.superior, pos.inferior,)
         }  
+
+
+    
+
 }
-
-
 export function calculatePOV3d(player, colisao, angle, index){
     function calcularDistanciaReal(ponto1, ponto2) {
         const deltaX = ponto2.x - ponto1.x; // Diferença em x
@@ -191,4 +284,5 @@ export function calculatePOV3d(player, colisao, angle, index){
         inferior: {x:RAIOposX, y: RAIOposYinf}
     }
 }
+
 export default {rayCasting, calculateRaycastingPOV}

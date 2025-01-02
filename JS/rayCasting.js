@@ -16,7 +16,8 @@ import {
     ALT_CANVAS,
     LARG_CANVAS,
     DIST_FOCAL,
-    RAYCASTING_RES
+    RAYCASTING_RES,
+    RAYCASTING_POV
 }from './config.js';
 
 export function rayCasting(x0, y0, anguloEmGraus, raio) {
@@ -76,7 +77,9 @@ export function calculateRaycastingPOV(player,gameMap){
 
         for(let i=0;i<RAYCASTING_RES;i++){
             rayCastingSize = 0
-            angle = normalizarAngulo(player.angle-(30)+i)
+            angle = normalizarAngulo(player.angle-(RAYCASTING_POV/2) + (RAYCASTING_POV/RAYCASTING_RES)*i
+        
+        )
            
             while(rayCastingSize<rayCastingSizeLimit){
                 //lança o primeiro raio
@@ -160,7 +163,7 @@ export function calculateRaycastingPOV(player,gameMap){
     //inicio do desenvolvimento
     calcularLoopdeRaiosParede(player,maxRayCastingSize)
 
-    let reta = new Map()
+    let mapaDeColisoes = new Map()
 
     
     //aqui irei traçar as retas do piso
@@ -171,66 +174,66 @@ export function calculateRaycastingPOV(player,gameMap){
             let pos = calculatePOV3dPAREDE(player, collisionData.colisao, angle, index++) 
             renderRay3D(pos.superior, pos.inferior,collisionData.tileColidido.cor)
 
-            let ladoEsquerdo = []
-            let ladoDireito = []
-            let ladoCima = []
-            let ladoBaixo = []
-            let obj
-            //seta o objeto da reta
-            if(!reta.get(collisionData.tileColidido)){
-                reta.set(collisionData.tileColidido, {inicio:pos.inferior,fim:pos.inferior,lowest:pos.inferior, quadrado:{ladoEsquerdo}})
-                
-                if(!obj)
-                    obj = collisionData.tileColidido
+
+            //SE FOR A PRIMEIRA ITERAÇÃO DO OBJETO, CRIA O PRIMEIRO RAIO
+            if(!mapaDeColisoes.get(collisionData.tileColidido)){
+                mapaDeColisoes.set(collisionData.tileColidido,
+                    {
+                            esquerdo:[],
+                            direito:[],
+                            cima:[],
+                            baixo:[]
+                    })
             }
-                
-            else{
-                reta.get(collisionData.tileColidido).fim = pos.inferior
-                if((pos.inferior.y > reta.get(collisionData.tileColidido).lowest.y)){
-                    //tileAnterior = reta.get(collisionData.tileColidido).lowest
-                    reta.get(collisionData.tileColidido).lowest = pos.inferior
-                }
 
 
-
-            //collisionData.colisao AQUI é a COLISAO
-            //aqui é o OBJETO tilecolidido
-            //console.log({tile:collisionData.tileColidido,colisao:collisionData.colisao}) 
-
-                if(collisionData.tileColidido.posicao.x==collisionData.colisao.x){
-                    //console.log("esquerdo")
-                    reta.get(collisionData.tileColidido).quadrado.ladoEsquerdo.push(pos)
-                    console.log(reta.get(collisionData.tileColidido).quadrado)
-                    
-                    let esq = reta.get(collisionData.tileColidido).quadrado.ladoEsquerdo
-                    if(esq.length>0)
-                    renderRay3D(esq[0].superior,esq[esq.length-1].superior)
-                }
-                else if (collisionData.tileColidido.posicao.x + collisionData.tileColidido.largura ==collisionData.colisao.x){
-                    //console.log("direito")
-                }
-                
-                
-                    
-            }
+          //CALCULA TRAPEZIO ESQUERDO
+            if(collisionData.tileColidido.posicao.x==collisionData.colisao.x)
+                mapaDeColisoes.get(collisionData.tileColidido).esquerdo.push(pos)
+            
+            //CALCULA TRAPEZIO DIREITO
+            if(collisionData.tileColidido.posicao.x+collisionData.tileColidido.largura==collisionData.colisao.x)
+                mapaDeColisoes.get(collisionData.tileColidido).direito.push(pos)
+            
+            //CALCULA TRAPEZIO EMBAIXO
+            if(
+                collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
+                collisionData.tileColidido.posicao.x+collisionData.tileColidido.largura >= collisionData.colisao.x &&
+                collisionData.tileColidido.posicao.y+collisionData.tileColidido.altura  == collisionData.colisao.y
+               )
+            mapaDeColisoes.get(collisionData.tileColidido).baixo.push(pos)
+            //CALCULA TRAPEZIO ENCIMA
+            if(
+                collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
+                collisionData.tileColidido.posicao.x+collisionData.tileColidido.largura >= collisionData.colisao.x &&
+                collisionData.tileColidido.posicao.y == collisionData.colisao.y
+               )
+            mapaDeColisoes.get(collisionData.tileColidido).cima.push(pos)
            
         } 
 
 
 
-        for ( const [a, b] of reta.entries()) {
-            {
+        for (const [tile, trapezios] of mapaDeColisoes.entries()) {
+            Object.keys(trapezios).forEach(lado => {
+                const trapezio = trapezios[lado];
+                let size = trapezio.length;
+                if (size > 0) {
+                    renderRay3D(trapezio[0].superior, trapezio[size - 1].superior);
+                    renderRay3D(trapezio[0].inferior, trapezio[size - 1].inferior);
+                    //coluna vertical
+                    renderRay3D(trapezio[size - 1].superior, trapezio[size - 1].inferior);
+                    //x
+                    if(tile.altura == ALT_TILE && tile.largura == LARG_TILE){
+                            renderRay3D(trapezio[0].superior, trapezio[size - 1].inferior);
+                            renderRay3D(trapezio[0].inferior, trapezio[size - 1].superior);
+                         }
+                    
 
-              if(b.lowest.y>b.inicio.y || b.lowest.y > b.fim.y){
-                renderRay3D(b.inicio,b.lowest)
-                renderRay3D(b.lowest,b.fim)
-              }else
-                renderRay3D(b.inicio,b.fim)
-            }
 
-            
+                }
+            });
         }
-
 }
 
 

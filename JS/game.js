@@ -14,15 +14,25 @@ import { renderGame } from './functions.js';
 
 const gameMap = new GameMap(LARG_SALA,COMP_SALA,DIST_TETO,DIST_PISO, 'mapainicial')
 const player = new Player(230,203,10)
-gameMap.addTile(new Tile(0,0))
+
+gameMap.addTile(new Tile(96,32))
+gameMap.addTile(new Tile(32,160))
+gameMap.addTile(new Tile(192,32))
+
+gameMap.addTile(new Tile(0,288,10,1))//coluna
+gameMap.addTile(new Tile(0,0,10,1))//coluna
+gameMap.addTile(new Tile(0,32,1,8))
+gameMap.addTile(new Tile(288,32,1,8))
+
+
 gameMap.addTile(new Tile(128,96,2,2))
-gameMap.addTile(new Tile(0,160))
+
 gameMap.addTile(new Tile(256,96,2,2))
 
-gameMap.addTile(new Tile(96,0))
-gameMap.addTile(new Tile(288,192))
-gameMap.addTile(new Tile(192,0))
-gameMap.addTile(new Tile(0,288,10,1))
+
+gameMap.addTile(new Tile(288,160))
+
+
 
 
 

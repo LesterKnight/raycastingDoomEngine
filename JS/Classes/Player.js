@@ -1,8 +1,9 @@
 import { GameObject } from './GameObject.js';
 
 export class Player extends GameObject {
-    constructor(x, y) {
+    constructor(x, y, angle) {
         super(x, y);
-        this.maxRayCastingSize = 300;
+        this.maxRayCastingSize = 300
+        this.angle = angle
     }
 }

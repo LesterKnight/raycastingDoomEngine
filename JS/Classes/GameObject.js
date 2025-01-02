@@ -11,8 +11,9 @@ export class  GameObject{
     constructor(x,y){
         this.posicao = new Posicao(x,y)
         this.angle=0
-        this.speed = 15
+        this.speed = 5
         this.turnSpeed = 5
+        this.altura = 1
     }
     normalizarAngulo = angulo => (angulo % 360 + 360) % 360;
 

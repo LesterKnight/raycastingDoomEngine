@@ -8,6 +8,13 @@ export class  Tile {
         this.altura = ALT_TILE*scaleY;
         this.largura = LARG_TILE*scaleX;
         this.posicao = new Posicao(x,y)
-        this.cor = "rgba(255,0,0,0.2)"
+        this.cor = this.gerarCorRGBAleatoria()
+    }
+
+     gerarCorRGBAleatoria() {
+        const r = Math.floor(Math.random() * 256);
+        const g = Math.floor(Math.random() * 256);
+        const b = Math.floor(Math.random() * 256);
+        return `rgb(${r}, ${g}, ${b})`;
     }
 }

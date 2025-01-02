@@ -13,29 +13,20 @@ import { calculateRaycastingPOV } from './rayCasting.js';
 import { renderGame } from './functions.js';
 
 const gameMap = new GameMap(LARG_SALA,COMP_SALA,DIST_TETO,DIST_PISO, 'mapainicial')
-console.log(GameMap.gameMapCollection)
-const player = new Player(132,286)
+//console.log(GameMap.gameMapCollection)
+const player = new Player(183,213,280)
 gameMap.addTile(new Tile(0,0))
-gameMap.addTile(new Tile(0,96,2,2))
+gameMap.addTile(new Tile(128,96,2,2))
 gameMap.addTile(new Tile(0,160))
 gameMap.addTile(new Tile(256,96,2,2))
-gameMap.addTile(new Tile(96,32))
+
 gameMap.addTile(new Tile(96,0))
 gameMap.addTile(new Tile(288,192))
-gameMap.addTile(new Tile(288,0))
-gameMap.addTile(new Tile(0,288,4,1))
-/*
-for(let i=0;i<LARG_SALA*LARG_TILE;i+=LARG_TILE)
-    for(let j=0;j<COMP_SALA*ALT_TILE;j+=ALT_TILE){
-        let tile = new Tile(i,j)
-        tile.cor = "rgba(177, 224, 171, 0.71)"
-        gameMap.addGround(tile)
-    }
-*/
-       
-let tile = new Tile(128,64)
-tile.cor = "rgba(177, 224, 171, 0.71)"
-gameMap.addGround(tile)
+gameMap.addTile(new Tile(192,0))
+gameMap.addTile(new Tile(0,288,10,1))
+
+
+
 
 
 
@@ -46,7 +37,6 @@ gameMap.addGround(tile)
 
 function f()
 {
-    gameMap.checkTileCollision(player.posicao)
     renderGame(player,gameMap)
     requestAnimationFrame(f);
 }

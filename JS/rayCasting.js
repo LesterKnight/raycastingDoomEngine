@@ -74,7 +74,7 @@ export function calculateRaycastingPOV(player,gameMap){
         let rayCastingSize = 0
         let angle = player.angle
 
-        for(let i=20;i<RAYCASTING_RES;i++){
+        for(let i=0;i<RAYCASTING_RES;i++){
             rayCastingSize = 0
             angle = normalizarAngulo(player.angle-(30)+i)
            
@@ -166,32 +166,71 @@ export function calculateRaycastingPOV(player,gameMap){
     //aqui irei traçar as retas do piso
         for ( const [angle, collisionData] of wallCollisionList.entries()) {
             renderRay(player.posicao,collisionData.colisao)
-            renderColisao(collisionData.colisao) 
+            //renderColisao(collisionData.colisao)
+
             let pos = calculatePOV3dPAREDE(player, collisionData.colisao, angle, index++) 
             renderRay3D(pos.superior, pos.inferior,collisionData.tileColidido.cor)
+
+            let ladoEsquerdo = []
+            let ladoDireito = []
+            let ladoCima = []
+            let ladoBaixo = []
+            let obj
+            //seta o objeto da reta
             if(!reta.get(collisionData.tileColidido)){
-                reta.set(collisionData.tileColidido, {inicio:pos.inferior,fim:pos.inferior,lowest:pos.inferior})
+                reta.set(collisionData.tileColidido, {inicio:pos.inferior,fim:pos.inferior,lowest:pos.inferior, quadrado:{ladoEsquerdo}})
+                
+                if(!obj)
+                    obj = collisionData.tileColidido
             }
                 
             else{
                 reta.get(collisionData.tileColidido).fim = pos.inferior
-                if(pos.inferior.y >= reta.get(collisionData.tileColidido).lowest.y){
+                if((pos.inferior.y > reta.get(collisionData.tileColidido).lowest.y)){
+                    //tileAnterior = reta.get(collisionData.tileColidido).lowest
                     reta.get(collisionData.tileColidido).lowest = pos.inferior
                 }
+
+
+
+            //collisionData.colisao AQUI é a COLISAO
+            //aqui é o OBJETO tilecolidido
+            //console.log({tile:collisionData.tileColidido,colisao:collisionData.colisao}) 
+
+                if(collisionData.tileColidido.posicao.x==collisionData.colisao.x){
+                    //console.log("esquerdo")
+                    reta.get(collisionData.tileColidido).quadrado.ladoEsquerdo.push(pos)
+                    console.log(reta.get(collisionData.tileColidido).quadrado)
+                    
+                    let esq = reta.get(collisionData.tileColidido).quadrado.ladoEsquerdo
+                    if(esq.length>0)
+                    renderRay3D(esq[0].superior,esq[esq.length-1].superior)
+                }
+                else if (collisionData.tileColidido.posicao.x + collisionData.tileColidido.largura ==collisionData.colisao.x){
+                    //console.log("direito")
+                }
+                
+                
                     
             }
+           
         } 
+
 
 
         for ( const [a, b] of reta.entries()) {
             {
+
               if(b.lowest.y>b.inicio.y || b.lowest.y > b.fim.y){
                 renderRay3D(b.inicio,b.lowest)
                 renderRay3D(b.lowest,b.fim)
               }else
                 renderRay3D(b.inicio,b.fim)
             }
+
+            
         }
+
 }
 
 
@@ -219,6 +258,8 @@ export function calculatePOV3dPAREDE(player, colisao, angle, index){
     RAIOposX = (index/RAYCASTING_RES)*LARG_CANVAS
     RAIOposYSup = ALT_CANVAS/2 - alturaRenderizada
     RAIOposYinf = ALT_CANVAS/2 + alturaRenderizada
+
+
 
     return {
         superior: {x:RAIOposX, y: RAIOposYSup},

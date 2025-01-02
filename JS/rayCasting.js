@@ -89,7 +89,7 @@ function calcColisaoPrecisa(
 }
 //calcula o loop para cada angulo adjacente desde o ponto zero ate N
 function calcRaycastingLoop(player, gameMap) {
-  let mapaDeColisoes = new Map();
+  let wallCollisionList = new Map();
   let angle = player.angle;
   let ray;
   for (let i = 0; i < RAYCASTING_RES; i++) {
@@ -125,7 +125,7 @@ function calcRaycastingLoop(player, gameMap) {
       break;
     }
   }
-  return mapaDeColisoes;
+  return wallCollisionList;
 }
 //calcula reta projetada de acordo com o angulo do jogador
 export function calcularRetaParede3D(player, colisao, angle, index) {
@@ -158,38 +158,42 @@ export function calcularRetaParede3D(player, colisao, angle, index) {
 }
 //calcula o loop de raios de raycasting 2D, calcula as retas projetadas em 3D, usa as retas para formar retangulos em 3D na tela
 export function calculateRaycastingPOV(player, gameMap) {
-  let index = 0;
-  const wallCollisionList = calcRaycastingLoop(player, gameMap);
+  let index = 0
+  //calcula o loop de raios de raycasting 2D
+  const wallCollisionList = calcRaycastingLoop(player, gameMap)
+  const wallRectangles = new Map()
 
+  //calcula as retas projetadas em 3D
   for (const [angle, collisionData] of wallCollisionList.entries()) {
-    renderRay(player.posicao, collisionData.colisao);
-    //renderColisao(collisionData.colisao)
+    renderRay(player.posicao, collisionData.colisao)
+    renderColisao(collisionData.colisao)
     let pos = calcularRetaParede3D(
       player,
       collisionData.colisao,
       angle,
       index++
-    );
+    )
     renderRay3D(pos.superior, pos.inferior, collisionData.tileColidido.cor);
     //SE FOR A PRIMEIRA ITERAÇÃO DO OBJETO, INICIALIZA OS VETORES DE RETANGULOS
-    if (!mapaDeColisoes.get(collisionData.tileColidido)) {
-      mapaDeColisoes.set(collisionData.tileColidido, {
+    if (!wallRectangles.get(collisionData.tileColidido)) {
+      wallRectangles.set(collisionData.tileColidido, {
         esquerdo: [],
         direito: [],
         cima: [],
         baixo: [],
-      });
+      })
     }
+  
     //CALCULA TRAPEZIO ESQUERDO
     if (collisionData.tileColidido.posicao.x == collisionData.colisao.x)
-      mapaDeColisoes.get(collisionData.tileColidido).esquerdo.push(pos);
+      wallRectangles.get(collisionData.tileColidido).esquerdo.push(pos);
     //CALCULA TRAPEZIO DIREITO
     if (
       collisionData.tileColidido.posicao.x +
         collisionData.tileColidido.largura ==
       collisionData.colisao.x
     )
-      mapaDeColisoes.get(collisionData.tileColidido).direito.push(pos);
+    wallRectangles.get(collisionData.tileColidido).direito.push(pos);
     //CALCULA TRAPEZIO EMBAIXO
     if (
       collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
@@ -200,7 +204,7 @@ export function calculateRaycastingPOV(player, gameMap) {
         collisionData.tileColidido.altura ==
         collisionData.colisao.y
     )
-      mapaDeColisoes.get(collisionData.tileColidido).baixo.push(pos);
+    wallRectangles.get(collisionData.tileColidido).baixo.push(pos);
     //CALCULA TRAPEZIO ENCIMA
     if (
       collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
@@ -209,11 +213,11 @@ export function calculateRaycastingPOV(player, gameMap) {
         collisionData.colisao.x &&
       collisionData.tileColidido.posicao.y == collisionData.colisao.y
     )
-      mapaDeColisoes.get(collisionData.tileColidido).cima.push(pos);
+    wallRectangles.get(collisionData.tileColidido).cima.push(pos);
   }
 
   //renderiza os trapezios
-  for (const [tile, trapezios] of mapaDeColisoes.entries()) {
+  for (const [tile, trapezios] of wallRectangles.entries()) {
     Object.keys(trapezios).forEach((lado) => {
       const trapezio = trapezios[lado];
       let size = trapezio.length;
@@ -228,8 +232,9 @@ export function calculateRaycastingPOV(player, gameMap) {
           renderRay3D(trapezio[0].inferior, trapezio[size - 1].superior);
         }
       }
-    });
+    })
   }
+  
 }
 
 export default { rayCasting, calculateRaycastingPOV };

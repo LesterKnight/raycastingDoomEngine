@@ -13,7 +13,6 @@ import { calculateRaycastingPOV } from './rayCasting.js';
 import { renderGame } from './functions.js';
 
 const gameMap = new GameMap(LARG_SALA,COMP_SALA,DIST_TETO,DIST_PISO, 'mapainicial')
-//console.log(GameMap.gameMapCollection)
 const player = new Player(183,213,280)
 gameMap.addTile(new Tile(0,0))
 gameMap.addTile(new Tile(128,96,2,2))

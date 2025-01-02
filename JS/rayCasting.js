@@ -74,10 +74,10 @@ export function calculateRaycastingPOV(player,gameMap){
         let rayCastingSize = 0
         let angle = player.angle
 
-        for(let i=0;i<RAYCASTING_RES;i++){
+        for(let i=20;i<RAYCASTING_RES;i++){
             rayCastingSize = 0
             angle = normalizarAngulo(player.angle-(30)+i)
-            console.log(angle)
+           
             while(rayCastingSize<rayCastingSizeLimit){
                 //lança o primeiro raio
                 stroke = rayCasting
@@ -95,20 +95,20 @@ export function calculateRaycastingPOV(player,gameMap){
                     if(angle % 90 == 0){
                         if(angle==0)//o ponto é a direita
                         {
-                            wallCollisionList.set(player.angle, {colisao: new Posicao(tileColidido.posicao.x, player.posicao.y), tileColidido})
+                            //wallCollisionList.set(player.angle, {colisao: new Posicao(tileColidido.posicao.x, player.posicao.y), tileColidido})
                             break
                         }
                         else if(angle == 90)
                         {
-                            wallCollisionList.set(player.angle, {colisao: new Posicao(player.posicao.x, tileColidido.posicao.y), tileColidido})
+                           // wallCollisionList.set(player.angle, {colisao: new Posicao(player.posicao.x, tileColidido.posicao.y), tileColidido})
                             break
                         }
                         else if(angle == 180){
-                            wallCollisionList.set(player.angle, {colisao: new Posicao(tileColidido.posicao.x + tileColidido.largura , player.posicao.y), tileColidido})
+                           // wallCollisionList.set(player.angle, {colisao: new Posicao(tileColidido.posicao.x + tileColidido.largura , player.posicao.y), tileColidido})
                             break
                         }
                         else if(angle == 270){
-                            wallCollisionList.set(player.angle,  {colisao: new Posicao(player.posicao.x, tileColidido.posicao.y+ tileColidido.altura),tileColidido})
+                            //wallCollisionList.set(player.angle,  {colisao: new Posicao(player.posicao.x, tileColidido.posicao.y+ tileColidido.altura),tileColidido})
                             break
                         }
                         break
@@ -161,9 +161,6 @@ export function calculateRaycastingPOV(player,gameMap){
     calcularLoopdeRaiosParede(player,maxRayCastingSize)
 
     let reta = new Map()
-    let currentTile
-    let firstPoint
-    let lastPoint
 
     
     //aqui irei traçar as retas do piso
@@ -172,20 +169,26 @@ export function calculateRaycastingPOV(player,gameMap){
             renderColisao(collisionData.colisao) 
             let pos = calculatePOV3dPAREDE(player, collisionData.colisao, angle, index++) 
             renderRay3D(pos.superior, pos.inferior,collisionData.tileColidido.cor)
-
-            if(!reta.get(collisionData.tileColidido))
-                reta.set(collisionData.tileColidido, {inicio:pos.inferior,fim:pos.inferior,lower:pos.inferior})
-            else{//calcular se é subida ou descida, caso mude, calcular segunda reta
-                reta.get(collisionData.tileColidido).fim = pos.inferior
-
+            if(!reta.get(collisionData.tileColidido)){
+                reta.set(collisionData.tileColidido, {inicio:pos.inferior,fim:pos.inferior,lowest:pos.inferior})
             }
                 
+            else{
+                reta.get(collisionData.tileColidido).fim = pos.inferior
+                if(pos.inferior.y >= reta.get(collisionData.tileColidido).lowest.y){
+                    reta.get(collisionData.tileColidido).lowest = pos.inferior
+                }
+                    
+            }
         } 
 
 
         for ( const [a, b] of reta.entries()) {
             {
-              
+              if(b.lowest.y>b.inicio.y || b.lowest.y > b.fim.y){
+                renderRay3D(b.inicio,b.lowest)
+                renderRay3D(b.lowest,b.fim)
+              }else
                 renderRay3D(b.inicio,b.fim)
             }
         }

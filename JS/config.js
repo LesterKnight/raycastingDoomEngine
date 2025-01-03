@@ -6,7 +6,7 @@ export const LARG_SALA = 10;
 export const DIST_TETO = 2;
 export const DIST_PISO = 1;
 
-export const RAYCASTING_RES = 120; //60 graus
+export const RAYCASTING_RES = 180; //60 graus
 export const RAYCASTING_POV = 60; //60 graus
 export const RAYCASTING_STEP_SIZE = 1;
 export const MAX_RAYCASTING_SIZE = 300;

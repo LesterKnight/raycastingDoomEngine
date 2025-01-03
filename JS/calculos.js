@@ -28,7 +28,6 @@ export function calcularIntersecaoLateral(
     return new Posicao(x, posicaoInterseccaoY);
   }
 }
-
 export function calcIntersecaoVertical(tile, pontoColidido, angle, cima) {
   const anguloRaioEmRadianos = angle * (Math.PI / 180);
   let posicaoInterseccaoX;
@@ -53,6 +52,20 @@ export function calcIntersecaoVertical(tile, pontoColidido, angle, cima) {
     return new Posicao(posicaoInterseccaoX, y);
   }
 }
+export function calcDistanciaReal(ponto1, ponto2) {//DISTANCIA EUCLIDIANA
+  const deltaX = ponto2.x - ponto1.x; // Diferença em x
+  const deltaY = ponto2.y - ponto1.y; // Diferença em y
+  return Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Fórmula da distância
+}
+export function anguloRelativo(anguloRaio,anguloCentral){
+  return (anguloRaio - anguloCentral) * (Math.PI / 180); // Convertendo para radianos
+}
+export function calcDistanciaProjetada(distanciaReal, anguloRaio, anguloCentral) {//calcula a distancia da tela do raycasting
+  const anguloR = anguloRelativo(anguloRaio,anguloCentral)
+  const distanciaProjetada = distanciaReal * Math.cos(anguloR);
+  return distanciaProjetada;
+}
+
 //cria um raio no plano 2d entre o jogador e um ponto definido
 export function rayCasting(x0, y0, angulo, raio) {
   const anguloEmRadianos = angulo * (Math.PI / 180);
@@ -64,4 +77,11 @@ export function rayCasting(x0, y0, angulo, raio) {
 //criar a logica que ira disparar N raios, adiciona-los a coleçao e renderiza-los no fim
 export function normalizarAngulo(angulo) {
   return ((angulo % 360) + 360) % 360;
+}
+
+function calcDistanciaPerspectiva(distancia) {
+  let alturaProjetada, larguraProjetada;
+  alturaProjetada = (ALT_TILE * DIST_FOCAL) / distancia;
+  larguraProjetada = (ALT_TILE * DIST_FOCAL) / distancia;
+  return { alturaProjetada, larguraProjetada };
 }

@@ -4,6 +4,9 @@ import {
   calcIntersecaoVertical,
   normalizarAngulo,
   rayCasting,
+  calcDistanciaReal,
+  calcDistanciaProjetada,
+  anguloRelativo,
 } from "./calculos.js";
 import { renderColisao, renderRay, renderDot2D } from "./Render/render2d.js";
 import { renderRay3D, renderDot3D } from "./Render/render3d.js";
@@ -138,17 +141,6 @@ function calcRaycastingLoop(player, gameMap) {
 }
 //calcula reta projetada de acordo com o angulo do jogador
 export function calcularRetaParede3D(player, colisao, angle, index) {
-  function calcDistanciaReal(ponto1, ponto2) {
-    const deltaX = ponto2.x - ponto1.x; // Diferença em x
-    const deltaY = ponto2.y - ponto1.y; // Diferença em y
-    return Math.sqrt(deltaX * deltaX + deltaY * deltaY); // Fórmula da distância
-  }
-  function calcDistanciaProjetada(distanciaReal, anguloRaio, anguloCentral) {
-    const anguloRelativo = (anguloRaio - anguloCentral) * (Math.PI / 180); // Convertendo para radianos
-    const distanciaProjetada = distanciaReal * Math.cos(anguloRelativo);
-    return distanciaProjetada;
-  }
-
   let distanciaReal = calcDistanciaReal(player.posicao, colisao);
   let distanciaProjetada = calcDistanciaProjetada(
     distanciaReal,
@@ -157,7 +149,7 @@ export function calcularRetaParede3D(player, colisao, angle, index) {
   );
   let posX, posYtop, posYinf;
   let comprimentoVertical = (ALT_TILE * DIST_FOCAL) / distanciaProjetada;
-  posX = (index / RAYCASTING_RES) * LARG_CANVAS;
+  posX = (index / RAYCASTING_RES) * LARG_CANVAS;//entender melhor
   posYtop = ALT_CANVAS / 2 - comprimentoVertical;
   posYinf = ALT_CANVAS / 2 + comprimentoVertical;
   return {
@@ -170,9 +162,6 @@ export function calculateRaycastingPOV(player, gameMap) {
   let index = 0;
   //calcula o loop de raios de raycasting 2D
   const wallCollisionList = calcRaycastingLoop(player, gameMap);
-
-  calcGrid(wallCollisionList);
-
   const wallRectangles = new Map();
 
   //calcula as retas projetadas em 3D
@@ -186,6 +175,9 @@ export function calculateRaycastingPOV(player, gameMap) {
       index++
     );
     renderRay3D(pos.superior, pos.inferior, collisionData.tileColidido.cor);
+
+
+
     //SE FOR A PRIMEIRA ITERAÇÃO DO OBJETO, INICIALIZA OS VETORES DE RETANGULOS
     if (!wallRectangles.get(collisionData.tileColidido)) {
       wallRectangles.set(collisionData.tileColidido, {
@@ -246,44 +238,155 @@ export function calculateRaycastingPOV(player, gameMap) {
       }
     });
   }
+
+
+
+
+  calcGrid(player,wallCollisionList, wallRectangles);
 }
 
-export function calcGrid(wallCollisionList) {
 
-  let c0,c1
-  let hLines = []
 
-  for (const [angle, collisionData] of wallCollisionList.entries()) {
-    if (
-      hLines.length == 0 ||
-      hLines[hLines.length - 1].tileColidido != collisionData.tileColidido
-    ) {
-      hLines.push({ tileColidido: collisionData.tileColidido, c0, c1 });
-      
-    if (collisionData.orientacao.esquerda)
-      hLines[hLines.length - 1].c0 = collisionData.colisao;
+
+
+
+
+
+
+
+
+
+
+
+export function calcGrid(player,wallCollisionList, wallRectangles) {
+
+  let retas = [];
+  for (const  [angulo, collisionData] of wallCollisionList.entries()) {
+
+
+    let diferente = false
+    if(retas.length>0){
+      diferente = retas[retas.length - 1].tileColidido != collisionData.tileColidido
     }
-    else{
-      if (collisionData.orientacao.esquerda) 
-        hLines[hLines.length - 1].c1 = collisionData.colisao;
-    }
-  }
-
-  for(let i=0;i<hLines.length;i++){
-    if(hLines[i].c0 && hLines[i].c1)
-      {
-        for(let j=parseInt(hLines[i].c0.y); j< parseInt(hLines[i].c1.y);j++){
-          if(j%ALT_TILE==0){
-            renderDot2D({x: hLines[i].c0.x, y: j})
-          }
-        }
+    
+    //DETECCAO DOS PONTOS NO EIXO X
+    if ( retas.length == 0 || diferente) {
+      retas.push({ tileColidido: collisionData.tileColidido, colisaoInicial:collisionData.colisao, colisaoFinal:collisionData.colisao});
         
+      if (collisionData.orientacao.baixo) {
+        retas[retas.length - 1].colisaoInicial = collisionData.colisao;
       }
-    
-
-  
-    
+    }
+    else {
+      if (collisionData.orientacao.baixo) {
+        retas[retas.length - 1].colisaoFinal = collisionData.colisao;
+      }
+    }
   }
+//CALCULO E RENDERIZACAO CONTEXTO AINDA 2D
+
+let colisoesNaReta=[]
+
+
+
+
+function renderP(colisao,retas){
+  //uma vez que temos a reta e temos o jogador, podemos efetuar um unico calculo de raycasting
+   //rayCasting(player.posicao.x, player.posicao.y)
+
+   renderRay(player.posicao,colisao, "blue")
+   renderRay(player.posicao,colisao, "blue")
+   renderRay(player.posicao,colisao, "blue")
+   renderRay(player.posicao,colisao, "blue")
+
+
+
+   let distanciaReal = calcDistanciaReal(player.posicao, colisao);
+   //precisamos calcular o angulo em relacao ao jogador em vez de calcular altura ou largura pois o angulo seria fornecido pelo raycasting
+   //para isso, iremos triangular o jogador com um ponto reto em direção ao eixo x tendo P0 colisao, p1 jogador na reta e p2 como jogador
+   //let p1 = {x: player.posicao.x, y:colisao.distancia.y} funçao atan desprezou P1
+   //agora que temos uma reta, precisamos calcular o angulo gerado 
+   function tangenteReversa(pontoOrigem,pontoDestino){
+     const deltaY = pontoDestino.y-pontoOrigem.y
+     const deltaX = pontoDestino.x-pontoOrigem.x
+     const angulo = Math.atan2(deltaY,deltaX)
+     const anguloEmGraus = angulo * (180/Math.PI)
+     return anguloEmGraus
+   }//o calculo atan localiza o angulo, ao contrario da tangente que localiza o comprimento usando o angulo em RAD
+
+let angle = tangenteReversa(player.posicao,colisao)
+   let distanciaProjetada = calcDistanciaProjetada(
+     distanciaReal,
+     angle,
+     player.angle
+   );
+
+
+ let a = {
+   x0:retas[0].colisaoInicial.x,
+   x1:retas[retas.length-1].colisaoFinal.x
+ }
+
+ let b = {
+   x0:0,
+   x1:LARG_CANVAS
+ }
+
+
+ function calcularPosicaoProporcional(ponto, retaA, retaB) {
+   // Calcula a posição relativa do ponto na reta A
+   const posicaoRelativa = (ponto.x - retaA.x0) / (retaA.x1 - retaA.x0);
+   // Calcula o ponto correspondente na reta B
+   const pontoCorrespondente = posicaoRelativa * (retaB.x1 - retaB.x0) + retaB.x0;
+   return pontoCorrespondente;
+}
+
+let p = calcularPosicaoProporcional(colisao,a,b)
+
+ let posX, posYtop, posYinf;
+ let comprimentoVertical = (ALT_TILE * DIST_FOCAL) / distanciaProjetada;
+ //posX = (index / RAYCASTING_RES) * LARG_CANVAS;//DIVIDE O CANVAS em 60 partes e determina o x usando um slice posX = (index / RAYCASTING_RES) * LARG_CANVAS;
+ posYtop = ALT_CANVAS / 2 - comprimentoVertical;
+ posYinf = ALT_CANVAS / 2 + comprimentoVertical;
+renderDot3D({x:p,y:posYinf})
+
+}
+  
+//-------------------------------------------------------------------------------------------------------------------------------------------
+  for (let i = 0; i < retas.length; i++) {
+    //if (retas[i].c0 && retas[i].c1) {
+      for (
+        let j = parseInt(retas[i].colisaoInicial.x);//ADICIONAR -1
+        j < parseInt(retas[i].colisaoFinal.x);
+        j++
+      ) {
+        if (j % LARG_TILE == 0) {
+          //renderDot2D({ x: linhasVerticais[i].c0.x, y: j });//UTIL
+          renderDot2D({ x: j, y: retas[i].colisaoInicial.y });
+          colisoesNaReta.push({ x: j, y: retas[i].colisaoInicial.y })
+
+        }
+      }
+    }
+
+
+    colisoesNaReta.forEach((colisao, indice) => {
+      renderP(colisao,retas,wallRectangles)
+  });
+
+
+console.log(wallRectangles)
+
+
+
+
+
+
+
+
+
+
+
 }
 
 export default { rayCasting, calculateRaycastingPOV };

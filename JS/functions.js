@@ -7,7 +7,7 @@ function renderInfo(player) {
   CTX_2D.fillStyle = "black";
   const texto = `X:${Math.round(player.posicao.x)} Y:${Math.round(
     player.posicao.y
-  )} angle: ${player.angle} dist: ${player.menorDistancia}`;
+  )} angle: ${player.angle}`;
   const x = 0; // Posição horizontal
   const y = 350; // Posição vertical
   CTX_2D.fillText(texto, x, y);

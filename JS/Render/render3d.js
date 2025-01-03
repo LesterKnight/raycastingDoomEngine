@@ -8,8 +8,8 @@ export function renderRay3D(a, b, color = "rgb(255, 123, 0)") {
   CTX_3D.stroke();
   CTX_3D.closePath();
 }
-export function renderDot3D(a) {
-  CTX_3D.fillStyle = "red";
+export function renderDot3D(a,color = "red") {
+  CTX_3D.fillStyle = color;
   CTX_3D.beginPath();
   CTX_3D.arc(
     a.x,

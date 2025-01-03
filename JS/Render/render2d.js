@@ -82,12 +82,27 @@ export function renderColisao(colisao, color = "rgba(218, 28, 7, 2)") {
   CTX_2D.closePath();
 }
 
-export function renderRay(a, b, color = "rgb(255, 123, 0)") {
+export function renderRay(a, b, color = "rgba(255, 123, 0,0.05)") {
   CTX_2D.strokeStyle = color;
   CTX_2D.beginPath();
   CTX_2D.moveTo(a.x, a.y);
   CTX_2D.lineTo(b.x, b.y);
   CTX_2D.stroke();
+  CTX_2D.closePath();
+}
+
+export function renderDot2D(a) {
+  CTX_2D.fillStyle = "red";
+  CTX_2D.beginPath();
+  CTX_2D.arc(
+    a.x,
+    a.y,
+    4,
+    0,
+    2 * Math.PI,
+    false
+  )
+  CTX_2D.fill();
   CTX_2D.closePath();
 }
 
@@ -97,4 +112,5 @@ export default {
   renderPlayer2D,
   renderColisao,
   renderRay,
+  renderDot2D
 };

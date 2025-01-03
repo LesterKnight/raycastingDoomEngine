@@ -12,7 +12,7 @@ const gameMap = new GameMap(
   DIST_PISO,
   "mapa_inicial"
 );
-const player = new Player(230, 203, 10);
+const player = new Player(128, 261, 335);
 
 function initMap() {
   gameMap.addTile(new Tile(96, 32));

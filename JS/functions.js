@@ -5,9 +5,9 @@ import { renderMap2D, renderTiles, renderPlayer2D } from "./Render/render2d.js";
 function renderInfo(player) {
   CTX_2D.font = "20px Arial";
   CTX_2D.fillStyle = "black";
-  const texto = `player x:${Math.round(player.posicao.x)} player y:${Math.round(
+  const texto = `X:${Math.round(player.posicao.x)} Y:${Math.round(
     player.posicao.y
-  )} angle: ${player.angle} `;
+  )} angle: ${player.angle} dist: ${player.menorDistancia}`;
   const x = 0; // Posição horizontal
   const y = 350; // Posição vertical
   CTX_2D.fillText(texto, x, y);

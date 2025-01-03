@@ -5,8 +5,8 @@ import {
   normalizarAngulo,
   rayCasting,
 } from "./calculos.js";
-import { renderColisao, renderRay } from "./Render/render2d.js";
-import { renderRay3D } from "./Render/render3d.js";
+import { renderColisao, renderRay, renderDot2D } from "./Render/render2d.js";
+import { renderRay3D, renderDot3D } from "./Render/render3d.js";
 import {
   ALT_TILE,
   LARG_TILE,
@@ -62,27 +62,35 @@ function calcColisaoPrecisa(
     */
   //calcular colisao nas laterais dos blocos
 
-  let esquerda = false,
-    direita = false,
-    cima = false,
-    baixo = false;
-  if (player.posicao.y < tileColidido.posicao.y) cima = true;
+  let orientacao = {
+    esquerda: false,
+    direita: false,
+    cima: false,
+    baixo: false,
+  };
+
+  if (player.posicao.y < tileColidido.posicao.y) orientacao.cima = true;
 
   if (player.posicao.y > tileColidido.posicao.y + tileColidido.altura)
-    baixo = true;
+    orientacao.baixo = true;
 
-  if (player.posicao.x < tileColidido.posicao.x) esquerda = true;
+  if (player.posicao.x < tileColidido.posicao.x) orientacao.esquerda = true;
 
   if (player.posicao.x > tileColidido.posicao.x + tileColidido.largura)
-    direita = true;
+    orientacao.direita = true;
 
-  if (esquerda || direita) {
-    colisao = calcularIntersecaoLateral(tileColidido, ray, angle, esquerda);
-    wallCollisionList.set(angle, { colisao, tileColidido });
+  if (orientacao.esquerda || orientacao.direita) {
+    colisao = calcularIntersecaoLateral(
+      tileColidido,
+      ray,
+      angle,
+      orientacao.esquerda
+    );
+    wallCollisionList.set(angle, { colisao, tileColidido, orientacao });
   }
-  if (!colisao && (cima || baixo)) {
-    colisao = calcIntersecaoVertical(tileColidido, ray, angle, cima);
-    wallCollisionList.set(angle, { colisao, tileColidido });
+  if (!colisao && (orientacao.cima || orientacao.baixo)) {
+    colisao = calcIntersecaoVertical(tileColidido, ray, angle, orientacao.cima);
+    wallCollisionList.set(angle, { colisao, tileColidido, orientacao });
   }
   if (!colisao) return false;
   return true;
@@ -92,6 +100,7 @@ function calcRaycastingLoop(player, gameMap) {
   let wallCollisionList = new Map();
   let angle = player.angle;
   let ray;
+
   for (let i = 0; i < RAYCASTING_RES; i++) {
     let rayCastingSize = 0;
     angle = normalizarAngulo(
@@ -158,21 +167,24 @@ export function calcularRetaParede3D(player, colisao, angle, index) {
 }
 //calcula o loop de raios de raycasting 2D, calcula as retas projetadas em 3D, usa as retas para formar retangulos em 3D na tela
 export function calculateRaycastingPOV(player, gameMap) {
-  let index = 0
+  let index = 0;
   //calcula o loop de raios de raycasting 2D
-  const wallCollisionList = calcRaycastingLoop(player, gameMap)
-  const wallRectangles = new Map()
+  const wallCollisionList = calcRaycastingLoop(player, gameMap);
+
+  calcGrid(wallCollisionList);
+
+  const wallRectangles = new Map();
 
   //calcula as retas projetadas em 3D
   for (const [angle, collisionData] of wallCollisionList.entries()) {
-    renderRay(player.posicao, collisionData.colisao)
-    renderColisao(collisionData.colisao)
+    renderRay(player.posicao, collisionData.colisao);
+    renderColisao(collisionData.colisao);
     let pos = calcularRetaParede3D(
       player,
       collisionData.colisao,
       angle,
       index++
-    )
+    );
     renderRay3D(pos.superior, pos.inferior, collisionData.tileColidido.cor);
     //SE FOR A PRIMEIRA ITERAÇÃO DO OBJETO, INICIALIZA OS VETORES DE RETANGULOS
     if (!wallRectangles.get(collisionData.tileColidido)) {
@@ -181,9 +193,9 @@ export function calculateRaycastingPOV(player, gameMap) {
         direito: [],
         cima: [],
         baixo: [],
-      })
+      });
     }
-  
+
     //CALCULA TRAPEZIO ESQUERDO
     if (collisionData.tileColidido.posicao.x == collisionData.colisao.x)
       wallRectangles.get(collisionData.tileColidido).esquerdo.push(pos);
@@ -193,7 +205,7 @@ export function calculateRaycastingPOV(player, gameMap) {
         collisionData.tileColidido.largura ==
       collisionData.colisao.x
     )
-    wallRectangles.get(collisionData.tileColidido).direito.push(pos);
+      wallRectangles.get(collisionData.tileColidido).direito.push(pos);
     //CALCULA TRAPEZIO EMBAIXO
     if (
       collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
@@ -204,7 +216,7 @@ export function calculateRaycastingPOV(player, gameMap) {
         collisionData.tileColidido.altura ==
         collisionData.colisao.y
     )
-    wallRectangles.get(collisionData.tileColidido).baixo.push(pos);
+      wallRectangles.get(collisionData.tileColidido).baixo.push(pos);
     //CALCULA TRAPEZIO ENCIMA
     if (
       collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
@@ -213,10 +225,10 @@ export function calculateRaycastingPOV(player, gameMap) {
         collisionData.colisao.x &&
       collisionData.tileColidido.posicao.y == collisionData.colisao.y
     )
-    wallRectangles.get(collisionData.tileColidido).cima.push(pos);
+      wallRectangles.get(collisionData.tileColidido).cima.push(pos);
   }
 
-  //renderiza os trapezios
+  //renderiza os trapezios, SEPARAR NO FUTURO
   for (const [tile, trapezios] of wallRectangles.entries()) {
     Object.keys(trapezios).forEach((lado) => {
       const trapezio = trapezios[lado];
@@ -232,9 +244,46 @@ export function calculateRaycastingPOV(player, gameMap) {
           renderRay3D(trapezio[0].inferior, trapezio[size - 1].superior);
         }
       }
-    })
+    });
   }
+}
+
+export function calcGrid(wallCollisionList) {
+
+  let c0,c1
+  let hLines = []
+
+  for (const [angle, collisionData] of wallCollisionList.entries()) {
+    if (
+      hLines.length == 0 ||
+      hLines[hLines.length - 1].tileColidido != collisionData.tileColidido
+    ) {
+      hLines.push({ tileColidido: collisionData.tileColidido, c0, c1 });
+      
+    if (collisionData.orientacao.esquerda)
+      hLines[hLines.length - 1].c0 = collisionData.colisao;
+    }
+    else{
+      if (collisionData.orientacao.esquerda) 
+        hLines[hLines.length - 1].c1 = collisionData.colisao;
+    }
+  }
+
+  for(let i=0;i<hLines.length;i++){
+    if(hLines[i].c0 && hLines[i].c1)
+      {
+        for(let j=parseInt(hLines[i].c0.y); j< parseInt(hLines[i].c1.y);j++){
+          if(j%ALT_TILE==0){
+            renderDot2D({x: hLines[i].c0.x, y: j})
+          }
+        }
+        
+      }
+    
+
   
+    
+  }
 }
 
 export default { rayCasting, calculateRaycastingPOV };

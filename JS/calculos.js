@@ -65,7 +65,6 @@ export function calcDistanciaProjetada(distanciaReal, anguloRaio, anguloCentral)
   const distanciaProjetada = distanciaReal * Math.cos(anguloR);
   return distanciaProjetada;
 }
-
 //cria um raio no plano 2d entre o jogador e um ponto definido
 export function rayCasting(x0, y0, angulo, raio) {
   const anguloEmRadianos = angulo * (Math.PI / 180);
@@ -73,13 +72,11 @@ export function rayCasting(x0, y0, angulo, raio) {
   const y = y0 + raio * Math.sin(anguloEmRadianos);
   return { x, y };
 }
-
 //criar a logica que ira disparar N raios, adiciona-los a coleçao e renderiza-los no fim
 export function normalizarAngulo(angulo) {
   return ((angulo % 360) + 360) % 360;
 }
-
-function calcDistanciaPerspectiva(distancia) {
+export function calcDistanciaPerspectiva(distancia) {
   let alturaProjetada, larguraProjetada;
   alturaProjetada = (ALT_TILE * DIST_FOCAL) / distancia;
   larguraProjetada = (ALT_TILE * DIST_FOCAL) / distancia;

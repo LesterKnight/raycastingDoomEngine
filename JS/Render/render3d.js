@@ -1,5 +1,23 @@
-import { CTX_3D } from "../config.js";
 
+import {
+  ALT_TILE,
+  LARG_TILE,
+  COMP_SALA,
+  LARG_SALA,
+  DIST_TETO,
+  DIST_PISO,
+  CANVAS2D,
+  CTX_2D,
+  CANVAS3D,
+  CTX_3D,
+  ALT_CANVAS,
+  LARG_CANVAS,
+  DIST_FOCAL,
+  RAYCASTING_RES,
+  RAYCASTING_POV,
+  RAYCASTING_STEP_SIZE,
+  MAX_RAYCASTING_SIZE,
+} from "../config.js";
 export function renderRay3D(a, b, color = "rgb(255, 123, 0)") {
   CTX_3D.strokeStyle = color;
   CTX_3D.beginPath();
@@ -22,5 +40,36 @@ export function renderDot3D(a,color = "red") {
   CTX_3D.fill();
   CTX_3D.closePath();
 }
+export function desenharRetangulosParede3D(wallRectangles){
+  //renderiza os trapezios, SEPARAR NO FUTURO
+  for (const [tile, trapezios] of wallRectangles.entries()) {
+   Object.keys(trapezios).forEach((lado) => {
+     const trapezio = trapezios[lado];
+     let size = trapezio.length;
+     if (size > 0) {
+       renderRay3D(trapezio[0].superior, trapezio[size - 1].superior);
+       renderRay3D(trapezio[0].inferior, trapezio[size - 1].inferior);
+       //coluna vertical
+       renderRay3D(trapezio[size - 1].superior, trapezio[size - 1].inferior);
+       //CRIA UM X NAS CAIXAS
+       if (tile.altura == ALT_TILE && tile.largura == LARG_TILE) {
+         renderRay3D(trapezio[0].superior, trapezio[size - 1].inferior);
+         renderRay3D(trapezio[0].inferior, trapezio[size - 1].superior);
+       }
+     }
+   });
+ }
+ }
+ export function renderPiso3D(wallCollisionList,projectedRays){
+  //obter as posicoes p0 e p1  VERTICAL OU HORIZONTAL de cada objeto colidido e traçar retas no plano 2d com os pontos adequados
 
-export default { renderRay3D,renderDot3D };
+
+  //traça as retas no plano 3d, esta errado pois deve considerar o angulo da reta para obter o comprimento real,
+  //sugestao: fazer um raycasting do ponto 0 ate o ponto especificado e obter o tamanho
+
+  //let first = projectedRays[0].inferior.x
+  //let last = projectedRays[projectedRays.length-1].inferior.x
+  //console.log({first,last})
+ // renderRay3D({x:first,y:ALT_CANVAS/2},{x:last,y:ALT_CANVAS/2},"green")
+}
+export default { renderRay3D,renderDot3D ,desenharRetangulosParede3D,renderPiso3D};

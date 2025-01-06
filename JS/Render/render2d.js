@@ -82,7 +82,7 @@ export function renderColisao(colisao, color = "rgba(218, 28, 7, 2)") {
   CTX_2D.closePath();
 }
 
-export function renderRay(a, b, color = "rgba(255, 123, 0, 1)") {
+export function renderRay2D(a, b, color = "rgba(255, 123, 0, 1)") {
   CTX_2D.strokeStyle = color;
   CTX_2D.beginPath();
   CTX_2D.moveTo(a.x, a.y);
@@ -111,6 +111,6 @@ export default {
   renderTiles,
   renderPlayer2D,
   renderColisao,
-  renderRay,
+  renderRay2D,
   renderDot2D
 };

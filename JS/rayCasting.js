@@ -8,7 +8,7 @@ import {
   calcDistanciaProjetada,
   anguloRelativo,
 } from "./calculos.js";
-import { renderColisao, renderRay, renderDot2D } from "./Render/render2d.js";
+import { renderColisao, renderRay2D, renderDot2D } from "./Render/render2d.js";
 import { renderRay3D, renderDot3D ,desenharRetangulosParede3D,renderPiso3D} from "./Render/render3d.js";
 import {
   ALT_TILE,
@@ -137,7 +137,7 @@ function calcularRetangulosParede3D(wallCollisionList,player){//calcula os retan
 let index = 0
   const wallRectangles = new Map();
   for (const [angle, collisionData] of wallCollisionList.entries()) {
-    renderRay(player.posicao, collisionData.colisao);
+    renderRay2D(player.posicao, collisionData.colisao);
     renderColisao(collisionData.colisao);
     let pos = calcularRetaParede3D(
       player,
@@ -202,38 +202,39 @@ export function calcGrid(player,wallCollisionList, wallRectangles) {
 
   let vetorRetas = []
 
-  function compararTile(collision1,collision2){
-    if(!collision1 || !collision2)
+  function compararTile(t1,vetorRetas){
+    if(!t1 || vetorRetas.length==0)
       return false
-    //(collision1.tileColidido == collision2.tileColidido)
-    return collision1.orientacao == collision2.orientacao
+    let t2 = vetorRetas[vetorRetas.length-1]
+
+    return(t1.tile == t2.tile) &&
+          (t1.orientacao.esquerda == t2.orientacao.esquerda) &&
+          (t1.orientacao.cima == t2.orientacao.cima) &&
+          (t1.orientacao.direita == t2.orientacao.direita) &&
+          (t1.orientacao.baixo == t2.orientacao.baixo) 
+  }
+
+  for (const  [angle,collisionData] of wallCollisionList.entries()) {
+    if(!compararTile(collisionData,vetorRetas))
+    {
+      vetorRetas.push({
+        posicaoInicial: collisionData.colisao,
+        posicaoFinal:collisionData.colisao,
+        tile: collisionData.tile,
+        orientacao:collisionData.orientacao
+      })
+    }
+    else
+    vetorRetas[vetorRetas.length-1].posicaoFinal = collisionData.colisao
   }
 
 
-  for (const  [angle,collision] of wallCollisionList.entries()) {
-    //se a colisao anterior nao existir seta
-    if(!colisaoAnterior){
-      colisaoAnterior = collision
-      posicaoInicial = collision.posicao
-      posicaoFinal = collision.posicao
-    }
-      
-    //se a colisao atual mudou, passa a regua
-    else if (!compararTile(collision,colisaoAnterior)){
-     
-      colisaoAnterior = collision
-      posicaoInicial = collision.posicao
-      posicaoFinal = collision.posicao
-    }else{
-      posicaoFinal = collision.posicao
-    }
-    
-console.log(vetorRetas.length)
-    
-  }
-
-
-  
+  vetorRetas.forEach(reta => {
+    console.log(reta)
+    renderRay2D(reta.posicaoInicial,reta.posicaoFinal,"blue")
+    renderRay2D(reta.posicaoInicial,reta.posicaoFinal,"blue")
+    renderRay2D(reta.posicaoInicial,reta.posicaoFinal,"blue")
+  });
 }
 
 export default { rayCasting, calculateRaycastingPOV };

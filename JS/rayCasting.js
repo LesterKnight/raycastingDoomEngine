@@ -138,7 +138,7 @@ let index = 0
   const wallRectangles = new Map();
   for (const [angle, collisionData] of wallCollisionList.entries()) {
     renderRay2D(player.posicao, collisionData.colisao);
-    renderColisao(collisionData.colisao);
+    //renderColisao(collisionData.colisao);
     let pos = calcularRetaParede3D(
       player,
       collisionData.colisao,
@@ -207,11 +207,18 @@ export function calcGrid(player,wallCollisionList, wallRectangles) {
       return false
     let t2 = vetorRetas[vetorRetas.length-1]
 
-    return(t1.tile == t2.tile) &&
+    return(t1.tileColidido == t2.tile) &&
           (t1.orientacao.esquerda == t2.orientacao.esquerda) &&
           (t1.orientacao.cima == t2.orientacao.cima) &&
           (t1.orientacao.direita == t2.orientacao.direita) &&
           (t1.orientacao.baixo == t2.orientacao.baixo) 
+  }
+  function checkTileCornerCollision(i){
+    if (Math.round(i)%LARG_TILE==0)
+      return true
+    else if(Math.ceil(i)%LARG_TILE==0)
+      return true
+    else return false
   }
 
   for (const  [angle,collisionData] of wallCollisionList.entries()) {
@@ -220,7 +227,7 @@ export function calcGrid(player,wallCollisionList, wallRectangles) {
       vetorRetas.push({
         posicaoInicial: collisionData.colisao,
         posicaoFinal:collisionData.colisao,
-        tile: collisionData.tile,
+        tile: collisionData.tileColidido,
         orientacao:collisionData.orientacao
       })
     }
@@ -228,12 +235,44 @@ export function calcGrid(player,wallCollisionList, wallRectangles) {
     vetorRetas[vetorRetas.length-1].posicaoFinal = collisionData.colisao
   }
 
-
   vetorRetas.forEach(reta => {
-    console.log(reta)
-    renderRay2D(reta.posicaoInicial,reta.posicaoFinal,"blue")
-    renderRay2D(reta.posicaoInicial,reta.posicaoFinal,"blue")
-    renderRay2D(reta.posicaoInicial,reta.posicaoFinal,"blue")
+
+    if(reta.orientacao.baixo){
+      for(let i=parseInt(reta.posicaoInicial.x);i<reta.posicaoFinal.x;i++){
+        if(checkTileCornerCollision(i)){
+          renderDot2D({x:i,y:reta.posicaoFinal.y})
+        } 
+      }
+    }
+    else if(reta.orientacao.cima){
+      for(let i=parseInt(reta.posicaoFinal.x);i<reta.posicaoInicial.x;i++){
+        if(checkTileCornerCollision(i)){
+          renderDot2D({x:i,y:reta.posicaoFinal.y})
+        } 
+      }
+    }
+//EIXO Y
+    else if(reta.orientacao.esquerda){
+      for(let i=parseInt(reta.posicaoInicial.y);i<reta.posicaoFinal.y;i++){
+        if(checkTileCornerCollision(i)){
+          renderDot2D({x:reta.posicaoInicial.x,y:i})
+        } 
+      }
+    }
+    else if(reta.orientacao.direita){
+      for(let i=parseInt(reta.posicaoFinal.y);i<reta.posicaoInicial.y;i++){
+        if(checkTileCornerCollision(i)){
+          renderDot2D({x:reta.posicaoInicial.x,y:i})
+        } 
+      }
+    }
+    
+
+
+
+    //renderRay2D(reta.posicaoInicial,reta.posicaoFinal,"blue")
+    console.log(vetorRetas)
+
   });
 }
 

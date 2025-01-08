@@ -22,7 +22,7 @@ function initMap() {
   gameMap.addTile(new Tile(0, 0, 10, 1)); //coluna
   gameMap.addTile(new Tile(0, 32, 1, 8));
   gameMap.addTile(new Tile(288, 32, 1, 8));
-  gameMap.addTile(new Tile(128, 96, 4, 2));
+  gameMap.addTile(new Tile(64, 96, 4, 2));
   gameMap.addTile(new Tile(256, 96, 2, 2));
 }
 

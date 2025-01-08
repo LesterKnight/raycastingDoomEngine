@@ -30,7 +30,7 @@ import {
   MAX_RAYCASTING_SIZE,
 } from "./config.js";
 
-function calcColisaoPrecisa(
+function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
   player,
   angle,
   ray,
@@ -138,7 +138,8 @@ let index = 0
   const wallRectangles = new Map();
   for (const [angle, collisionData] of wallCollisionList.entries()) {
     renderRay2D(player.posicao, collisionData.colisao);
-    //renderColisao(collisionData.colisao);
+    renderColisao(collisionData.colisao);
+
     let pos = calcularRetaParede3D(
       player,
       collisionData.colisao,
@@ -146,6 +147,8 @@ let index = 0
       index++
     );
     renderRay3D(pos.superior, pos.inferior, collisionData.tileColidido.cor);
+
+
     //SE FOR A PRIMEIRA ITERAÇÃO DO OBJETO, INICIALIZA OS VETORES DE RETANGULOS
     if (!wallRectangles.get(collisionData.tileColidido)) {
       wallRectangles.set(collisionData.tileColidido, {
@@ -188,6 +191,111 @@ let index = 0
   }
   return wallRectangles
 }
+function checkTileCornerCollision(i){
+  if (Math.round(i)%LARG_TILE==0)
+    return true
+  else if(Math.ceil(i)%LARG_TILE==0)
+    return true
+  else return false
+}
+
+function calcularRetasPiso2D(wallCollisionList){//calcula retas para o piso 2D
+
+    const tileRects = new Map();
+    for (const [angle, collisionData] of wallCollisionList.entries()) {
+            
+      //SE FOR A PRIMEIRA ITERAÇÃO DO OBJETO, INICIALIZA OS VETORES DE RETANGULOS
+      if (!tileRects.get(collisionData.tileColidido)) {
+        tileRects.set(collisionData.tileColidido, {
+          esquerdo: [],
+          direito: [],
+          cima: [],
+          baixo: [],
+        });
+      }
+      
+      if (collisionData.tileColidido.posicao.x == collisionData.colisao.x)
+        tileRects.get(collisionData.tileColidido).esquerdo.push({angle, collisionData});
+      
+      if (
+        collisionData.tileColidido.posicao.x +
+          collisionData.tileColidido.largura ==
+        collisionData.colisao.x
+      )
+        tileRects.get(collisionData.tileColidido).direito.push({angle, collisionData});
+      
+      if (
+        collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
+        collisionData.tileColidido.posicao.x +
+          collisionData.tileColidido.largura >=
+          collisionData.colisao.x &&
+        collisionData.tileColidido.posicao.y +
+          collisionData.tileColidido.altura ==
+          collisionData.colisao.y
+      )
+        tileRects.get(collisionData.tileColidido).baixo.push({angle, collisionData});
+      
+      if (
+        collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
+        collisionData.tileColidido.posicao.x +
+          collisionData.tileColidido.largura >=
+          collisionData.colisao.x &&
+        collisionData.tileColidido.posicao.y == collisionData.colisao.y
+      )
+        tileRects.get(collisionData.tileColidido).cima.push({angle, collisionData});
+    }
+    let first = true
+    //criou 4 vetores para cada objeto
+    for (const [angle, rects] of tileRects.entries()){
+              console.log(rects)
+      if(rects.esquerdo.length>0){
+        let posInicial = rects.esquerdo[0].collisionData.colisao
+        let posFinal = rects.esquerdo[rects.esquerdo.length-1].collisionData.colisao
+        renderRay2D(posInicial,posFinal, "blue")
+        renderRay2D(posInicial,posFinal, "blue")
+        renderRay2D(posInicial,posFinal, "blue")
+        renderRay2D(posInicial,posFinal, "blue")
+      }
+      if(rects.direito.length>0){
+        let posInicial = rects.direito[0].collisionData.colisao
+        let posFinal = rects.direito[rects.direito.length-1].collisionData.colisao
+        renderRay2D(posInicial,posFinal, "yellow")
+        renderRay2D(posInicial,posFinal, "yellow")
+        renderRay2D(posInicial,posFinal, "yellow")
+        renderRay2D(posInicial,posFinal, "yellow")
+      }
+
+      if(rects.cima.length>0){
+        let posInicial = rects.cima[0].collisionData.colisao
+        let posFinal = rects.cima[rects.cima.length-1].collisionData.colisao
+        renderRay2D(posInicial,posFinal, "purple")
+        renderRay2D(posInicial,posFinal, "purple")
+        renderRay2D(posInicial,posFinal, "purple")
+        renderRay2D(posInicial,posFinal, "purple")
+      }
+
+      if(rects.baixo.length>0){
+        let posInicial = rects.baixo[0].collisionData.colisao
+        let posFinal = rects.baixo[rects.baixo.length-1].collisionData.colisao
+        renderRay2D(posInicial,posFinal, "green")
+        renderRay2D(posInicial,posFinal, "green")
+        renderRay2D(posInicial,posFinal, "green")
+        renderRay2D(posInicial,posFinal, "green")
+      }
+    }
+
+
+
+
+
+
+
+
+
+
+
+    return tileRects
+  }
 
 export function calculateRaycastingPOV(player, gameMap) {//calcula o loop de raios de raycasting 2D, calcula as retas projetadas em 3D, usa as retas para formar retangulos em 3D na tela
   //calcula o loop de raios de raycasting 2D
@@ -198,82 +306,9 @@ export function calculateRaycastingPOV(player, gameMap) {//calcula o loop de rai
 
 }
 
-export function calcGrid(player,wallCollisionList, wallRectangles) {
+export function calcGrid (player, wallRectangles) {
 
-  let vetorRetas = []
-
-  function compararTile(t1,vetorRetas){
-    if(!t1 || vetorRetas.length==0)
-      return false
-    let t2 = vetorRetas[vetorRetas.length-1]
-
-    return(t1.tileColidido == t2.tile) &&
-          (t1.orientacao.esquerda == t2.orientacao.esquerda) &&
-          (t1.orientacao.cima == t2.orientacao.cima) &&
-          (t1.orientacao.direita == t2.orientacao.direita) &&
-          (t1.orientacao.baixo == t2.orientacao.baixo) 
-  }
-  function checkTileCornerCollision(i){
-    if (Math.round(i)%LARG_TILE==0)
-      return true
-    else if(Math.ceil(i)%LARG_TILE==0)
-      return true
-    else return false
-  }
-
-  for (const  [angle,collisionData] of wallCollisionList.entries()) {
-    if(!compararTile(collisionData,vetorRetas))
-    {
-      vetorRetas.push({
-        posicaoInicial: collisionData.colisao,
-        posicaoFinal:collisionData.colisao,
-        tile: collisionData.tileColidido,
-        orientacao:collisionData.orientacao
-      })
-    }
-    else
-    vetorRetas[vetorRetas.length-1].posicaoFinal = collisionData.colisao
-  }
-
-  vetorRetas.forEach(reta => {
-
-    if(reta.orientacao.baixo){
-      for(let i=parseInt(reta.posicaoInicial.x);i<reta.posicaoFinal.x;i++){
-        if(checkTileCornerCollision(i)){
-          renderDot2D({x:i,y:reta.posicaoFinal.y})
-        } 
-      }
-    }
-    else if(reta.orientacao.cima){
-      for(let i=parseInt(reta.posicaoFinal.x);i<reta.posicaoInicial.x;i++){
-        if(checkTileCornerCollision(i)){
-          renderDot2D({x:i,y:reta.posicaoFinal.y})
-        } 
-      }
-    }
-//EIXO Y
-    else if(reta.orientacao.esquerda){
-      for(let i=parseInt(reta.posicaoInicial.y);i<reta.posicaoFinal.y;i++){
-        if(checkTileCornerCollision(i)){
-          renderDot2D({x:reta.posicaoInicial.x,y:i})
-        } 
-      }
-    }
-    else if(reta.orientacao.direita){
-      for(let i=parseInt(reta.posicaoFinal.y);i<reta.posicaoInicial.y;i++){
-        if(checkTileCornerCollision(i)){
-          renderDot2D({x:reta.posicaoInicial.x,y:i})
-        } 
-      }
-    }
-    
-
-
-
-    //renderRay2D(reta.posicaoInicial,reta.posicaoFinal,"blue")
-    console.log(vetorRetas)
-
-  });
+  calcularRetasPiso2D(wallRectangles)
 }
 
 export default { rayCasting, calculateRaycastingPOV };

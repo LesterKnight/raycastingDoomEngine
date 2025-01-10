@@ -1,5 +1,5 @@
 import { Posicao } from "./Classes/Posicao.js";
-
+import{RAYCASTING_POV,RAYCASTING_RES } from "./config.js"
 //calcula intersecção lateral entre o tile e o raycasting
 export function calcularIntersecaoLateral(
   tile,
@@ -81,4 +81,47 @@ export function calcDistanciaPerspectiva(distancia) {
   alturaProjetada = (ALT_TILE * DIST_FOCAL) / distancia;
   larguraProjetada = (ALT_TILE * DIST_FOCAL) / distancia;
   return { alturaProjetada, larguraProjetada };
+}
+export function calcularIndex(player, colisao) {
+  // Usa a função calcularAngle para obter o ângulo relativo entre a posição do jogador e a colisão
+
+  
+
+  let relativeAngle = calcularAngle(player, colisao); 
+  // Esperado: O cálculo do ângulo relativo será baseado na diferença das coordenadas. 
+  // O ângulo resultante entre o jogador (147, 220) e a colisão (228, 63.96) será aproximadamente 333.6 graus.
+
+  // Calcula o início do FOV e normaliza o valor do ângulo inicial do campo de visão (FOV)
+  let fovStart = normalizarAngulo(player.angle - RAYCASTING_POV / 2); 
+  // Esperado: O player.angle pode ser, por exemplo, 0, então o FOV começa em 330 graus.
+  // fovStart será 330 (0 - 30), representando o início do campo de visão.
+
+  // Calcula o índice diretamente, normalizando o ângulo para o FOV
+  let index = ((relativeAngle - fovStart + 360) % 360) / (RAYCASTING_POV / RAYCASTING_RES);
+  // Esperado:
+  // Se o relativeAngle for aproximadamente 333.6 graus e fovStart for 330, o índice seria calculado como:
+  // index = ((333.6 - 330 + 360) % 360) / (60 / 60)
+  // index = (3.6 % 360) / 1
+  // index = 3.6
+  // O índice esperado para esse ângulo seria aproximadamente **3.6**.
+
+  return index;
+}
+
+
+export function calcularAngle(player, P) {
+  // Calcula a diferença entre as coordenadas do ponto P e a posição do jogador
+  let deltaX = P.x - player.posicao.x;
+  let deltaY = P.y - player.posicao.y;
+
+  // Calcula o ângulo entre o jogador e o ponto P em radianos
+  let angleToPoint = Math.atan2(deltaY, deltaX);
+
+  // Converte o ângulo para graus
+  let angleToPointDegrees = (angleToPoint * 180) / Math.PI;
+
+  // Ajusta o ângulo relativo ao ângulo de visão atual do jogador e normaliza
+  let relativeAngle = normalizarAngulo(angleToPointDegrees - player.angle);
+
+  return relativeAngle;
 }

@@ -40,6 +40,7 @@ export function renderDot3D(a,color = "red") {
   CTX_3D.fill();
   CTX_3D.closePath();
 }
+
 export function desenharRetangulosParede3D(wallRectangles){
   //renderiza os trapezios, SEPARAR NO FUTURO
   for (const [tile, trapezios] of wallRectangles.entries()) {
@@ -60,16 +61,5 @@ export function desenharRetangulosParede3D(wallRectangles){
    });
  }
  }
- export function renderPiso3D(wallCollisionList,projectedRays){
-  //obter as posicoes p0 e p1  VERTICAL OU HORIZONTAL de cada objeto colidido e traçar retas no plano 2d com os pontos adequados
 
-
-  //traça as retas no plano 3d, esta errado pois deve considerar o angulo da reta para obter o comprimento real,
-  //sugestao: fazer um raycasting do ponto 0 ate o ponto especificado e obter o tamanho
-
-  //let first = projectedRays[0].inferior.x
-  //let last = projectedRays[projectedRays.length-1].inferior.x
-  //console.log({first,last})
- // renderRay3D({x:first,y:ALT_CANVAS/2},{x:last,y:ALT_CANVAS/2},"green")
-}
-export default { renderRay3D,renderDot3D ,desenharRetangulosParede3D,renderPiso3D};
+export default { renderRay3D,renderDot3D ,desenharRetangulosParede3D};

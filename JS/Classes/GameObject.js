@@ -7,7 +7,7 @@ export class GameObject {
     this.posicao = new Posicao(x, y);
     this.angle = 0;
     this.speed = 5;
-    this.turnSpeed = 5;
+    this.turnSpeed = 3;
     this.altura = 1;
   }
   movimentoValido(stroke) {

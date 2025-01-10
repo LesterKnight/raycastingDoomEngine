@@ -42,16 +42,26 @@ export function renderDot3D(a,color = "red") {
 }
 
 export function desenharRetangulosParede3D(wallRectangles){
+  
   //renderiza os trapezios, SEPARAR NO FUTURO
+  
   for (const [tile, trapezios] of wallRectangles.entries()) {
+
    Object.keys(trapezios).forEach((lado) => {
+    
      const trapezio = trapezios[lado];
      let size = trapezio.length;
+
      if (size > 0) {
+      //COLUNAS HORIZONTAIS
        renderRay3D(trapezio[0].superior, trapezio[size - 1].superior);
        renderRay3D(trapezio[0].inferior, trapezio[size - 1].inferior);
-       //coluna vertical
+       
+      //COLUNAS VERTICAIS
+       renderRay3D(trapezio[0].superior, trapezio[0].inferior);
        renderRay3D(trapezio[size - 1].superior, trapezio[size - 1].inferior);
+
+
        //CRIA UM X NAS CAIXAS
        if (tile.altura == ALT_TILE && tile.largura == LARG_TILE) {
          renderRay3D(trapezio[0].superior, trapezio[size - 1].inferior);

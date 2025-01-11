@@ -3,7 +3,7 @@ import { Player } from "./Classes/Player.js";
 import { Tile } from "./Classes/Tile.js";
 import { GameMap } from "./Classes/GameMap.js";
 import { calculateRaycastingPOV } from "./rayCasting.js";
-import { renderGame } from "./functions.js";
+import { renderGame ,initMap} from "./functions.js";
 
 const gameMap = new GameMap(
   LARG_SALA,
@@ -12,21 +12,11 @@ const gameMap = new GameMap(
   DIST_PISO,
   "mapa_inicial"
 );
-const player = new Player(173, 205, 334);
+const player = new Player(192, 86, 20);
 
-function initMap() {
-  gameMap.addTile(new Tile(96, 32));
-  gameMap.addTile(new Tile(32, 160));
-  gameMap.addTile(new Tile(192, 32));
-  gameMap.addTile(new Tile(0, 288, 10, 1)); //coluna
-  gameMap.addTile(new Tile(0, 0, 10, 1)); //coluna
-  gameMap.addTile(new Tile(0, 32, 1, 8));
-  gameMap.addTile(new Tile(288, 32, 1, 8));
-  gameMap.addTile(new Tile(64, 96, 4, 2));
-  gameMap.addTile(new Tile(256, 96, 2, 2));
-}
+initMap(gameMap)
 
-initMap();
+
 
 function f() {
   renderGame(player, gameMap);

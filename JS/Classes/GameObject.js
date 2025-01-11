@@ -1,9 +1,11 @@
 import { ALT_TILE, LARG_TILE, COMP_SALA, LARG_SALA } from "../config.js";
 import { rayCasting, normalizarAngulo } from "../calculos.js";
 import { Posicao } from "./Posicao.js";
+import { Fisica } from "./Fisica.js";
 
-export class GameObject {
+export class GameObject extends Fisica{ 
   constructor(x, y) {
+    super()
     this.posicao = new Posicao(x, y);
     this.angle = 0;
     this.speed = 5;
@@ -53,4 +55,6 @@ export class GameObject {
       this.posicao.y = stroke.y;
     }
   }
+
+ 
 }

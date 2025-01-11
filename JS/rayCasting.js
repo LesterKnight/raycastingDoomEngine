@@ -31,6 +31,8 @@ import {
   RAYCASTING_STEP_SIZE,
   MAX_RAYCASTING_SIZE,
 } from "./config.js";
+import { Tile } from "./Classes/Tile.js";
+
 
 function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
   player,
@@ -96,7 +98,7 @@ function calcRaycastingLoopWall(player, gameMap) {//calcula o loop para cada ang
       let tileColidido = gameMap.checkTileCollision(ray);
       if (tileColidido) {
         if (
-          calcColisaoPrecisa(
+          calcColisaoPrecisa(//AQUI TA ERRADO
             player,
             angle,
             ray,
@@ -170,9 +172,15 @@ function calcularRetangulosParede3D(wallCollisionList, player) {//calcula os ret
       collisionData.tileColidido != lastElement &&
       !lastPosicao) {
 
-      const tileCopy = Object.assign({}, collisionData.tileColidido);
+      //const tileCopy = Object.assign({}, collisionData.tileColidido);
+      const tileCopy = new Tile(0,0)
+      tileCopy.altura = collisionData.tileColidido.altura
+      tileCopy.largura = collisionData.tileColidido.altura
+      tileCopy.posicao = collisionData.tileColidido.altura
+      tileCopy.cor = collisionData.tileColidido.altura
+
       replica.push(tileCopy)
-      collisionData.tileColidido = tileCopy
+      collisionData.tileColidido = tileCopy//
       wallRectangles.set(collisionData.tileColidido, {
         esquerdo: [],
         direito: [],
@@ -188,12 +196,9 @@ function calcularRetangulosParede3D(wallCollisionList, player) {//calcula os ret
 
     lastElement = collisions.tileColidido
 
-    //CALCULA TRAPEZIO ESQUERDO
     if (collisionData.tileColidido.posicao.x == collisionData.colisao.x) {
       wallRectangles.get(collisionData.tileColidido).esquerdo.push(pos);
     }
-
-    //CALCULA TRAPEZIO DIREITO
     if (
       collisionData.tileColidido.posicao.x +
       collisionData.tileColidido.largura ==
@@ -201,7 +206,6 @@ function calcularRetangulosParede3D(wallCollisionList, player) {//calcula os ret
     ) {
       wallRectangles.get(collisionData.tileColidido).direito.push(pos);
     }
-    //CALCULA TRAPEZIO EMBAIXO
     if (
       collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
       collisionData.tileColidido.posicao.x +
@@ -213,7 +217,6 @@ function calcularRetangulosParede3D(wallCollisionList, player) {//calcula os ret
     ) {
       wallRectangles.get(collisionData.tileColidido).baixo.push(pos);
     }
-    //CALCULA TRAPEZIO ENCIMA
     if (
       collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
       collisionData.tileColidido.posicao.x +
@@ -266,6 +269,7 @@ function checkTileCornerCollision(i) {
   else return false
 }
 function calcularPontosIniciaisPiso2D(wallCollisionList, player) {//calcula retas para o piso 2D
+console.log(wallCollisionList)
 
   const tileRects = new Map();
   let vet = []
@@ -280,17 +284,22 @@ function calcularPontosIniciaisPiso2D(wallCollisionList, player) {//calcula reta
         baixo: [],
       });
     }
+    try{
+      collisionData.tileColidido.verificarColisaoEsquerda()
+    }catch(ex){
+      console.log(collisionData.tileColidido)
+      debugger
+    }
+    
 
     if (collisionData.tileColidido.posicao.x == collisionData.colisao.x)
       tileRects.get(collisionData.tileColidido).esquerdo.push({ angle, collisionData });
-
     if (
       collisionData.tileColidido.posicao.x +
       collisionData.tileColidido.largura ==
       collisionData.colisao.x
     )
       tileRects.get(collisionData.tileColidido).direito.push({ angle, collisionData });
-
     if (
       collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
       collisionData.tileColidido.posicao.x +
@@ -301,7 +310,6 @@ function calcularPontosIniciaisPiso2D(wallCollisionList, player) {//calcula reta
       collisionData.colisao.y
     )
       tileRects.get(collisionData.tileColidido).baixo.push({ angle, collisionData });
-
     if (
       collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
       collisionData.tileColidido.posicao.x +
@@ -311,32 +319,20 @@ function calcularPontosIniciaisPiso2D(wallCollisionList, player) {//calcula reta
     )
       tileRects.get(collisionData.tileColidido).cima.push({ angle, collisionData });
   }
-
-  //-------------------------------------------------------------------------------------------------------PODE SER QUEBRADO
-
-
-  //criou 4 vetores para cada objeto
   for (const [tile, rects] of tileRects.entries()) {
-
     if (rects.esquerdo.length > 0) {
       let posInicial = rects.esquerdo[0].collisionData.colisao
       let posFinal = rects.esquerdo[rects.esquerdo.length - 1].collisionData.colisao
       for (let i = posInicial.y; i < posFinal.y; i++) {
         if (checkTileCornerCollision(i)) {
-          let posicao = {posicao:{ x: parseInt(posInicial.x), y: parseInt(i) },
+          let posicao = new Posicao(parseInt(posInicial.x), parseInt(i))
+          renderDot2D(posicao)
+          let data = {
+          posicao,
           tile,
           rects
         }
-        
-        
-
-          //let index = calcularIndex(player,posicao)
-          //let angle = calcularAngle(player,posicao)
-          //let reta = calcularRetaParede3D(player, posicao, angle, index)
-          //renderDot3D(reta.inferior)
-          //aqui vaiser criada a logica, o angulo desse ponto em relacao ao jogador,
-          //o index desse ponto em relacao aos 60 graus
-          vet.push(posicao) 
+          vet.push(data) 
         }
       }
     }
@@ -345,8 +341,14 @@ function calcularPontosIniciaisPiso2D(wallCollisionList, player) {//calcula reta
       let posFinal = rects.direito[rects.direito.length - 1].collisionData.colisao
       for (let i = posFinal.y; i < posInicial.y; i++) {
         if (checkTileCornerCollision(i)) {
-          renderDot2D({ x: posInicial.x, y: i })
-          vet.push({ x: parseInt(posInicial.x), y: parseInt(i) })
+          let posicao = new Posicao(parseInt(posInicial.x), parseInt(i))
+          renderDot2D(posicao)
+          let data = {
+          posicao,
+          tile,
+          rects
+        }
+          vet.push(data) 
         }
       }
     }
@@ -356,8 +358,14 @@ function calcularPontosIniciaisPiso2D(wallCollisionList, player) {//calcula reta
       let posFinal = rects.cima[rects.cima.length - 1].collisionData.colisao
       for (let i = posFinal.x; i < posInicial.x; i++) {
         if (checkTileCornerCollision(i)) {
-          renderDot2D({ x: i, y: posInicial.y })
-          vet.push({ x: parseInt(i), y: parseInt(posInicial.y) })
+          let posicao = new Posicao(parseInt(i), parseInt(posInicial.y))
+          renderDot2D(posicao)
+          let data = {
+          posicao,
+          tile,
+          rects
+        }
+          vet.push(data) 
         }
       }
     }
@@ -367,23 +375,23 @@ function calcularPontosIniciaisPiso2D(wallCollisionList, player) {//calcula reta
       let posFinal = rects.baixo[rects.baixo.length - 1].collisionData.colisao
       for (let i = posInicial.x; i < posFinal.x; i++) {
         if (checkTileCornerCollision(i)) {
-          renderDot2D({ x: i, y: posInicial.y })
-          vet.push({ x: parseInt(i), y: parseInt(posInicial.y) })
+          let posicao = new Posicao(parseInt(i), parseInt(posInicial.y))
+          renderDot2D(posicao)
+          let data = {
+          posicao,
+          tile,
+          rects
+        }
+          vet.push(data) 
         }
       }
     }
   }
-
-
   return vet
 }
 
 export function calculateRaycastingPOV(player, gameMap) {//calcula o loop de raios de raycasting 2D, calcula as retas projetadas em 3D, usa as retas para formar retangulos em 3D na tela
-  //calcula o loop de raios de raycasting 2D
-  //let wallCollisionList = calcRaycastingLoopWall(player, gameMap);
-    let wallCollisionList = calcRaycastingLoopWall(player, gameMap);
-
-  //aqui
+  let wallCollisionList = calcRaycastingLoopWall(player, gameMap);//{}
   let wallRectangles = calcularRetangulosParede3D(wallCollisionList, player)
   desenharRetangulosParede3D(wallRectangles)//REMOVER
   let pontos = calcularPontosIniciaisPiso2D(wallCollisionList, player)//FINALIZAR E SIMPLIFICAR

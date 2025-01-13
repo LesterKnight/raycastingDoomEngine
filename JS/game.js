@@ -11,7 +11,7 @@ const gameMap = new GameMap(
   DIST_PISO,
   "mapa_inicial"
 );
-const player = new Player(220, 138, 269);
+const player = new Player(211, 270, 0);
 initMap(gameMap)
 function f() {
   renderGame(player, gameMap);

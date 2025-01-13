@@ -92,3 +92,54 @@ export function calcularAnguloAB(player, P) {
   let relativeAngle = normalizarAngulo(angleToPointDegrees - player.angle);
   return relativeAngle;
 }
+
+
+export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
+  player,
+  angle,
+  ray,
+  tile,
+  wallCollisionList
+) {
+
+  let colisao;
+  let orientacao = {
+    esquerda: false,
+    direita: false,
+    cima: false,
+    baixo: false,
+  };
+
+  if (player.pos.y < tile.pos.y) orientacao.cima = true;
+
+  if (player.pos.y > tile.pos.y + tile.altura)
+    orientacao.baixo = true;
+
+  if (player.pos.x < tile.pos.x) orientacao.esquerda = true;
+
+  if (player.pos.x > tile.pos.x + tile.largura)
+    orientacao.direita = true;
+
+  if (orientacao.esquerda || orientacao.direita) {
+    colisao = calcularIntersecaoLateral(
+      tile,
+      ray,
+      angle,
+      orientacao.esquerda
+    );
+    wallCollisionList.set(angle, { colisao, tile, orientacao });
+  }
+  if (!colisao && (orientacao.cima || orientacao.baixo)) {
+    colisao = calcIntersecaoVertical(tile, ray, angle, orientacao.cima);
+    wallCollisionList.set(angle, { colisao, tile, orientacao });
+  }
+  if (!colisao) return false;
+  return true;
+}
+export function calcularIndexEAngulo(player,relativeAngle) {//calcula indice customizado para objetos fora do loop original
+  // 3. Calcular o índice no FOV
+  let fovStart = normalizarAngulo(player.angle - RAYCASTING_POV / 2);
+  let index = ((relativeAngle - fovStart + 360) % 360) / (RAYCASTING_POV / RAYCASTING_RES);
+  return index
+    //index: Math.floor(index)  // Arredondando para o índice mais próximo
+}

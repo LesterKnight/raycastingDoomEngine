@@ -6,7 +6,9 @@ import {
   rayCasting,
   calcDistanciaReal,
   calcDistanciaProjetada,
-  calcularAnguloAB
+  calcularAnguloAB,
+  calcColisaoPrecisa,
+  calcularIndexEAngulo
 } from "./calculos.js";
 import { renderColisao, renderRay2D, renderDot2D } from "./Render/render2d.js";
 import { renderRay3D, renderDot3D, desenharRetangulosParede3D } from "./Render/render3d.js";
@@ -31,49 +33,6 @@ import {
 } from "./config.js";
 import { Tile } from "./Classes/Tile.js";
 
-
-function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
-  player,
-  angle,
-  ray,
-  tile,
-  wallCollisionList
-) {
-
-  let colisao;
-  let orientacao = {
-    esquerda: false,
-    direita: false,
-    cima: false,
-    baixo: false,
-  };
-
-  if (player.pos.y < tile.pos.y) orientacao.cima = true;
-
-  if (player.pos.y > tile.pos.y + tile.altura)
-    orientacao.baixo = true;
-
-  if (player.pos.x < tile.pos.x) orientacao.esquerda = true;
-
-  if (player.pos.x > tile.pos.x + tile.largura)
-    orientacao.direita = true;
-
-  if (orientacao.esquerda || orientacao.direita) {
-    colisao = calcularIntersecaoLateral(
-      tile,
-      ray,
-      angle,
-      orientacao.esquerda
-    );
-    wallCollisionList.set(angle, { colisao, tile, orientacao });
-  }
-  if (!colisao && (orientacao.cima || orientacao.baixo)) {
-    colisao = calcIntersecaoVertical(tile, ray, angle, orientacao.cima);
-    wallCollisionList.set(angle, { colisao, tile, orientacao });
-  }
-  if (!colisao) return false;
-  return true;
-}
 function calcRaycastingLoopWall(player, gameMap) {//calcula o loop para cada angulo adjacente desde o ponto zero ate N e retorna PONTOS COLIDIDOS PLANO 2D
   let wallCollisionList = new Map();
   let angle = player.angle;
@@ -116,7 +75,6 @@ function calcRaycastingLoopWall(player, gameMap) {//calcula o loop para cada ang
 
   return wallCollisionList;
 }
-
 export function calcularRetaParede3D(player, colisao, angle, index) {//calcula reta projetada de acordo com o angulo do jogador
   let distanciaReal = calcDistanciaReal(player.pos, colisao);
   let distanciaProjetada = calcDistanciaProjetada(
@@ -134,7 +92,6 @@ export function calcularRetaParede3D(player, colisao, angle, index) {//calcula r
     inferior: { x: posX, y: posYinf },
   };
 }
-
 function calcularRetangulosParede3D(wallCollisionList, player) {//calcula os retangulos usando as retas geradas acima  //calcula as retas projetadas em 3D
 
   let index = 0
@@ -145,8 +102,8 @@ function calcularRetangulosParede3D(wallCollisionList, player) {//calcula os ret
 
     let collisionData = collisions
 
-    renderRay2D(player.pos, collisionData.colisao);
-    renderColisao(collisionData.colisao);
+    //renderRay2D(player.pos, collisionData.colisao);
+    //renderColisao(collisionData.colisao);
     let pos = calcularRetaParede3D(
       player,
       collisionData.colisao,
@@ -206,8 +163,8 @@ function calcularRetangulosParede3D(wallCollisionList, player) {//calcula os ret
 
   return wallRectangles
 }
-
 function calcularCustom3D(player, ponto){
+  let pos
   if(ponto.pos){
     renderDot2D( ponto.pos);
     //CALCULA ANGULO ABSOLUTO
@@ -220,32 +177,68 @@ function calcularCustom3D(player, ponto){
     let index = calcularIndexEAngulo(player,angle2)
 
 
-    let pos = calcularRetaParede3D(
+
+    pos = calcularRetaParede3D(
       player,
       ponto.pos,
       angle2,
       index
     );
+
     renderRay3D(pos.inferior,pos.superior,"blue")
-    
+
+    if(ponto.tile.pos.x == ponto.pos.x ){
+      let tile = ponto.tile
+      let posicao = ponto.pos
+      let lado = "esquerdo"
+      let anguloRelativo = angle2
+  
+
+      //2d
+      let a,b,c,d
+      
+      //superior DIREITO pois o retangulo vai ser desenhado para tras 
+      b = ponto.pos
+      a = new Posicao(ponto.pos.x- LARG_TILE ,ponto.pos.y)
+
+      function projetarPiso(player, colisao, alturaHorizonte) {
+        
+        let distanciaReal = calcDistanciaReal(player.pos, colisao);
+        let distanciaProjetada = calcDistanciaProjetada(
+          distanciaReal,
+          angle,
+          player.angle
+        );
+
+        let posX, posYtop, posYinf;
+        let comprimentoVertical = (ALT_TILE * DIST_FOCAL) / distanciaProjetada;
+        posX = (index / RAYCASTING_RES) * LARG_CANVAS;
+        posYtop = alturaHorizonte.y;
+        posYinf = ALT_CANVAS / 2 + comprimentoVertical;
+        
+         let superior= { x: posX, y: posYtop }
+         let inferior= { x: posX, y: posYinf }
+         return {superior,inferior}
+         
+      }
+      //renderRay3D(inferior,superior,"red")                          
+      let a_ = projetarPiso(player, a, pos.inferior)//pos inferior é o ponto base do raycasting
+      renderRay3D(a_.superior, a_.inferior)
+
+
+    }
+
+
+ 
+
   }
 }
-
-export function calcularIndexEAngulo(player,relativeAngle) {
-  // 3. Calcular o índice no FOV
-  let fovStart = normalizarAngulo(player.angle - RAYCASTING_POV / 2);
-  let index = ((relativeAngle - fovStart + 360) % 360) / (RAYCASTING_POV / RAYCASTING_RES);
-  return index
-    //index: Math.floor(index)  // Arredondando para o índice mais próximo
-}
-
 function checkTileCornerCollision(i) {
   if (parseInt(i) % LARG_TILE == 0)
     return true
   else return false
 }
 function calcularPontosIniciaisPiso2D(wallCollisionList, player) {//calcula retas para o piso 2D
-
 
   const tileRects = new Map();
   let vet = []
@@ -340,7 +333,6 @@ function calcularPontosIniciaisPiso2D(wallCollisionList, player) {//calcula reta
   }
   return vet
 }
-
 export function calculateRaycastingPOV(player, gameMap) {//calcula o loop de raios de raycasting 2D, calcula as retas projetadas em 3D, usa as retas para formar retangulos em 3D na tela
   let wallCollisionList = calcRaycastingLoopWall(player, gameMap);//{}
   let wallRectangles = calcularRetangulosParede3D(wallCollisionList, player)

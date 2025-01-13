@@ -6,7 +6,7 @@ import { Fisica } from "./Fisica.js";
 export class GameObject extends Fisica{ 
   constructor(x, y) {
     super()
-    this.posicao = new Posicao(x, y);
+    this.pos = new Posicao(x, y);
     this.angle = 0;
     this.speed = 5;
     this.turnSpeed = 3;
@@ -28,14 +28,14 @@ export class GameObject extends Fisica{
 
   moverFrente() {
     let stroke = rayCasting(
-      this.posicao.x,
-      this.posicao.y,
+      this.pos.x,
+      this.pos.y,
       this.angle,
       this.speed
     );
     if (this.movimentoValido(stroke)) {
-      this.posicao.x = stroke.x;
-      this.posicao.y = stroke.y;
+      this.pos.x = stroke.x;
+      this.pos.y = stroke.y;
     }
   }
   girarEsquerda() {
@@ -44,15 +44,15 @@ export class GameObject extends Fisica{
   }
   moverTras() {
     let stroke = rayCasting(
-      this.posicao.x,
-      this.posicao.y,
+      this.pos.x,
+      this.pos.y,
       this.angle + 180,
       this.speed
     );
 
     if (this.movimentoValido(stroke)) {
-      this.posicao.x = stroke.x;
-      this.posicao.y = stroke.y;
+      this.pos.x = stroke.x;
+      this.pos.y = stroke.y;
     }
   }
 

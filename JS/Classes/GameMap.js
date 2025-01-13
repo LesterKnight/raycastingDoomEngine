@@ -7,24 +7,13 @@ export class GameMap {
       (this.gameObjects = new Map());
     GameMap.gameMapCollection.set(mapName, this);
   }
-  checkTileCollision(posicao) {
+  checkTileCollision(pos) {
     for (let [tilePos, tile] of this.tiles) {
-      let xInicial = tilePos.x;
-      let xFinal = tilePos.x + tile.largura;
-      let yInicial = tilePos.y;
-      let yFinal = tilePos.y + tile.altura;
-      if (
-        posicao.x >= xInicial &&
-        posicao.x <= xFinal &&
-        posicao.y >= yInicial &&
-        posicao.y <= yFinal
-      ) {
+      if (tile.verificarColisaoInterna(pos))
         return tile;
-      }
     }
   }
-
   addTile(tile) {
-    this.tiles.set(tile.posicao, tile);
+    this.tiles.set(tile.pos, tile);
   }
 }

@@ -1,6 +1,5 @@
 import { COMP_SALA, LARG_SALA, DIST_TETO, DIST_PISO } from "./config.js";
 import { Player } from "./Classes/Player.js";
-import { Tile } from "./Classes/Tile.js";
 import { GameMap } from "./Classes/GameMap.js";
 import { calculateRaycastingPOV } from "./rayCasting.js";
 import { renderGame ,initMap} from "./functions.js";
@@ -12,12 +11,8 @@ const gameMap = new GameMap(
   DIST_PISO,
   "mapa_inicial"
 );
-const player = new Player(192, 86, 20);
-
+const player = new Player(220, 138, 269);
 initMap(gameMap)
-
-
-
 function f() {
   renderGame(player, gameMap);
   requestAnimationFrame(f);

@@ -6,8 +6,6 @@ import {
   rayCasting,
   calcDistanciaReal,
   calcDistanciaProjetada,
-  anguloRelativo,
-  calcularIndex,
   calcularAnguloAB
 } from "./calculos.js";
 import { renderColisao, renderRay2D, renderDot2D } from "./Render/render2d.js";
@@ -38,7 +36,7 @@ function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
   player,
   angle,
   ray,
-  tileColidido,
+  tile,
   wallCollisionList
 ) {
 
@@ -50,28 +48,28 @@ function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
     baixo: false,
   };
 
-  if (player.posicao.y < tileColidido.posicao.y) orientacao.cima = true;
+  if (player.pos.y < tile.pos.y) orientacao.cima = true;
 
-  if (player.posicao.y > tileColidido.posicao.y + tileColidido.altura)
+  if (player.pos.y > tile.pos.y + tile.altura)
     orientacao.baixo = true;
 
-  if (player.posicao.x < tileColidido.posicao.x) orientacao.esquerda = true;
+  if (player.pos.x < tile.pos.x) orientacao.esquerda = true;
 
-  if (player.posicao.x > tileColidido.posicao.x + tileColidido.largura)
+  if (player.pos.x > tile.pos.x + tile.largura)
     orientacao.direita = true;
 
   if (orientacao.esquerda || orientacao.direita) {
     colisao = calcularIntersecaoLateral(
-      tileColidido,
+      tile,
       ray,
       angle,
       orientacao.esquerda
     );
-    wallCollisionList.set(angle, { colisao, tileColidido, orientacao });
+    wallCollisionList.set(angle, { colisao, tile, orientacao });
   }
   if (!colisao && (orientacao.cima || orientacao.baixo)) {
-    colisao = calcIntersecaoVertical(tileColidido, ray, angle, orientacao.cima);
-    wallCollisionList.set(angle, { colisao, tileColidido, orientacao });
+    colisao = calcIntersecaoVertical(tile, ray, angle, orientacao.cima);
+    wallCollisionList.set(angle, { colisao, tile, orientacao });
   }
   if (!colisao) return false;
   return true;
@@ -90,19 +88,19 @@ function calcRaycastingLoopWall(player, gameMap) {//calcula o loop para cada ang
 
     while (rayCastingSize < MAX_RAYCASTING_SIZE) {
       ray = rayCasting(
-        player.posicao.x,
-        player.posicao.y,
+        player.pos.x,
+        player.pos.y,
         angle,
         rayCastingSize
       );
-      let tileColidido = gameMap.checkTileCollision(ray);
-      if (tileColidido) {
+      let tile = gameMap.checkTileCollision(ray);
+      if (tile) {
         if (
           calcColisaoPrecisa(//AQUI TA ERRADO
             player,
             angle,
             ray,
-            tileColidido,
+            tile,
             wallCollisionList
           )
         )
@@ -120,7 +118,7 @@ function calcRaycastingLoopWall(player, gameMap) {//calcula o loop para cada ang
 }
 
 export function calcularRetaParede3D(player, colisao, angle, index) {//calcula reta projetada de acordo com o angulo do jogador
-  let distanciaReal = calcDistanciaReal(player.posicao, colisao);
+  let distanciaReal = calcDistanciaReal(player.pos, colisao);
   let distanciaProjetada = calcDistanciaProjetada(
     distanciaReal,
     angle,
@@ -147,7 +145,7 @@ function calcularRetangulosParede3D(wallCollisionList, player) {//calcula os ret
 
     let collisionData = collisions
 
-    renderRay2D(player.posicao, collisionData.colisao);
+    renderRay2D(player.pos, collisionData.colisao);
     renderColisao(collisionData.colisao);
     let pos = calcularRetaParede3D(
       player,
@@ -156,97 +154,75 @@ function calcularRetangulosParede3D(wallCollisionList, player) {//calcula os ret
       index++
     );
 
-    //renderRay3D(pos.superior, pos.inferior, collisionData.tileColidido.cor);
-    const lastPosicao = replica.length > 0 && replica[replica.length - 1].posicao == collisionData.tileColidido.posicao
+    renderRay3D(pos.superior, pos.inferior, collisionData.tile.cor);
+    const lastPosicao = replica.length > 0 && replica[replica.length - 1].pos == collisionData.tile.pos
 
     //SE FOR A PRIMEIRA ITERAÇÃO DO OBJETO, INICIALIZA OS VETORES DE RETANGULOS
-    if (!wallRectangles.get(collisionData.tileColidido)) {
-      wallRectangles.set(collisionData.tileColidido, {
+    if (!wallRectangles.get(collisionData.tile)) {
+      wallRectangles.set(collisionData.tile, {
         esquerdo: [],
         direito: [],
         cima: [],
         baixo: [],
       });
     }
-    else if (wallRectangles.get(collisionData.tileColidido) &&
-      collisionData.tileColidido != lastElement &&
+    else if (wallRectangles.get(collisionData.tile) &&
+      collisionData.tile != lastElement &&
       !lastPosicao) {
 
-      //const tileCopy = Object.assign({}, collisionData.tileColidido);
-      const tileCopy = new Tile(0,0)
-      tileCopy.altura = collisionData.tileColidido.altura
-      tileCopy.largura = collisionData.tileColidido.altura
-      tileCopy.posicao = collisionData.tileColidido.altura
-      tileCopy.cor = collisionData.tileColidido.altura
+      //const tileCopy = Object.assign({}, collisionData.tile);
+      const tileCopy = new Tile(collisionData.tile.pos.x,collisionData.tile.pos.y)
+      tileCopy.altura = collisionData.tile.altura
+      tileCopy.largura = collisionData.tile.largura
+      tileCopy.pos = collisionData.tile.pos
+      tileCopy.cor = collisionData.tile.cor
 
       replica.push(tileCopy)
-      collisionData.tileColidido = tileCopy//
-      wallRectangles.set(collisionData.tileColidido, {
+      collisionData.tile = tileCopy//
+      wallRectangles.set(collisionData.tile, {
         esquerdo: [],
         direito: [],
         cima: [],
         baixo: [],
       });
     }
-    else if (wallRectangles.get(collisionData.tileColidido) && collisionData.tileColidido != lastElement) {
-      if (replica.length > 0 && replica[replica.length - 1].posicao == collisionData.tileColidido.posicao) {
-        collisionData.tileColidido = replica[replica.length - 1]
+    else if (wallRectangles.get(collisionData.tile) && collisionData.tile != lastElement) {
+      if (replica.length > 0 && replica[replica.length - 1].pos == collisionData.tile.pos) {
+        collisionData.tile = replica[replica.length - 1]
       }
     }
 
-    lastElement = collisions.tileColidido
+    lastElement = collisions.tile
 
-    if (collisionData.tileColidido.posicao.x == collisionData.colisao.x) {
-      wallRectangles.get(collisionData.tileColidido).esquerdo.push(pos);
-    }
-    if (
-      collisionData.tileColidido.posicao.x +
-      collisionData.tileColidido.largura ==
-      collisionData.colisao.x
-    ) {
-      wallRectangles.get(collisionData.tileColidido).direito.push(pos);
-    }
-    if (
-      collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
-      collisionData.tileColidido.posicao.x +
-      collisionData.tileColidido.largura >=
-      collisionData.colisao.x &&
-      collisionData.tileColidido.posicao.y +
-      collisionData.tileColidido.altura ==
-      collisionData.colisao.y
-    ) {
-      wallRectangles.get(collisionData.tileColidido).baixo.push(pos);
-    }
-    if (
-      collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
-      collisionData.tileColidido.posicao.x +
-      collisionData.tileColidido.largura >=
-      collisionData.colisao.x &&
-      collisionData.tileColidido.posicao.y == collisionData.colisao.y
-    ) {
-      wallRectangles.get(collisionData.tileColidido).cima.push(pos);
-    }
+    if (collisionData.tile.verificarColisaoEsquerda(collisionData.colisao))
+      wallRectangles.get(collisionData.tile).esquerdo.push(pos);
+    if (collisionData.tile.verificarColisaoDireita(collisionData.colisao))
+      wallRectangles.get(collisionData.tile).direito.push(pos);
+    if (collisionData.tile.verificarColisaoAbaixo(collisionData.colisao))
+      wallRectangles.get(collisionData.tile).baixo.push(pos);
+    if (collisionData.tile.verificarColisaoAcima(collisionData.colisao))
+      wallRectangles.get(collisionData.tile).cima.push(pos);
   }
 
   return wallRectangles
 }
 
 function calcularCustom3D(player, ponto){
-  if(ponto.posicao){
-    renderDot2D( ponto.posicao);
+  if(ponto.pos){
+    renderDot2D( ponto.pos);
     //CALCULA ANGULO ABSOLUTO
-    let angle = calcularAnguloAB(player,ponto.posicao)
+    let angle = calcularAnguloAB(player,ponto.pos)
   //CALCULA ANGULO RELATIVO
     let angle2 = normalizarAngulo(player.angle + angle)
     //let agle3 = anguloRelativo(angle,player.angle)?????????????????????????????
-    let r = rayCasting(player.posicao.x, player.posicao.y, angle2 , 50)
-    renderRay2D(player.posicao, r,"blue");
+    let r = rayCasting(player.pos.x, player.pos.y, angle2 , 50)
+    renderRay2D(player.pos, r,"blue");
     let index = calcularIndexEAngulo(player,angle2)
 
 
     let pos = calcularRetaParede3D(
       player,
-      ponto.posicao,
+      ponto.pos,
       angle2,
       index
     );
@@ -269,55 +245,30 @@ function checkTileCornerCollision(i) {
   else return false
 }
 function calcularPontosIniciaisPiso2D(wallCollisionList, player) {//calcula retas para o piso 2D
-console.log(wallCollisionList)
+
 
   const tileRects = new Map();
   let vet = []
   for (const [angle, collisionData] of wallCollisionList.entries()) {
-
     //SE FOR A PRIMEIRA ITERAÇÃO DO OBJETO, INICIALIZA OS VETORES DE RETANGULOS
-    if (!tileRects.get(collisionData.tileColidido)) {
-      tileRects.set(collisionData.tileColidido, {
+    if (!tileRects.get(collisionData.tile)) {
+      tileRects.set(collisionData.tile, {
         esquerdo: [],
         direito: [],
         cima: [],
         baixo: [],
       });
     }
-    try{
-      collisionData.tileColidido.verificarColisaoEsquerda()
-    }catch(ex){
-      console.log(collisionData.tileColidido)
-      debugger
-    }
-    
 
-    if (collisionData.tileColidido.posicao.x == collisionData.colisao.x)
-      tileRects.get(collisionData.tileColidido).esquerdo.push({ angle, collisionData });
-    if (
-      collisionData.tileColidido.posicao.x +
-      collisionData.tileColidido.largura ==
-      collisionData.colisao.x
-    )
-      tileRects.get(collisionData.tileColidido).direito.push({ angle, collisionData });
-    if (
-      collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
-      collisionData.tileColidido.posicao.x +
-      collisionData.tileColidido.largura >=
-      collisionData.colisao.x &&
-      collisionData.tileColidido.posicao.y +
-      collisionData.tileColidido.altura ==
-      collisionData.colisao.y
-    )
-      tileRects.get(collisionData.tileColidido).baixo.push({ angle, collisionData });
-    if (
-      collisionData.tileColidido.posicao.x <= collisionData.colisao.x &&
-      collisionData.tileColidido.posicao.x +
-      collisionData.tileColidido.largura >=
-      collisionData.colisao.x &&
-      collisionData.tileColidido.posicao.y == collisionData.colisao.y
-    )
-      tileRects.get(collisionData.tileColidido).cima.push({ angle, collisionData });
+    if (collisionData.tile.verificarColisaoEsquerda(collisionData.colisao))
+      tileRects.get(collisionData.tile).esquerdo.push({ angle, collisionData });
+    if (collisionData.tile.verificarColisaoDireita(collisionData.colisao))
+      tileRects.get(collisionData.tile).direito.push({ angle, collisionData });
+    if (collisionData.tile.verificarColisaoAbaixo(collisionData.colisao))
+      tileRects.get(collisionData.tile).baixo.push({ angle, collisionData });
+    if (collisionData.tile.verificarColisaoAcima(collisionData.colisao))
+      tileRects.get(collisionData.tile).cima.push({ angle, collisionData });
+
   }
   for (const [tile, rects] of tileRects.entries()) {
     if (rects.esquerdo.length > 0) {
@@ -325,10 +276,10 @@ console.log(wallCollisionList)
       let posFinal = rects.esquerdo[rects.esquerdo.length - 1].collisionData.colisao
       for (let i = posInicial.y; i < posFinal.y; i++) {
         if (checkTileCornerCollision(i)) {
-          let posicao = new Posicao(parseInt(posInicial.x), parseInt(i))
-          renderDot2D(posicao)
+          let pos = new Posicao(parseInt(posInicial.x), parseInt(i))
+          renderDot2D(pos)
           let data = {
-          posicao,
+          pos,
           tile,
           rects
         }
@@ -341,10 +292,10 @@ console.log(wallCollisionList)
       let posFinal = rects.direito[rects.direito.length - 1].collisionData.colisao
       for (let i = posFinal.y; i < posInicial.y; i++) {
         if (checkTileCornerCollision(i)) {
-          let posicao = new Posicao(parseInt(posInicial.x), parseInt(i))
-          renderDot2D(posicao)
+          let pos = new Posicao(parseInt(posInicial.x), parseInt(i))
+          renderDot2D(pos)
           let data = {
-          posicao,
+          pos,
           tile,
           rects
         }
@@ -358,10 +309,10 @@ console.log(wallCollisionList)
       let posFinal = rects.cima[rects.cima.length - 1].collisionData.colisao
       for (let i = posFinal.x; i < posInicial.x; i++) {
         if (checkTileCornerCollision(i)) {
-          let posicao = new Posicao(parseInt(i), parseInt(posInicial.y))
-          renderDot2D(posicao)
+          let pos = new Posicao(parseInt(i), parseInt(posInicial.y))
+          renderDot2D(pos)
           let data = {
-          posicao,
+          pos,
           tile,
           rects
         }
@@ -375,10 +326,10 @@ console.log(wallCollisionList)
       let posFinal = rects.baixo[rects.baixo.length - 1].collisionData.colisao
       for (let i = posInicial.x; i < posFinal.x; i++) {
         if (checkTileCornerCollision(i)) {
-          let posicao = new Posicao(parseInt(i), parseInt(posInicial.y))
-          renderDot2D(posicao)
+          let pos = new Posicao(parseInt(i), parseInt(posInicial.y))
+          renderDot2D(pos)
           let data = {
-          posicao,
+          pos,
           tile,
           rects
         }

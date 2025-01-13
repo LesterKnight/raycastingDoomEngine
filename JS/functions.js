@@ -5,8 +5,8 @@ import { Tile } from "./Classes/Tile.js";
 function renderInfo(player) {
   CTX_2D.font = "20px Arial";
   CTX_2D.fillStyle = "black";
-  const texto = `X:${Math.round(player.posicao.x)} Y:${Math.round(
-    player.posicao.y
+  const texto = `X:${Math.round(player.pos.x)} Y:${Math.round(
+    player.pos.y
   )} angle: ${player.angle}`;
   const x = 0; // Posição horizontal
   const y = 350; // Posição vertical

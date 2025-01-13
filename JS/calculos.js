@@ -13,18 +13,18 @@ export function calcularIntersecaoLateral(
   if (ladoEsquerdo)
     posicaoInterseccaoY =
       pontoColidido.y +
-      (tile.posicao.x - pontoColidido.x) * Math.tan(anguloRaioEmRadianos);
+      (tile.pos.x - pontoColidido.x) * Math.tan(anguloRaioEmRadianos);
   else
     posicaoInterseccaoY =
       pontoColidido.y +
-      (tile.posicao.x + tile.largura - pontoColidido.x) *
+      (tile.pos.x + tile.largura - pontoColidido.x) *
         Math.tan(anguloRaioEmRadianos);
 
   if (
-    posicaoInterseccaoY >= tile.posicao.y &&
-    posicaoInterseccaoY <= tile.posicao.y + tile.altura
+    posicaoInterseccaoY >= tile.pos.y &&
+    posicaoInterseccaoY <= tile.pos.y + tile.altura
   ) {
-    let x = ladoEsquerdo ? tile.posicao.x : tile.posicao.x + tile.largura;
+    let x = ladoEsquerdo ? tile.pos.x : tile.pos.x + tile.largura;
     return new Posicao(x, posicaoInterseccaoY);
   }
 }
@@ -36,18 +36,18 @@ export function calcIntersecaoVertical(tile, pontoColidido, angle, cima) {
   if (cima)
     posicaoInterseccaoX =
       pontoColidido.x +
-      (tile.posicao.y - pontoColidido.y) / Math.tan(anguloRaioEmRadianos);
+      (tile.pos.y - pontoColidido.y) / Math.tan(anguloRaioEmRadianos);
   else
     posicaoInterseccaoX =
       pontoColidido.x +
-      (tile.posicao.y + tile.altura - pontoColidido.y) /
+      (tile.pos.y + tile.altura - pontoColidido.y) /
         Math.tan(anguloRaioEmRadianos);
 
   if (
-    posicaoInterseccaoX >= tile.posicao.x &&
-    posicaoInterseccaoX <= tile.posicao.x + tile.largura
+    posicaoInterseccaoX >= tile.pos.x &&
+    posicaoInterseccaoX <= tile.pos.x + tile.largura
   ) {
-    let y = cima ? tile.posicao.y : tile.posicao.y + tile.altura;
+    let y = cima ? tile.pos.y : tile.pos.y + tile.altura;
     //renderColisao({x:posicaoInterseccaoX, y})
     return new Posicao(posicaoInterseccaoX, y);
   }
@@ -85,8 +85,8 @@ export function calcularIndex(player, colisao) {
   return index;
 }
 export function calcularAnguloAB(player, P) {
-  let deltaX = P.x - player.posicao.x;
-  let deltaY = P.y - player.posicao.y;
+  let deltaX = P.x - player.pos.x;
+  let deltaY = P.y - player.pos.y;
   let angleToPoint = Math.atan2(deltaY, deltaX);
   let angleToPointDegrees = (angleToPoint * 180) / Math.PI;
   let relativeAngle = normalizarAngulo(angleToPointDegrees - player.angle);

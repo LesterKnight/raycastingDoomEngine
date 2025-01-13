@@ -33,22 +33,19 @@ export function renderTiles(gameMap) {
     CTX_2D.fillRect(pos.x, pos.y, tile.largura, tile.altura);
   }
 }
-
 export function renderPlayer2D(player) {
   let radius = 15;
   CTX_2D.lineWidth = 3;
-
   CTX_2D.strokeStyle = "red";
   CTX_2D.beginPath();
-  CTX_2D.arc(player.posicao.x, player.posicao.y, radius, 0, 2 * Math.PI, false);
+  CTX_2D.arc(player.pos.x, player.pos.y, radius, 0, 2 * Math.PI, false);
   CTX_2D.stroke(); //fill
   CTX_2D.closePath();
-
   CTX_2D.fillStyle = "blue";
   CTX_2D.beginPath();
   CTX_2D.arc(
-    player.posicao.x,
-    player.posicao.y,
+    player.pos.x,
+    player.pos.y,
     radius / 2,
     0,
     2 * Math.PI,
@@ -58,19 +55,17 @@ export function renderPlayer2D(player) {
   CTX_2D.closePath();
 
   let stroke = rayCasting(
-    player.posicao.x,
-    player.posicao.y,
+    player.pos.x,
+    player.pos.y,
     player.angle,
     radius * 2
   );
-
   CTX_2D.strokeStyle = "rgb(0, 255, 0)";
   CTX_2D.beginPath();
-  CTX_2D.moveTo(player.posicao.x, player.posicao.y);
+  CTX_2D.moveTo(player.pos.x, player.pos.y);
   CTX_2D.lineTo(stroke.x, stroke.y);
   CTX_2D.stroke();
   CTX_2D.closePath();
-
   CTX_2D.lineWidth = 1;
 }
 

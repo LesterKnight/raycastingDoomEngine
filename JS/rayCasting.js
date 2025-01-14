@@ -102,8 +102,8 @@ function calcularRetangulosParede3D(wallCollisionList, player) {//calcula os ret
 
     let collisionData = collisions
 
-    //renderRay2D(player.pos, collisionData.colisao);
-    //renderColisao(collisionData.colisao);
+    renderRay2D(player.pos, collisionData.colisao);
+    renderColisao(collisionData.colisao, "blue");
     let pos = calcularRetaParede3D(
       player,
       collisionData.colisao,
@@ -163,76 +163,26 @@ function calcularRetangulosParede3D(wallCollisionList, player) {//calcula os ret
 
   return wallRectangles
 }
-function calcularCustom3D(player, ponto){
-  let pos
-  if(ponto.pos){
+
+
+function calcularReta3DPiso(player, ponto){
+  //----------------------------------------------------------------------
     renderDot2D( ponto.pos);
-    //CALCULA ANGULO ABSOLUTO
     let angle = calcularAnguloAB(player,ponto.pos)
-  //CALCULA ANGULO RELATIVO
     let angle2 = normalizarAngulo(player.angle + angle)
-    //let agle3 = anguloRelativo(angle,player.angle)?????????????????????????????
-    let r = rayCasting(player.pos.x, player.pos.y, angle2 , 50)
-    renderRay2D(player.pos, r,"blue");
+    //let r = rayCasting(player.pos.x, player.pos.y, angle2 , 50)
+    //renderRay2D(player.pos, r,"blue");//RENDER A PAREDE
     let index = calcularIndexEAngulo(player,angle2)
-
-
-
-    pos = calcularRetaParede3D(
+    let pos = calcularRetaParede3D(
       player,
       ponto.pos,
       angle2,
       index
     );
-
-    renderRay3D(pos.inferior,pos.superior,"blue")
-
-    if(ponto.tile.pos.x == ponto.pos.x ){
-      let tile = ponto.tile
-      let posicao = ponto.pos
-      let lado = "esquerdo"
-      let anguloRelativo = angle2
-  
-
-      //2d
-      let a,b,c,d
-      
-      //superior DIREITO pois o retangulo vai ser desenhado para tras 
-      b = ponto.pos
-      a = new Posicao(ponto.pos.x- LARG_TILE ,ponto.pos.y)
-
-      function projetarPiso(player, colisao, alturaHorizonte) {
-        
-        let distanciaReal = calcDistanciaReal(player.pos, colisao);
-        let distanciaProjetada = calcDistanciaProjetada(
-          distanciaReal,
-          angle,
-          player.angle
-        );
-
-        let posX, posYtop, posYinf;
-        let comprimentoVertical = (ALT_TILE * DIST_FOCAL) / distanciaProjetada;
-        posX = (index / RAYCASTING_RES) * LARG_CANVAS;
-        posYtop = alturaHorizonte.y;
-        posYinf = ALT_CANVAS / 2 + comprimentoVertical;
-        
-         let superior= { x: posX, y: posYtop }
-         let inferior= { x: posX, y: posYinf }
-         return {superior,inferior}
-         
-      }
-      //renderRay3D(inferior,superior,"red")                          
-      let a_ = projetarPiso(player, a, pos.inferior)//pos inferior é o ponto base do raycasting
-      renderRay3D(a_.superior, a_.inferior)
-
-
-    }
-
-
- 
-
-  }
+    renderDot3D(pos.inferior,"blue")
+    return pos.inferior
 }
+
 function checkTileCornerCollision(i) {
   if (parseInt(i) % LARG_TILE == 0)
     return true
@@ -333,16 +283,42 @@ function calcularPontosIniciaisPiso2D(wallCollisionList, player) {//calcula reta
   }
   return vet
 }
+
+
+
+
 export function calculateRaycastingPOV(player, gameMap) {//calcula o loop de raios de raycasting 2D, calcula as retas projetadas em 3D, usa as retas para formar retangulos em 3D na tela
   let wallCollisionList = calcRaycastingLoopWall(player, gameMap);//{}
   let wallRectangles = calcularRetangulosParede3D(wallCollisionList, player)
   desenharRetangulosParede3D(wallRectangles)//REMOVER
   let pontos = calcularPontosIniciaisPiso2D(wallCollisionList, player)//FINALIZAR E SIMPLIFICAR
+
   if(pontos.length>0){
     pontos.forEach(ponto => {
-      calcularCustom3D(player,ponto)
-  });
-  }
+     let tile = ponto.tile
+     if(tile.verificarColisaoEsquerda(ponto.pos)){
+       let distancia = parseInt((tile.pos.x - player.pos.x)/LARG_TILE)
+       
+       for(let i=0;i<distancia;i++){
+        ponto.pos.x-=i*LARG_TILE
+        let a0 = calcularReta3DPiso(player,ponto)
+       }
+
+
+     }
+       
+     
+        
+      
+
+       
+  
+ 
+ 
+ 
+   });
+   }
+
 }
 
 export default { rayCasting, calculateRaycastingPOV };

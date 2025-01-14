@@ -48,7 +48,6 @@ export function calcIntersecaoVertical(tile, pontoColidido, angle, cima) {
     posicaoInterseccaoX <= tile.pos.x + tile.largura
   ) {
     let y = cima ? tile.pos.y : tile.pos.y + tile.altura;
-    //renderColisao({x:posicaoInterseccaoX, y})
     return new Posicao(posicaoInterseccaoX, y);
   }
 }

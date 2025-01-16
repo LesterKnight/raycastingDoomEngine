@@ -26,12 +26,21 @@ export function renderMap2D() {
     CTX_2D.closePath();
   }
 }
-
 export function renderTiles(gameMap) {
   for (let [pos, tile] of gameMap.tiles) {
     CTX_2D.fillStyle = tile.cor;
     CTX_2D.fillRect(pos.x, pos.y, tile.largura, tile.altura);
   }
+}
+export function renderGround(groundCollisionList) {
+  for (let [pos, tile] of groundCollisionList) {
+    CTX_2D.fillStyle = "rgba(0,0,0,1)";
+    CTX_2D.fillRect(pos.x, pos.y, tile.largura, tile.altura);
+  }
+}
+export function renderTileGround(pos,tile) {
+    CTX_2D.fillStyle = "rgba(0,0,0,1)";
+    CTX_2D.fillRect(pos.x, pos.y, tile.largura, tile.altura);
 }
 export function renderPlayer2D(player) {
   let radius = 15;
@@ -68,7 +77,6 @@ export function renderPlayer2D(player) {
   CTX_2D.closePath();
   CTX_2D.lineWidth = 1;
 }
-
 export function renderColisao(colisao, color = "rgba(218, 28, 7, 2)") {
   CTX_2D.fillStyle = color;
   CTX_2D.beginPath();
@@ -76,8 +84,7 @@ export function renderColisao(colisao, color = "rgba(218, 28, 7, 2)") {
   CTX_2D.fill();
   CTX_2D.closePath();
 }
-
-export function renderRay2D(a, b, color = "rgba(255, 123, 0, 1)") {
+export function renderRay2D(a, b, color = "rgba(255, 123, 0, 0.3)") {
   CTX_2D.strokeStyle = color;
   CTX_2D.beginPath();
   CTX_2D.moveTo(a.x, a.y);
@@ -85,9 +92,8 @@ export function renderRay2D(a, b, color = "rgba(255, 123, 0, 1)") {
   CTX_2D.stroke();
   CTX_2D.closePath();
 }
-
-export function renderDot2D(a) {
-  CTX_2D.fillStyle = "red";
+export function renderDot2D(a,color="red") {
+  CTX_2D.fillStyle = color;
   CTX_2D.beginPath();
   CTX_2D.arc(
     a.x,
@@ -100,7 +106,6 @@ export function renderDot2D(a) {
   CTX_2D.fill();
   CTX_2D.closePath();
 }
-
 export default {
   renderMap2D,
   renderTiles,

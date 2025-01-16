@@ -2,7 +2,7 @@ import { COMP_SALA, LARG_SALA, DIST_TETO, DIST_PISO } from "./config.js";
 import { Player } from "./Classes/Player.js";
 import { GameMap } from "./Classes/GameMap.js";
 import { calculateRaycastingPOV } from "./rayCasting.js";
-import { renderGame ,initMap} from "./functions.js";
+import { renderGame, initMap } from "./functions.js";
 
 const gameMap = new GameMap(
   LARG_SALA,
@@ -11,12 +11,34 @@ const gameMap = new GameMap(
   DIST_PISO,
   "mapa_inicial"
 );
-const player = new Player(211, 270, 0);
-initMap(gameMap)
-function f() {
+const player = new Player(207, 202, 12);
+initMap(gameMap);
+
+let frameCount = 0;
+let lastTime = 0;
+let fps = 0;
+
+function gameLoop(currentTime) {
+  if (lastTime) {
+    const deltaTime = currentTime - lastTime;
+
+    // Atualiza o contador de frames
+    frameCount++;
+
+    // Atualiza o FPS a cada segundo (1000 ms)
+    if (deltaTime >= 1000) {
+      fps = frameCount;
+      frameCount = 0;  // Reseta o contador de frames
+      lastTime = currentTime;  // Atualiza o tempo da última animação
+    }
+  } else {
+    lastTime = currentTime;
+  }
+  document.title = `FPS: ${fps}`;
   renderGame(player, gameMap);
-  requestAnimationFrame(f);
+  requestAnimationFrame(gameLoop);
 }
+
 document.addEventListener("keydown", (event) => {
   const key = event.key;
 
@@ -45,4 +67,4 @@ document.addEventListener("keydown", (event) => {
   }
 });
 
-f();
+requestAnimationFrame(gameLoop);

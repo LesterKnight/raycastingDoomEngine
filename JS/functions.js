@@ -1,6 +1,6 @@
 import { CANVAS2D, CTX_2D, CTX_3D } from "./config.js";
 import { calculateRaycastingPOV } from "./rayCasting.js";
-import { renderMap2D, renderTiles, renderPlayer2D } from "./Render/render2d.js";
+import { renderMap2D, renderTiles, renderGround, renderPlayer2D } from "./Render/render2d.js";
 import { Tile } from "./Classes/Tile.js";
 function renderInfo(player) {
   CTX_2D.font = "20px Arial";
@@ -22,6 +22,11 @@ export function initMap(gameMap) {
   gameMap.addTile(new Tile(288, 32, 1, 8));
   gameMap.addTile(new Tile(64, 96, 4, 2));
   gameMap.addTile(new Tile(256, 96, 2, 2));
+  for (let i = 0; i < 320; i += 32) {
+    for (let j = 0; j < 320; j += 32) {
+      gameMap.addGround(new Tile(i, j))
+    }
+  }
 }
 
 function clearScreen() {
@@ -35,6 +40,7 @@ export function renderGame(player, gameMap) {
   renderInfo(player);
   renderMap2D();
   renderTiles(gameMap);
+  //renderGround(gameMap)
 
   calculateRaycastingPOV(player, gameMap);
   renderPlayer2D(player);

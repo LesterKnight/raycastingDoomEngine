@@ -69,7 +69,7 @@ export function rayCasting(x0, y0, angulo, raio) {
   const anguloEmRadianos = angulo * (Math.PI / 180);
   const x = x0 + raio * Math.cos(anguloEmRadianos);
   const y = y0 + raio * Math.sin(anguloEmRadianos);
-  return { x, y };
+  return new Posicao(x,y);
 }
 //criar a logica que ira disparar N raios, adiciona-los a coleçao e renderiza-los no fim
 export function normalizarAngulo(angulo) {
@@ -135,6 +135,51 @@ export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
   if (!colisao) return false;
   return true;
 }
+export function calcularIndexEAngulo(player, relativeAngle) {
+  // Normaliza o ângulo relativo para o intervalo [0, 360)
+  relativeAngle = normalizarAngulo(relativeAngle);
+
+  // Calcula o início e o fim do FOV principal
+  let fovStart = normalizarAngulo(player.angle - RAYCASTING_POV / 2);
+  let fovEnd = normalizarAngulo(fovStart + RAYCASTING_POV);
+  
+  let index;
+//QUANDO FINAL DO POV NAO ESTIVER NOS ANGULOS INICIAIS
+  if (fovStart < fovEnd) {
+    if (relativeAngle >= fovStart && relativeAngle <= fovEnd) {
+      index = ((relativeAngle - fovStart) / (RAYCASTING_POV / RAYCASTING_RES));
+    } else {
+      // Ajuste para valores fora do FOV
+      index = (relativeAngle < fovStart) 
+        ? (relativeAngle - fovStart) / (RAYCASTING_POV / RAYCASTING_RES)
+        : (relativeAngle - fovEnd) / (RAYCASTING_POV / RAYCASTING_RES) + RAYCASTING_RES;
+    }
+  }
+  //QUANDO FINAL DO POV ESTIVER NOS ANGULOS INICIAIS
+  else {
+    if (relativeAngle >= fovStart || relativeAngle <= fovEnd) {
+      if (relativeAngle >= fovStart) {
+        index = ((relativeAngle - fovStart) / (RAYCASTING_POV / RAYCASTING_RES));
+      } else {
+        index = ((relativeAngle + 360 - fovStart) / (RAYCASTING_POV / RAYCASTING_RES));
+      }
+    }
+    
+    else {
+      
+      index = (relativeAngle < fovStart) 
+        ? (relativeAngle - fovStart) / (RAYCASTING_POV / RAYCASTING_RES)
+        : (relativeAngle - fovEnd) / (RAYCASTING_POV / RAYCASTING_RES) + RAYCASTING_RES;
+    }
+
+
+  }
+  
+  // Retorna o índice, permitindo valores negativos para extrapolar o canvas 
+  return Math.floor(index);
+}
+
+/*
 export function calcularIndexEAngulo(player,relativeAngle) {//calcula indice customizado para objetos fora do loop original
   // 3. Calcular o índice no FOV
   let fovStart = normalizarAngulo(player.angle - RAYCASTING_POV / 2);
@@ -142,3 +187,4 @@ export function calcularIndexEAngulo(player,relativeAngle) {//calcula indice cus
   return index
     //index: Math.floor(index)  // Arredondando para o índice mais próximo
 }
+*/

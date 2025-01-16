@@ -36,6 +36,10 @@ import { Tile } from "./Classes/Tile.js";
 function calcRaycastingLoop(player, gameMap) {//calcula o loop para cada angulo adjacente desde o ponto zero ate N e retorna PONTOS COLIDIDOS PLANO 2D
   let wallCollisionList = new Map();
   let groundCollisionList = new Map()
+
+  let groundCollisionListTemp = new Map()
+
+
   let angle = player.angle;
   let ray;
 
@@ -57,6 +61,16 @@ function calcRaycastingLoop(player, gameMap) {//calcula o loop para cada angulo 
       let tile = gameMap.checkTileCollision(ray);
 
       if(parseInt(ray.x) % 32 ==0 && parseInt(ray.y)%32==0 ){
+        groundCollisionListTemp.set(`${parseInt(ray.x)},${parseInt(ray.y)}`,ray)
+
+        /*
+        let ground = gameMap.checkGroundCollision(ray)
+        if(ground){
+          renderTileGround(ground.pos,ground)
+        }
+          
+          //renderDot2D(ray, "green")
+
         /*
         let ground = gameMap.checkGroundCollision(ray)
         if (ground && !groundCollisionList.has(ground.pos) && !tile) {
@@ -69,7 +83,7 @@ function calcRaycastingLoop(player, gameMap) {//calcula o loop para cada angulo 
             renderTileGround(pos,tile)
         }
 */
-renderDot2D(ray, "green")
+
 
       }
 
@@ -92,15 +106,30 @@ renderDot2D(ray, "green")
       break;
     }
   }
-  /*
-  for (const [pos, tile] of groundCollisionList.entries()) {
-    if (!tile.allFlags()) {
-      tile.resetAllFlags()
-      groundCollisionList.delete(tile.pos)
+  
+
+
+  for (const [pos, ray] of groundCollisionListTemp.entries()) {
+    for (const [pos, tile] of gameMap.ground.entries()){
+      tile.atualizarFlagColisao(ray)
     }
   }
-  */
-  return wallCollisionList;
+
+  for (const [pos, tile] of gameMap.ground.entries()){
+    if(tile.allFlags()){
+      renderTileGround(tile.pos,tile,"black")
+      groundCollisionList.set(tile.pos,tile)
+    }
+      
+    else if(tile.someFlags())
+      renderTileGround(tile.pos,tile,"rgba(0,255,0,0.1")
+    tile.resetAllFlags()
+  }
+
+
+
+  
+  return [wallCollisionList,groundCollisionList];
 }
 
 export function calcularRetaParede3D(player, colisao, angle, index) {//calcula reta projetada de acordo com o angulo do jogador
@@ -207,7 +236,8 @@ function calcularReta3DPiso(player, ponto) {
   );
   //let r = rayCasting(player.pos.x, player.pos.y, angle2 , 50)
   //renderRay2D(player.pos, r,"blue");//RENDER A PAREDE
-  renderDot3D(pos.inferior, "blue")
+  
+  //renderDot3D(pos.inferior, "blue")
   return pos.inferior
 }
 
@@ -333,15 +363,18 @@ function renderTile(player, tile) {
   p2 = calcularReta3DPiso(player, p2)
   p3 = calcularReta3DPiso(player, p3)
   // criar um raycasting do primeiro e do ultimo raio que disparem ate o objeto, caso algum dos lados do objeto esteja fora do raycasting, sera ajustado
-  renderRay3D(p0, p3)
-  renderRay3D(p1, p2)
+  renderRay3D(p0, p1)
+  renderRay3D(p0, p2)
+  renderRay3D(p2, p3)
+  renderRay3D(p3, p1)
+
 }
 
 export function calculateRaycastingPOV(player, gameMap) {//calcula o loop de raios de raycasting 2D, calcula as retas projetadas em 3D, usa as retas para formar retangulos em 3D na tela
-  let wallCollisionList = calcRaycastingLoop(player, gameMap);//{}
+  let [wallCollisionList, groundCollisionList] = calcRaycastingLoop(player, gameMap);//{}
   let wallRectangles = calcularRetangulosParede3D(wallCollisionList, player)
   desenharRetangulosParede3D(wallRectangles)//REMOVER
-
+/*
   let pontos = calcularPontosIniciaisPiso2D(wallCollisionList, player)//FINALIZAR E SIMPLIFICAR
   pontos.esquerdo.forEach(ponto => {
     let tile = ponto.tile
@@ -351,12 +384,13 @@ export function calculateRaycastingPOV(player, gameMap) {//calcula o loop de rai
       let a1 = calcularReta3DPiso(player, ponto)
     }
   });
-
+*/
   //let t = new Tile(224,224,1,1)
-  //renderTile(player,t)
+  
 
-
-
+  for (const [pos, tile] of groundCollisionList.entries()){
+      renderTile(player,tile)  
+  }
 
 
 

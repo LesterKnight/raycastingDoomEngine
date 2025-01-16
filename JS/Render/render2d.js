@@ -38,8 +38,8 @@ export function renderGround(groundCollisionList) {
     CTX_2D.fillRect(pos.x, pos.y, tile.largura, tile.altura);
   }
 }
-export function renderTileGround(pos,tile) {
-    CTX_2D.fillStyle = "rgba(0,0,0,1)";
+export function renderTileGround(pos,tile,color="black") {
+    CTX_2D.fillStyle = color
     CTX_2D.fillRect(pos.x, pos.y, tile.largura, tile.altura);
 }
 export function renderPlayer2D(player) {

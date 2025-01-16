@@ -52,6 +52,9 @@ export class Fisica {
     allFlags(){
         return this.collisionFlags.p0 && this.collisionFlags.p1 && this.collisionFlags.p2 && this.collisionFlags.p3
     }
+   someFlags(){
+        return this.collisionFlags.p0 || this.collisionFlags.p1 || this.collisionFlags.p2 || this.collisionFlags.p3
+    }
     resetAllFlags(){
         this.collisionFlags.p0 = false
         this.collisionFlags.p1 = false

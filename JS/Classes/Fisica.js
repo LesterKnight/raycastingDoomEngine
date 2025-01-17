@@ -41,13 +41,13 @@ export class Fisica {
     }
     atualizarFlagColisao(ray) {
         if (this.pos.x == parseInt(ray.x) && this.pos.y == parseInt(ray.y))
-            this.collisionFlags.p0 = true
+            this.collisionFlags.p0 = ray
         else if (this.pos1.x == parseInt(ray.x) && this.pos1.y == parseInt(ray.y))
-            this.collisionFlags.p1 = true
+            this.collisionFlags.p1 = ray
         else if (this.pos2.x == parseInt(ray.x) && this.pos2.y == parseInt(ray.y))
-            this.collisionFlags.p2 = true
+            this.collisionFlags.p2 = ray
         else if (this.pos3.x == parseInt(ray.x) && this.pos3.y == parseInt(ray.y))
-            this.collisionFlags.p3 = true
+            this.collisionFlags.p3 = ray
     }
     allFlags(){
         return this.collisionFlags.p0 && this.collisionFlags.p1 && this.collisionFlags.p2 && this.collisionFlags.p3

@@ -70,6 +70,8 @@ export function desenharRetangulosParede3D(wallRectangles){
      }
    });
  }
- }
+}
 
-export default { renderRay3D,renderDot3D ,desenharRetangulosParede3D};
+export function screenBlanking3D() {
+  CTX_3D.clearRect(0, 0, CANVAS2D.width, CANVAS2D.height);
+}

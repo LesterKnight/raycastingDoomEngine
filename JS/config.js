@@ -15,26 +15,15 @@ export const CANVAS2D = document.getElementById("2d-view");
 export const CTX_2D = CANVAS2D.getContext("2d");
 export const CANVAS3D = document.getElementById("3d-view");
 export const CTX_3D = CANVAS3D.getContext("2d");
+
 export const ALT_CANVAS = CANVAS3D.height;
 export const LARG_CANVAS = CANVAS3D.width;
 export const DIST_FOCAL = LARG_CANVAS / 2;
 
-export default {
-  ALT_TILE,
-  LARG_TILE,
-  COMP_SALA,
-  LARG_SALA,
-  DIST_TETO,
-  DIST_PISO,
-  CANVAS2D,
-  CTX_2D,
-  CANVAS3D,
-  CTX_3D,
-  ALT_CANVAS,
-  LARG_CANVAS,
-  DIST_FOCAL,
-  RAYCASTING_RES,
-  RAYCASTING_POV,
-  RAYCASTING_STEP_SIZE,
-  MAX_RAYCASTING_SIZE,
-}
+export const DEBUG_GROUND_POS_2D = false
+export const DEBUG_GROUND_POS_3D = false
+
+export const DEBUG_RAYCASTING_POS_2D = false
+export const DEBUG_RAYCASTING_POS_3D = false
+
+

@@ -91,8 +91,6 @@ export function calcularAnguloAB(player, P) {
   let relativeAngle = normalizarAngulo(angleToPointDegrees - player.angle);
   return relativeAngle;
 }
-
-
 export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
   player,
   angle,
@@ -171,20 +169,8 @@ export function calcularIndexEAngulo(player, relativeAngle) {
         ? (relativeAngle - fovStart) / (RAYCASTING_POV / RAYCASTING_RES)
         : (relativeAngle - fovEnd) / (RAYCASTING_POV / RAYCASTING_RES) + RAYCASTING_RES;
     }
-
-
   }
   
   // Retorna o índice, permitindo valores negativos para extrapolar o canvas 
   return Math.floor(index);
 }
-
-/*
-export function calcularIndexEAngulo(player,relativeAngle) {//calcula indice customizado para objetos fora do loop original
-  // 3. Calcular o índice no FOV
-  let fovStart = normalizarAngulo(player.angle - RAYCASTING_POV / 2);
-  let index = ((relativeAngle - fovStart + 360) % 360) / (RAYCASTING_POV / RAYCASTING_RES);
-  return index
-    //index: Math.floor(index)  // Arredondando para o índice mais próximo
-}
-*/

@@ -1,3 +1,5 @@
+import { ALT_TILE, LARG_TILE } from "../config.js";
+
 export class GameMap {
   static gameMapCollection = new Map();
   constructor(largura, comprimento, distanciaTeto, distanciaPiso, mapName) {
@@ -20,6 +22,19 @@ export class GameMap {
         return tile;
     }
   }
+  existingTilePosCheck(pos) {
+    for (let [tilePos, tile] of this.tiles) {
+        for (let i = tilePos.y; i < tilePos.y + tile.altura; i += ALT_TILE) {
+            for (let j = tilePos.x; j < tilePos.x + tile.largura; j += LARG_TILE) {
+                if (pos.x == j && pos.y == i) {
+                    return true;
+                }
+            }
+        }
+    }
+    return false; // Adicionei um retorno falso caso a posição não seja encontrada
+}
+
   addTile(tile) {
     this.tiles.set(tile.pos, tile);
   }

@@ -4,6 +4,7 @@ import {
   ALT_TILE,
   LARG_TILE,
   CTX_2D,
+  CANVAS2D
 } from "../config.js";
 import { rayCasting } from "../calculos.js";
 
@@ -106,11 +107,6 @@ export function renderDot2D(a,color="red") {
   CTX_2D.fill();
   CTX_2D.closePath();
 }
-export default {
-  renderMap2D,
-  renderTiles,
-  renderPlayer2D,
-  renderColisao,
-  renderRay2D,
-  renderDot2D
-};
+export function screenBlanking2D() {
+  CTX_2D.clearRect(0, 0, CANVAS2D.width, CANVAS2D.height);
+}

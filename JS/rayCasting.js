@@ -59,9 +59,6 @@ function calcRaycastingLoop(player, gameMap) {//calcula o loop para cada angulo 
         rayCastingSize
       );
 
-      if(DEBUG_RAYCASTING_POS_2D)
-        renderRay2D(player.pos,ray, "rgba(0,0,0,0.01)")
-
       let tile = gameMap.checkTileCollision(ray);
 
       if (parseInt(ray.x) % 32 == 0 && parseInt(ray.y) % 32 == 0) {
@@ -99,13 +96,13 @@ function calcRaycastingLoop(player, gameMap) {//calcula o loop para cada angulo 
   //WIP
   for (const [pos, tile] of gameMap.ground.entries()) {
     if (tile.allFlags()) {
-      renderTileGround(tile.pos, tile, "black")
+      renderTileGround(tile.pos, tile, true)
       renderTile(player, tile)
       tile.resetAllFlags()
       //groundCollisionList.set(tile.pos,tile)
     }
     else if (tile.someFlags()) {
-      renderTileGround(tile.pos, tile, "rgba(0,255,0,0.3")
+      renderTileGround(tile.pos, tile,false, "rgba(0,255,0,0.3")
       tile.resetAllFlags()
     }
   }

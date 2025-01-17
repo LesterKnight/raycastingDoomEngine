@@ -2,27 +2,32 @@ import { ALT_TILE, LARG_TILE, COMP_SALA, LARG_SALA } from "../config.js";
 import { rayCasting, normalizarAngulo } from "../calculos.js";
 import { Posicao } from "./Posicao.js";
 import { Fisica } from "./Fisica.js";
+import { GameMap } from "./GameMap.js";
 
 export class GameObject extends Fisica{ 
   constructor(x, y) {
     super()
     this.pos = new Posicao(x, y);
     this.angle = 0;
-    this.speed = 5;
-    this.turnSpeed = 3;
+    this.speed = 2;
     this.altura = 1;
+    this.gameMap = null
   }
+ setGameMap(gameMap){
+  this.gameMap = gameMap
+ }
   movimentoValido(stroke) {
     return (
       stroke.x > 0 &&
       stroke.x < LARG_TILE * LARG_SALA &&
       stroke.y > 0 &&
-      stroke.y < ALT_TILE * COMP_SALA
+      stroke.y < ALT_TILE * COMP_SALA &&
+      !this.gameMap.checkTileCollision(stroke)
     );
   }
 
   girarDireita() {
-    let newAngle = normalizarAngulo(this.angle + this.turnSpeed);
+    let newAngle = normalizarAngulo(this.angle + this.speed);
     this.angle = newAngle;
   }
 
@@ -39,7 +44,7 @@ export class GameObject extends Fisica{
     }
   }
   girarEsquerda() {
-    let newAngle = normalizarAngulo(this.angle - this.turnSpeed);
+    let newAngle = normalizarAngulo(this.angle - this.speed);
     this.angle = newAngle;
   }
   moverTras() {
@@ -55,6 +60,16 @@ export class GameObject extends Fisica{
       this.pos.y = stroke.y;
     }
   }
-
- 
+  update(){
+    if(this.mov.frente){
+      this.moverFrente()
+    }else if(this.mov.tras){
+      this.moverTras()
+    }
+    if(this.mov.esquerda){
+      this.girarEsquerda()
+    }else if(this.mov.direita){
+      this.girarDireita()
+    }
+  }
 }

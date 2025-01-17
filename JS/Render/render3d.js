@@ -26,7 +26,7 @@ export function renderRay3D(a, b, color = "rgb(255, 123, 0)") {
   CTX_3D.stroke();
   CTX_3D.closePath();
 }
-export function renderDot3D(a,color = "red") {
+export function renderDot3D(a, color = "red") {
   CTX_3D.fillStyle = color;
   CTX_3D.beginPath();
   CTX_3D.arc(
@@ -41,35 +41,32 @@ export function renderDot3D(a,color = "red") {
   CTX_3D.closePath();
 }
 
-export function desenharRetangulosParede3D(wallRectangles){
-  
+export function desenharRetangulosParede3D(wallRectangles) {
+
   //renderiza os trapezios, SEPARAR NO FUTURO
-  
+
   for (const [tile, trapezios] of wallRectangles.entries()) {
 
-   Object.keys(trapezios).forEach((lado) => {
-    
-     const trapezio = trapezios[lado];
-     let size = trapezio.length;
-
-     if (size > 0) {
-      //COLUNAS HORIZONTAIS
-       renderRay3D(trapezio[0].superior, trapezio[size - 1].superior);
-       renderRay3D(trapezio[0].inferior, trapezio[size - 1].inferior);
-       
-      //COLUNAS VERTICAIS
-       renderRay3D(trapezio[0].superior, trapezio[0].inferior);
-       renderRay3D(trapezio[size - 1].superior, trapezio[size - 1].inferior);
-
-
-       //CRIA UM X NAS CAIXAS
-       if (tile.altura == ALT_TILE && tile.largura == LARG_TILE) {
-         renderRay3D(trapezio[0].superior, trapezio[size - 1].inferior);
-         renderRay3D(trapezio[0].inferior, trapezio[size - 1].superior);
-       }
-     }
-   });
- }
+    Object.keys(trapezios).forEach((lado) => {
+      const trapezio = trapezios[lado];
+      let size = trapezio.length;
+      if (size > 0) {
+        //COLUNAS HORIZONTAIS
+        renderRay3D(trapezio[0].superior, trapezio[size - 1].superior);
+        renderRay3D(trapezio[0].inferior, trapezio[size - 1].inferior);
+        //COLUNAS VERTICAIS
+        renderRay3D(trapezio[0].superior, trapezio[0].inferior);
+        renderRay3D(trapezio[size - 1].superior, trapezio[size - 1].inferior);
+        /*
+               //CRIA UM X NAS CAIXAS
+               if (tile.altura == ALT_TILE && tile.largura == LARG_TILE) {
+                 renderRay3D(trapezio[0].superior, trapezio[size - 1].inferior);
+                 renderRay3D(trapezio[0].inferior, trapezio[size - 1].superior);
+               }
+        */
+      }
+    });
+  }
 }
 
 export function screenBlanking3D() {

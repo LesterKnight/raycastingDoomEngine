@@ -13,6 +13,7 @@ const gameMap = new GameMap(
 );
 const player = new Player(157.79552919493148, 213.60094950233187, 18);
 initMap(gameMap);
+player.setGameMap(gameMap)
 
 let frameCount = 0;
 let lastTime = 0;
@@ -38,33 +39,5 @@ function gameLoop(currentTime) {
   renderGame(player, gameMap);
   requestAnimationFrame(gameLoop);
 }
-
-document.addEventListener("keydown", (event) => {
-  const key = event.key;
-
-  switch (key) {
-    case "ArrowUp":
-      event.preventDefault();
-      player.moverFrente();
-      break;
-    case "ArrowDown":
-      event.preventDefault();
-      player.moverTras();
-      break;
-    case "ArrowLeft":
-      event.preventDefault();
-      player.girarEsquerda();
-      break;
-    case "ArrowRight":
-      event.preventDefault();
-      player.girarDireita();
-      break;
-    case "Control":
-      calculateRaycastingPOV(player, gameMap);
-      break;
-    default:
-      break;
-  }
-});
 
 requestAnimationFrame(gameLoop);

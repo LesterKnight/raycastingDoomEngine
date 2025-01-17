@@ -39,6 +39,7 @@ export function initMap(gameMap) {
 }
 
 export function renderGame(player, gameMap) {
+  player.update()
   screenBlanking2D();
   renderInfo(player);
   renderMap2D();

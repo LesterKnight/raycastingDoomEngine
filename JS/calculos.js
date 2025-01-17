@@ -1,5 +1,6 @@
 import { Posicao } from "./Classes/Posicao.js";
-import{RAYCASTING_POV,RAYCASTING_RES } from "./config.js"
+import{RAYCASTING_POV,RAYCASTING_RES,DEBUG_RAYCASTING_POS_2D } from "./config.js"
+import { renderRay2D } from "./Render/render2d.js";
 //calcula intersecção lateral entre o tile e o raycasting
 export function calcularIntersecaoLateral(
   tile,
@@ -98,6 +99,9 @@ export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
   tile,
   wallCollisionList
 ) {
+
+  if(DEBUG_RAYCASTING_POS_2D)
+          renderRay2D(player.pos,ray, "rgba(0,0,0,0.3)")
 
   let colisao;
   let orientacao = {

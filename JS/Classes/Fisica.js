@@ -10,6 +10,7 @@ export class Fisica {
         this.pos1 = new Posicao(x + this.largura, y);
         this.pos2 = new Posicao(x, this.altura + y);
         this.pos3 = new Posicao(x + this.largura, this.altura + y);
+        this.mov = { frente: false, tras: false, esquerda: false, direita: false }
     }
     verificarColisaoEsquerda(pos) {
         return this.pos.x === pos.x

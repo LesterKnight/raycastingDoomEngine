@@ -39,9 +39,23 @@ export function renderGround(groundCollisionList) {
     CTX_2D.fillRect(pos.x, pos.y, tile.largura, tile.altura);
   }
 }
-export function renderTileGround(pos,tile,color="black") {
+export function renderTileGround(pos,tile,lines = false, color="rgb(255, 123, 0)") {
+  if(!lines){
     CTX_2D.fillStyle = color
     CTX_2D.fillRect(pos.x, pos.y, tile.largura, tile.altura);
+  }
+  else{
+    CTX_2D.beginPath();
+    CTX_2D.rect(pos.x, pos.y, tile.largura, tile.altura);
+    //CTX_2D.fillStyle = color;
+    //CTX_2D.fill();
+    CTX_2D.lineWidth = 1;
+    let oldStroke = CTX_2D.strokeStyle
+    CTX_2D.strokeStyle = color
+    CTX_2D.stroke();
+    CTX_2D.strokeStyle = oldStroke
+  }
+    
 }
 export function renderPlayer2D(player) {
   let radius = 15;

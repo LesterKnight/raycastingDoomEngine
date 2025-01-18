@@ -11,7 +11,7 @@ import {
   calcularIndexEAngulo
 } from "./calculos.js";
 import { renderColisao, renderRay2D, renderDot2D, renderGround, renderTileGround } from "./Render/render2d.js";
-import { renderRay3D, renderDot3D, desenharRetangulosParede3D } from "./Render/render3d.js";
+import { renderRay3D, renderDot3D, desenharRetangulosParede3D ,desenharCeu3D} from "./Render/render3d.js";
 import {
   ALT_TILE,
   LARG_TILE,
@@ -233,9 +233,63 @@ function renderTile(player, tile) {
   renderRay3D(p3, p1)
 
 }
+
+function calcularCeuParcial(wallRectangle){
+  let inicial
+  let final
+  wallRectangle.forEach(rayCasting => {
+    if(rayCasting.superior.y>0){
+      if(!inicial){
+        inicial = rayCasting
+      }
+      final = rayCasting
+    }
+  });
+  if(inicial&&final)
+    return{inicial,final}
+}
+
+function calcularCeu(wallRectangles){
+
+  let ceu = []
+  for (const [tile, wallRectangle] of wallRectangles.entries()) {
+    let baixo = calcularCeuParcial(wallRectangle.baixo)
+    if(baixo)
+      ceu.push(baixo)
+
+    let cima = calcularCeuParcial(wallRectangle.cima)
+    if(cima)
+      ceu.push(cima)
+
+    let esquerdo = calcularCeuParcial(wallRectangle.esquerdo)
+    if(esquerdo)
+      ceu.push(esquerdo)
+
+    let direito = calcularCeuParcial(wallRectangle.direito)
+    if(direito)
+      ceu.push(direito)
+  }
+  return ceu
+}
+
+function desenharCeu(wallRectangles){
+  let ceu = calcularCeu(wallRectangles)/*
+  ceu.forEach(ceuParcial => {
+    renderRay3D(ceuParcial.inicial.superior, ceuParcial.final.superior, "blue")//reta inferior
+    renderRay3D(new Posicao(ceuParcial.inicial.superior.x,0),new Posicao(ceuParcial.final.superior.x,0),"red")//reta superior
+    renderRay3D(ceuParcial.inicial.superior,new Posicao(ceuParcial.inicial.superior.x,0),"red")//reta 90 graus
+    renderRay3D(ceuParcial.final.superior,new Posicao(ceuParcial.final.superior.x,0),"red")//reta 90 graus
+  })
+  */
+
+  desenharCeu3D(ceu)
+
+}
 export function calculateRaycastingPOV(player, gameMap) {//calcula o loop de raios de raycasting 2D, calcula as retas projetadas em 3D, usa as retas para formar retangulos em 3D na tela
   let [wallCollisionList, groundCollisionList] = calcRaycastingLoop(player, gameMap);//{}
   let wallRectangles = calcularRetangulosParede3D(wallCollisionList, player)
+  desenharCeu(wallRectangles)
+
   desenharRetangulosParede3D(wallRectangles)//REMOVER
   //let t = new Tile(224,224,1,1)
 }

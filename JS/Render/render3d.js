@@ -1,4 +1,3 @@
-
 import {
   ALT_TILE,
   LARG_TILE,
@@ -29,24 +28,15 @@ export function renderRay3D(a, b, color = "rgb(255, 123, 0)") {
 export function renderDot3D(a, color = "red") {
   CTX_3D.fillStyle = color;
   CTX_3D.beginPath();
-  CTX_3D.arc(
-    a.x,
-    a.y,
-    8,
-    0,
-    2 * Math.PI,
-    false
-  )
+  CTX_3D.arc(a.x, a.y, 8, 0, 2 * Math.PI, false);
   CTX_3D.fill();
   CTX_3D.closePath();
 }
 
 export function desenharRetangulosParede3D(wallRectangles) {
-
   //renderiza os trapezios, SEPARAR NO FUTURO
 
   for (const [tile, trapezios] of wallRectangles.entries()) {
-
     Object.keys(trapezios).forEach((lado) => {
       const trapezio = trapezios[lado];
       let size = trapezio.length;
@@ -66,6 +56,32 @@ export function desenharRetangulosParede3D(wallRectangles) {
         */
       }
     });
+  }
+}
+
+export function desenharCeu3D(ceu) {
+  if (ceu.length > 0) {
+    // Ordenar ceu por x
+    ceu.sort((a, b) => a.inicial.superior.x - b.inicial.superior.x);
+
+    CTX_3D.beginPath();
+    CTX_3D.moveTo(ceu[0].inicial.superior.x, ceu[0].inicial.superior.y);
+
+    ceu.forEach((ceuParcial) => {
+      CTX_3D.lineTo(
+        ceuParcial.inicial.superior.x,
+        ceuParcial.inicial.superior.y
+      );
+      CTX_3D.lineTo(ceuParcial.final.superior.x, ceuParcial.final.superior.y);
+    });
+
+    const ultimoCeuParcial = ceu[ceu.length - 1];
+    CTX_3D.lineTo(ultimoCeuParcial.final.superior.x, 0);
+    CTX_3D.lineTo(ceu[0].inicial.superior.x, 0);
+    CTX_3D.lineTo(ceu[0].inicial.superior.x, ceu[0].inicial.superior.y);
+    CTX_3D.closePath();
+    CTX_3D.fillStyle = "rgb(25, 5, 58)";
+    CTX_3D.fill();
   }
 }
 

@@ -34,8 +34,6 @@ export function initMap(gameMap) {
       }
     }
   }
-
-  console.log(mapAmmount)
 }
 
 export function renderGame(player, gameMap) {

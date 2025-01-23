@@ -6,7 +6,7 @@ export class Fisica {
         this.altura = ALT_TILE * scaleY;
         this.largura = LARG_TILE * scaleX;
         this.pos = new Posicao(x, y);
-        this.collisionFlags = { p0: false, p1: false, p2: false, p3: false }
+        this.collisionFlags = { p0: false, p1: false, p2: false, p3: false, meio:false }
         this.pos1 = new Posicao(x + this.largura, y);
         this.pos2 = new Posicao(x, this.altura + y);
         this.pos3 = new Posicao(x + this.largura, this.altura + y);
@@ -49,17 +49,20 @@ export class Fisica {
             this.collisionFlags.p2 = ray
         else if (this.pos3.x == parseInt(ray.x) && this.pos3.y == parseInt(ray.y))
             this.collisionFlags.p3 = ray
+        else if (this.pos.x +(LARG_TILE/2) == parseInt(ray.x) && this.pos.y +(ALT_TILE/2) == parseInt(ray.y))
+            this.collisionFlags.meio = ray
     }
     allFlags(){
         return this.collisionFlags.p0 && this.collisionFlags.p1 && this.collisionFlags.p2 && this.collisionFlags.p3
     }
    someFlags(){
-        return this.collisionFlags.p0 || this.collisionFlags.p1 || this.collisionFlags.p2 || this.collisionFlags.p3
+        return this.collisionFlags.p0 || this.collisionFlags.p1 || this.collisionFlags.p2 || this.collisionFlags.p3 || this.collisionFlags.meio
     }
     resetAllFlags(){
         this.collisionFlags.p0 = false
         this.collisionFlags.p1 = false
         this.collisionFlags.p2 = false
         this.collisionFlags.p3 = false
+        this.collisionFlags.meio = false
     }
 }

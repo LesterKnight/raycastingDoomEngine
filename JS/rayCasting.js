@@ -64,10 +64,12 @@ function calcRaycastingLoop(player, gameMap) {
     );
 
     while (rayCastingSize < MAX_RAYCASTING_SIZE) {
-      ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize,true);
+      ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize);
 
       let tile = gameMap.checkTileCollision(ray);
-      if (parseInt(ray.x) % LARG_TILE == 0 && parseInt(ray.y) % ALT_TILE == 0) {
+      if ((parseInt(ray.x) % LARG_TILE == 0 && parseInt(ray.y) % ALT_TILE == 0)
+      ||(parseInt(ray.x) % LARG_TILE == LARG_TILE/2 && parseInt(ray.y) % ALT_TILE == ALT_TILE/2)
+      ) {
         groundCollisionListTemp.set(
           `${parseInt(ray.x)},${parseInt(ray.y)}`,
           ray
@@ -110,6 +112,7 @@ function calcRaycastingLoop(player, gameMap) {
       tile.resetAllFlags();
       //groundCollisionList.set(tile.pos,tile) FINAL
     } else if (tile.someFlags()) {
+      renderTileGround(tile.pos, tile,false,"rgba(0,0,255,0.3");
       vetParcial.push(tile);
     }
   }

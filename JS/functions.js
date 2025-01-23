@@ -1,4 +1,4 @@
-import { CANVAS2D, CTX_2D, CTX_3D } from "./config.js";
+import { ALT_TILE, CANVAS2D, CTX_2D, CTX_3D, LARG_SALA, LARG_TILE,COMP_SALA} from "./config.js";
 import { calculateRaycastingPOV } from "./rayCasting.js";
 import { renderMap2D, renderTiles, renderGround, renderPlayer2D,screenBlanking2D} from "./Render/render2d.js";
 import {screenBlanking3D} from "./Render/render3d.js"
@@ -23,9 +23,11 @@ export function initMap(gameMap) {
   gameMap.addTile(new Tile(288, 32, 1, 8));
   gameMap.addTile(new Tile(64, 96, 4, 2));
   gameMap.addTile(new Tile(256, 96, 2, 2));
+  
+  
   let mapAmmount = 0
-  for (let i = 0; i < 320; i += 32) {
-    for (let j = 0; j < 320; j += 32) {
+  for (let i = 0; i < LARG_TILE*LARG_SALA; i += LARG_TILE) {
+    for (let j = 0; j < ALT_TILE*COMP_SALA; j += ALT_TILE) {
 
       let t = new Tile(i, j)
       if(!gameMap.existingTilePosCheck(t.pos)){

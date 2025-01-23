@@ -12,13 +12,13 @@ export class GameMap {
   }
   checkTileCollision(pos) {
     for (let [tilePos, tile] of this.tiles) {
-      if (tile.verificarColisaoInterna(pos))
+      if (tile.verificarColisao(pos))
         return tile;
     }
   }
   checkGroundCollision(pos) {
     for (let [tilePos, tile] of this.ground) {
-      if (tile.verificarColisaoInterna(pos))
+      if (tile.verificarColisao(pos))
         return tile;
     }
   }

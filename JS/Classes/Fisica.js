@@ -28,7 +28,7 @@ export class Fisica {
             this.pos.x + this.largura >= pos.x &&
             this.pos.y + this.altura == pos.y
     }
-    verificarColisaoInterna(pos) {
+    verificarColisao(pos) {
         let xInicial = this.pos.x;
         let xFinal = this.pos.x + this.largura;
         let yInicial = this.pos.y;

@@ -27,7 +27,7 @@ export class GameObject extends Fisica{
   }
 
   girarDireita() {
-    let newAngle = normalizarAngulo(this.angle + this.speed);
+    let newAngle = normalizarAngulo(this.angle + this.speed );
     this.angle = newAngle;
   }
 
@@ -44,7 +44,7 @@ export class GameObject extends Fisica{
     }
   }
   girarEsquerda() {
-    let newAngle = normalizarAngulo(this.angle - this.speed);
+    let newAngle = normalizarAngulo(this.angle - this.speed );
     this.angle = newAngle;
   }
   moverTras() {

@@ -66,10 +66,14 @@ export function calcDistanciaProjetada(distanciaReal, anguloRaio, anguloCentral)
   return distanciaProjetada;
 }
 //cria um raio no plano 2d entre o jogador e um ponto definido
-export function rayCasting(x0, y0, angulo, raio) {
+export function rayCasting(x0, y0, angulo, raio,int = false) {
   const anguloEmRadianos = angulo * (Math.PI / 180);
   const x = x0 + raio * Math.cos(anguloEmRadianos);
   const y = y0 + raio * Math.sin(anguloEmRadianos);
+  if(int){
+    return new Posicao(parseInt(x),parseInt(y))
+  }
+  else
   return new Posicao(x,y);
 }
 //criar a logica que ira disparar N raios, adiciona-los a coleçao e renderiza-los no fim
@@ -84,6 +88,7 @@ export function calcularIndex(player, colisao) {
   let index = diferenca / (RAYCASTING_POV / RAYCASTING_RES);
   return index;
 }
+
 export function calcularAnguloAB(player, P) {
   let deltaX = P.x - player.pos.x;
   let deltaY = P.y - player.pos.y;

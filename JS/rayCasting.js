@@ -64,7 +64,7 @@ function calcRaycastingLoop(player, gameMap) {
     );
 
     while (rayCastingSize < MAX_RAYCASTING_SIZE) {
-      ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize);
+      ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize,true);
 
       let tile = gameMap.checkTileCollision(ray);
       if (parseInt(ray.x) % LARG_TILE == 0 && parseInt(ray.y) % ALT_TILE == 0) {
@@ -141,13 +141,13 @@ function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
     function classificarColisao(tile,lados, colisao, angle) {
       if (tile.verificarColisao(colisao)) {
         if (tile.verificarColisaoAcima(colisao))
-          lados.cima.push({ posicao: colisao, angle });
+          lados.cima.push({ posicao: colisao, angle,inicial:true });
         else if (tile.verificarColisaoAbaixo(colisao))
-          lados.baixo.push({ posicao: colisao, angle });
+          lados.baixo.push({ posicao: colisao, angle,inicial:true });
         else if (tile.verificarColisaoDireita(colisao))
-          lados.direita.push({ posicao: colisao, angle });
+          lados.direita.push({ posicao: colisao, angle,inicial:true });
         else if (tile.verificarColisaoEsquerda(colisao))
-          lados.esquerda.push({ posicao: colisao, angle });
+          lados.esquerda.push({ posicao: colisao, angle,inicial:true });
       }
     }
 
@@ -161,7 +161,8 @@ function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
           element.posicao.x,
           element.posicao.y,
           element.angle + 180,
-          rayCastingSize++
+          rayCastingSize++,
+          true
         );
         if (tile.verificarColisao(ray)) {
           previousPos = ray;
@@ -179,33 +180,36 @@ function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
 
 
     lados.esquerda.forEach((element) => {
-      let previousPos = calcGroundRaycasting(element)
-      classificarColisao(tile,lados, previousPos, element.angle)
+      if(element.inicial){
+        let previousPos = calcGroundRaycasting(element)
+        classificarColisao(tile,lados, previousPos, element.angle)
+      }
     })
 
     lados.direita.forEach((element) => {
-      let previousPos = calcGroundRaycasting(element)
-      classificarColisao(tile,lados, previousPos, element.angle)
+      if(element.inicial){
+        let previousPos = calcGroundRaycasting(element)
+        classificarColisao(tile,lados, previousPos, element.angle)
+      }
     })
 
     lados.cima.forEach((element) => {
-      let previousPos = calcGroundRaycasting(element)
-      classificarColisao(tile,lados, previousPos, element.angle)
+      if(element.inicial){
+        let previousPos = calcGroundRaycasting(element)
+        classificarColisao(tile,lados, previousPos, element.angle)
+      }
     })
 
     lados.baixo.forEach((element) => {
-      let previousPos = calcGroundRaycasting(element)
-      classificarColisao(tile,lados, previousPos, element.angle)
+      if(element.inicial){
+        let previousPos = calcGroundRaycasting(element)
+        classificarColisao(tile,lados, previousPos, element.angle)
+      }
     })
-//atribuir os lados nao identificados ao quadrado
-
     lados.esquerda.forEach((element)=> {renderDot2D(element.posicao, "pink");})
     lados.direita.forEach((element)=> {renderDot2D(element.posicao, "pink");})
     lados.cima.forEach((element)=> {renderDot2D(element.posicao, "pink");})
     lados.baixo.forEach((element)=> {renderDot2D(element.posicao, "pink");})
-
-
-
 
 
   }

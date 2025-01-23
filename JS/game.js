@@ -11,7 +11,7 @@ const gameMap = new GameMap(
   DIST_PISO,
   "mapa_inicial"
 );
-const player = new Player(157.79552919493148, 213.60094950233187, 270);
+const player = new Player(158, 214, 305);
 initMap(gameMap);
 player.setGameMap(gameMap)
 

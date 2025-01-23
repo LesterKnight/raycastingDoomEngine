@@ -67,8 +67,10 @@ function calcRaycastingLoop(player, gameMap) {
       ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize);
 
       let tile = gameMap.checkTileCollision(ray);
-      if ((parseInt(ray.x) % LARG_TILE == 0 && parseInt(ray.y) % ALT_TILE == 0)
-      ||(parseInt(ray.x) % LARG_TILE == LARG_TILE/2 && parseInt(ray.y) % ALT_TILE == ALT_TILE/2)
+      if (
+        (parseInt(ray.x) % LARG_TILE == 0 && parseInt(ray.y) % ALT_TILE == 0) ||
+        (parseInt(ray.x) % LARG_TILE == LARG_TILE / 2 &&
+          parseInt(ray.y) % ALT_TILE == ALT_TILE / 2)
       ) {
         groundCollisionListTemp.set(
           `${parseInt(ray.x)},${parseInt(ray.y)}`,
@@ -112,7 +114,7 @@ function calcRaycastingLoop(player, gameMap) {
       tile.resetAllFlags();
       //groundCollisionList.set(tile.pos,tile) FINAL
     } else if (tile.someFlags()) {
-      renderTileGround(tile.pos, tile,false,"rgba(0,0,255,0.3");
+      renderTileGround(tile.pos, tile, false, "rgba(0,0,255,0.3");
       vetParcial.push(tile);
     }
   }
@@ -141,25 +143,26 @@ function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
       cima: [],
       baixo: [],
     };
-    function classificarColisao(tile,lados, colisao, angle) {
+    function classificarColisao(tile, lados, colisao, angle) {
       if (tile.verificarColisao(colisao)) {
         if (tile.verificarColisaoAcima(colisao))
-          lados.cima.push({ posicao: colisao, angle,inicial:true });
+          lados.cima.push({ posicao: colisao, angle, inicial: true });
         else if (tile.verificarColisaoAbaixo(colisao))
-          lados.baixo.push({ posicao: colisao, angle,inicial:true });
+          lados.baixo.push({ posicao: colisao, angle, inicial: true });
         else if (tile.verificarColisaoDireita(colisao))
-          lados.direita.push({ posicao: colisao, angle,inicial:true });
+          lados.direita.push({ posicao: colisao, angle, inicial: true });
         else if (tile.verificarColisaoEsquerda(colisao))
-          lados.esquerda.push({ posicao: colisao, angle,inicial:true });
+          lados.esquerda.push({ posicao: colisao, angle, inicial: true });
       }
     }
 
-    function calcGroundRaycasting(element){
+    function calcGroundRaycasting(element) {
       //renderDot2D(element.posicao, "blue");
 
       let rayCastingSize = 0;
       let previousPos;
-      while (rayCastingSize < 64) {//limita raycasting ao quadrado
+      while (rayCastingSize < 64) {
+        //limita raycasting ao quadrado
         let ray = rayCasting(
           element.posicao.x,
           element.posicao.y,
@@ -172,48 +175,106 @@ function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
         } else break;
       }
       //renderDot2D(previousPos, "pink");
-      return previousPos
+      return previousPos;
     }
-
 
     for (const [angle, collisions] of wallCollisionList.entries()) {
-      
-      classificarColisao(tile,lados, collisions.colisao, angle)
+      classificarColisao(tile, lados, collisions.colisao, angle);
     }
 
-
     lados.esquerda.forEach((element) => {
-      if(element.inicial){
-        let previousPos = calcGroundRaycasting(element)
-        classificarColisao(tile,lados, previousPos, element.angle)
+      if (element.inicial) {
+        let previousPos = calcGroundRaycasting(element);
+        classificarColisao(tile, lados, previousPos, element.angle);
       }
-    })
+    });
 
     lados.direita.forEach((element) => {
-      if(element.inicial){
-        let previousPos = calcGroundRaycasting(element)
-        classificarColisao(tile,lados, previousPos, element.angle)
+      if (element.inicial) {
+        let previousPos = calcGroundRaycasting(element);
+        classificarColisao(tile, lados, previousPos, element.angle);
       }
-    })
+    });
 
     lados.cima.forEach((element) => {
-      if(element.inicial){
-        let previousPos = calcGroundRaycasting(element)
-        classificarColisao(tile,lados, previousPos, element.angle)
+      if (element.inicial) {
+        let previousPos = calcGroundRaycasting(element);
+        classificarColisao(tile, lados, previousPos, element.angle);
       }
-    })
+    });
 
     lados.baixo.forEach((element) => {
-      if(element.inicial){
-        let previousPos = calcGroundRaycasting(element)
-        classificarColisao(tile,lados, previousPos, element.angle)
+      if (element.inicial) {
+        let previousPos = calcGroundRaycasting(element);
+        classificarColisao(tile, lados, previousPos, element.angle);
       }
-    })
-    lados.esquerda.forEach((element)=> {renderDot2D(element.posicao, "pink");})
-    lados.direita.forEach((element)=> {renderDot2D(element.posicao, "pink");})
-    lados.cima.forEach((element)=> {renderDot2D(element.posicao, "pink");})
-    lados.baixo.forEach((element)=> {renderDot2D(element.posicao, "pink");})
+    });
 
+    lados.esquerda.sort((a, b) => a.posicao.y - b.posicao.y);
+    lados.direita.sort((a, b) => a.posicao.y - b.posicao.y);
+    lados.cima.sort((a, b) => a.posicao.x - b.posicao.x);
+    lados.baixo.sort((a, b) => a.posicao.x - b.posicao.x);
+/*
+    lados.esquerda.forEach((element) => {
+      renderDot2D(element.posicao, "pink");
+    });
+    lados.direita.forEach((element) => {
+      renderDot2D(element.posicao, "pink");
+    });
+    lados.cima.forEach((element) => {
+      renderDot2D(element.posicao, "pink");
+    });
+    lados.baixo.forEach((element) => {
+      renderDot2D(element.posicao, "pink");
+    });
+*/
+    let tamanhoEsquerda = lados.esquerda.length
+    let tamanhoDireita = lados.direita.length
+    let tamanhoCima = lados.cima.length
+    let tamanhoBaixo = lados.baixo.length
+    
+    let pontos = [];
+    if (tamanhoEsquerda > 0) {
+      pontos.push(lados.esquerda[tamanhoEsquerda-1])
+      pontos.push(lados.esquerda[0])
+    }
+
+    if (tamanhoCima > 0) {
+      pontos.push(lados.cima[0])
+      pontos.push(lados.cima[tamanhoCima-1])
+    }
+
+    if (tamanhoBaixo > 0) {
+      pontos.push(lados.baixo[0])
+      pontos.push(lados.baixo[tamanhoBaixo-1])
+    }
+
+    if (tamanhoDireita > 0) {
+      pontos.push(lados.direita[tamanhoDireita-1])
+      pontos.push(lados.direita[0])
+    }
+
+    pontos.forEach(element => {
+      renderDot2D(element.posicao, "blue");
+    });
+
+/*
+    if (!tile.collisionFlags.p0) {
+      const minP0 = lados.cima.reduce((min, current) => {
+        if (
+          current.posicao.x < min.posicao.x ||
+          (current.posicao.x === min.posicao.x &&
+            current.posicao.y < min.posicao.y)
+        ) {
+          return current;
+        }
+        return min;
+      }, lados.cima[0]);
+      if (minP0) {
+        renderDot2D(minP0.posicao, "blue");
+      }
+    }
+*/
 
   }
 

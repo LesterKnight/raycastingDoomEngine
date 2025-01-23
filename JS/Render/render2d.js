@@ -113,7 +113,7 @@ export function renderDot2D(a,color="red") {
   CTX_2D.arc(
     a.x,
     a.y,
-    4,
+    2,
     0,
     2 * Math.PI,
     false

@@ -67,15 +67,12 @@ function calcRaycastingLoop(player, gameMap) {
       ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize);
 
       let tile = gameMap.checkTileCollision(ray);
-      if (
+      if ( 
         (parseInt(ray.x) % LARG_TILE == 0 && parseInt(ray.y) % ALT_TILE == 0) ||
         (parseInt(ray.x) % LARG_TILE == LARG_TILE / 2 &&
           parseInt(ray.y) % ALT_TILE == ALT_TILE / 2)
       ) {
-        groundCollisionListTemp.set(
-          `${parseInt(ray.x)},${parseInt(ray.y)}`,
-          ray
-        );
+        groundCollisionListTemp.set(`${parseInt(ray.x)},${parseInt(ray.y)}`, ray);
       }
 
       if (tile) {
@@ -99,6 +96,8 @@ function calcRaycastingLoop(player, gameMap) {
     }
   }
 
+
+  /*
   for (const [pos, ray] of groundCollisionListTemp.entries()) {
     for (const [pos, tile] of gameMap.ground.entries()) {
       tile.atualizarFlagColisao(ray);
@@ -125,9 +124,34 @@ function calcRaycastingLoop(player, gameMap) {
     return distanciaB - distanciaA;
   });
 
-  calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player);
+  //calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player);
+  */
   return [wallCollisionList, groundCollisionList];
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
   //USAR OS RAIOS JA EXISTENTES........
@@ -161,7 +185,8 @@ function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
 
       let rayCastingSize = 0;
       let previousPos;
-      while (rayCastingSize < 64) {
+      const diagonal = Math.ceil(Math.sqrt(2 * Math.pow(ALT_TILE, 2)));
+      while (rayCastingSize < diagonal) {
         //limita raycasting ao quadrado
         let ray = rayCasting(
           element.posicao.x,
@@ -214,20 +239,7 @@ function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
     lados.direita.sort((a, b) => a.posicao.y - b.posicao.y);
     lados.cima.sort((a, b) => a.posicao.x - b.posicao.x);
     lados.baixo.sort((a, b) => a.posicao.x - b.posicao.x);
-/*
-    lados.esquerda.forEach((element) => {
-      renderDot2D(element.posicao, "pink");
-    });
-    lados.direita.forEach((element) => {
-      renderDot2D(element.posicao, "pink");
-    });
-    lados.cima.forEach((element) => {
-      renderDot2D(element.posicao, "pink");
-    });
-    lados.baixo.forEach((element) => {
-      renderDot2D(element.posicao, "pink");
-    });
-*/
+
     let tamanhoEsquerda = lados.esquerda.length
     let tamanhoDireita = lados.direita.length
     let tamanhoCima = lados.cima.length
@@ -244,43 +256,90 @@ function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
       pontos.push(lados.cima[tamanhoCima-1])
     }
 
+
+
+    if (tamanhoDireita > 0) {
+      pontos.push(lados.direita[0])
+      pontos.push(lados.direita[tamanhoDireita-1])
+    }
+
     if (tamanhoBaixo > 0) {
       pontos.push(lados.baixo[0])
       pontos.push(lados.baixo[tamanhoBaixo-1])
     }
 
-    if (tamanhoDireita > 0) {
-      pontos.push(lados.direita[tamanhoDireita-1])
-      pontos.push(lados.direita[0])
-    }
 
-    pontos.forEach(element => {
-      renderDot2D(element.posicao, "blue");
-    });
+
+    if (tamanhoEsquerda > 0) {
+      let zero = calcularReta3DPiso(player, lados.esquerda[0].posicao);
+      renderDot2D(lados.esquerda[0].posicao, "green");
+      let final = calcularReta3DPiso(player, lados.esquerda[tamanhoEsquerda - 1].posicao);
+      renderDot2D(lados.esquerda[tamanhoEsquerda - 1].posicao, "green");
+      renderRay3D(zero, final, "green", 3);
+  }
+  
+  if (tamanhoDireita > 0) {
+      let zero = calcularReta3DPiso(player, lados.direita[0].posicao);
+      renderDot2D(lados.direita[0].posicao, "blue");
+      let final = calcularReta3DPiso(player, lados.direita[tamanhoDireita - 1].posicao);
+      renderDot2D(lados.direita[tamanhoDireita - 1].posicao, "blue");
+      renderRay3D(zero, final, "blue", 3);
+  }
+  
+  if (tamanhoCima > 0) {
+      let zero = calcularReta3DPiso(player, lados.cima[0].posicao);
+      renderDot2D(lados.cima[0].posicao, "purple");
+      let final = calcularReta3DPiso(player, lados.cima[tamanhoCima - 1].posicao);
+      renderDot2D(lados.cima[tamanhoCima - 1].posicao, "purple");
+      renderRay3D(zero, final, "purple" ,3);
+  }
+  
+  if (tamanhoBaixo > 0) {
+      let zero = calcularReta3DPiso(player, lados.baixo[0].posicao);
+      renderDot2D(lados.baixo[0].posicao, "yellow");
+      let final = calcularReta3DPiso(player, lados.baixo[tamanhoBaixo - 1].posicao);
+      renderDot2D(lados.baixo[tamanhoBaixo - 1].posicao, "yellow");
+      renderRay3D(zero, final, "yellow",3);
+  }
+  
+
+
+
+
+
+
+
+
 
 /*
-    if (!tile.collisionFlags.p0) {
-      const minP0 = lados.cima.reduce((min, current) => {
-        if (
-          current.posicao.x < min.posicao.x ||
-          (current.posicao.x === min.posicao.x &&
-            current.posicao.y < min.posicao.y)
-        ) {
-          return current;
-        }
-        return min;
-      }, lados.cima[0]);
-      if (minP0) {
-        renderDot2D(minP0.posicao, "blue");
+    let previous 
+    pontos.forEach(element => {
+
+      renderDot2D(element.posicao, "blue");
+      if(previous){
+        let ant = calcularReta3DPiso(player, previous.posicao);
+        let atual = calcularReta3DPiso(player, element.posicao);
+        renderRay3D(ant, atual, "green");
       }
-    }
+      previous = element
+    });
 */
 
+
+
+
   }
+
+
+
 
   vetParcial.forEach((tile) => {
     tile.resetAllFlags();
   });
+
+    
+
+
 }
 
 export function calcularRetaParede3D(player, colisao, angle, index) {
@@ -379,7 +438,66 @@ function calcularRetangulosParede3D(wallCollisionList, player) {
       wallRectangles.get(collisionData.tile).cima.push(pos);
   }
 
+
+
+
+//if(1==2)
+wallRectangles.forEach((element,tile) => {
+
+  let tamanhoDireito = element.direito.length
+  let tamanhoCima = element.cima.length
+  let tamanhoEsquerdo = element.esquerdo.length
+  let tamanhoBaixo = element.baixo.length
+
+  
+function fecharLados(ladoA,ladoB){
+  let tamanhoA = ladoA.length
+  let tamanhoB = ladoB.length
+  if(tamanhoA>0 && tamanhoB>0){
+      let lastA = ladoA[tamanhoA-1]
+      let firstB= ladoB[0]
+    
+      let superior = new Posicao(
+        (lastA.superior.x + firstB.superior.x)/2,
+        (lastA.superior.y + firstB.superior.y)/2
+      )
+  
+      let inferior = new Posicao(
+        (lastA.inferior.x + firstB.inferior.x)/2,
+        (lastA.inferior.y + firstB.inferior.y)/2
+      )
+      return {inferior,superior} 
+  }
+}
+
+if(tamanhoEsquerdo>10 && tamanhoBaixo>10){
+  let media = fecharLados(element.esquerdo , element.baixo)
+  element.esquerdo[tamanhoEsquerdo-1] = media
+  element.baixo[0] = media
+}
+
+if(tamanhoBaixo>10 && tamanhoDireito>10){
+  let media = fecharLados(element.baixo , element.direito)
+  element.baixo[tamanhoBaixo-1] = media
+  element.direito[0] = media
+}
+
+if(tamanhoDireito>10 && tamanhoCima>10){
+  let media = fecharLados(element.direito , element.cima)
+  element.direito[tamanhoDireito-1] = media
+  element.cima[0] = media
+}
+
+if(tamanhoCima>10 && tamanhoEsquerdo>10){
+  let media = fecharLados(element.cima , element.esquerdo)
+  element.cima[tamanhoCima-1] = media
+  element.esquerdo[0] = media
+}
+  
+});
+
   return wallRectangles;
+
 }
 function calcularReta3DPiso(player, posicao) {
   let angle = calcularAnguloAB(player, posicao);
@@ -448,12 +566,13 @@ export function calculateRaycastingPOV(player, gameMap) {
   let [wallCollisionList, groundCollisionList] = calcRaycastingLoop(
     player,
     gameMap
-  ); //{}
+  );
+
   let wallRectangles = calcularRetangulosParede3D(wallCollisionList, player);
 
-  let ceu = calcularCeu(wallRectangles);
-  desenharCeu3D(ceu);
+  //let ceu = calcularCeu(wallRectangles);
+  //desenharCeu3D(ceu);
 
   desenharRetangulosParede3D(wallRectangles); //REMOVER
-  //let t = new Tile(224,224,1,1)
+
 }

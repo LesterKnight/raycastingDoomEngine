@@ -19,6 +19,10 @@ export function initMap(gameMap) {
   gameMap.addTile(new Tile(192, 32));
   gameMap.addTile(new Tile(0, 288, 10, 1)); //coluna
   gameMap.addTile(new Tile(0, 0, 10, 1)); //coluna
+
+
+
+  
   gameMap.addTile(new Tile(0, 32, 1, 8));
   gameMap.addTile(new Tile(288, 32, 1, 8));
   gameMap.addTile(new Tile(64, 96, 4, 2));
@@ -41,12 +45,16 @@ export function initMap(gameMap) {
 export function renderGame(player, gameMap) {
   player.update()
   screenBlanking2D();
+
+
   renderInfo(player);
   renderMap2D();
   renderPlayer2D(player);
 
   screenBlanking3D();
+
+
   renderTiles(gameMap);
   calculateRaycastingPOV(player, gameMap);
-  
+
 }

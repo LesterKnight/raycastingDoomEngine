@@ -17,14 +17,25 @@ import {
   RAYCASTING_STEP_SIZE,
   MAX_RAYCASTING_SIZE,
 } from "../config.js";
-export function renderRay3D(a, b, color = "rgb(255, 123, 0)") {
+export function renderRay3D(a, b, color = "rgb(255, 123, 0)", strokeSize = 1) {
+  // Save the current context state
+  CTX_3D.save();
+
+  // Set the stroke style and line width
   CTX_3D.strokeStyle = color;
+  CTX_3D.lineWidth = strokeSize;
+
+  // Draw the line
   CTX_3D.beginPath();
   CTX_3D.moveTo(a.x, a.y);
   CTX_3D.lineTo(b.x, b.y);
   CTX_3D.stroke();
   CTX_3D.closePath();
+
+  // Restore the context to its original state
+  CTX_3D.restore();
 }
+
 export function renderDot3D(a, color = "red") {
   CTX_3D.fillStyle = color;
   CTX_3D.beginPath();

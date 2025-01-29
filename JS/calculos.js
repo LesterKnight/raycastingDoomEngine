@@ -118,30 +118,37 @@ export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
 
   if (player.pos.y < tile.pos.y) orientacao.cima = true;
 
-  if (player.pos.y > tile.pos.y + tile.altura)
-    orientacao.baixo = true;
+  if (player.pos.y > tile.pos.y + tile.altura) orientacao.baixo = true;
 
   if (player.pos.x < tile.pos.x) orientacao.esquerda = true;
 
-  if (player.pos.x > tile.pos.x + tile.largura)
-    orientacao.direita = true;
+  if (player.pos.x > tile.pos.x + tile.largura) orientacao.direita = true;
 
   if (orientacao.esquerda || orientacao.direita) {
-    colisao = calcularIntersecaoLateral(
-      tile,
-      ray,
-      angle,
-      orientacao.esquerda
-    );
+    colisao = calcularIntersecaoLateral(tile,ray,angle, orientacao.esquerda);//é para saber se é a esquerda e deve inverter
     wallCollisionList.set(angle, { colisao, tile, orientacao });
   }
   if (!colisao && (orientacao.cima || orientacao.baixo)) {
     colisao = calcIntersecaoVertical(tile, ray, angle, orientacao.cima);
     wallCollisionList.set(angle, { colisao, tile, orientacao });
   }
-  if (!colisao) return false;
+    if(!colisao)
+      return false;
   return true;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 export function calcularIndexEAngulo(player, relativeAngle) {
   // Normaliza o ângulo relativo para o intervalo [0, 360)
   relativeAngle = normalizarAngulo(relativeAngle);

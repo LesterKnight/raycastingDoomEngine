@@ -56,6 +56,7 @@ function calcRaycastingLoop(player, gameMap) {
   let groundCollisionListTemp = new Map();
   let angle = player.angle;
   let ray;
+  let step = false
 
   for (let i = 0; i < RAYCASTING_RES; i++) {
     let rayCastingSize = 0;
@@ -65,39 +66,38 @@ function calcRaycastingLoop(player, gameMap) {
 
     while (rayCastingSize < MAX_RAYCASTING_SIZE) {
       ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize);
-
-      let tile = gameMap.checkTileCollision(ray);
-      if ( 
-        (parseInt(ray.x) % LARG_TILE == 0 && parseInt(ray.y) % ALT_TILE == 0) ||
-        (parseInt(ray.x) % LARG_TILE == LARG_TILE / 2 &&
-          parseInt(ray.y) % ALT_TILE == ALT_TILE / 2)
-      ) {
+      
+      let tileCorner = false
+      if(parseInt(ray.x) % LARG_TILE == 0 && parseInt(ray.y) % ALT_TILE == 0){
+        tileCorner = true
         groundCollisionListTemp.set(`${parseInt(ray.x)},${parseInt(ray.y)}`, ray);
       }
+      else if((parseInt(ray.x) % LARG_TILE == LARG_TILE / 2 && parseInt(ray.y) % ALT_TILE == ALT_TILE / 2))
+        groundCollisionListTemp.set(`${parseInt(ray.x)},${parseInt(ray.y)}`, ray);
+        
+      let tile = gameMap.checkTileCollision(ray);
 
+        
       if (tile) {
-        if (
-          calcColisaoPrecisa(
-            //AQUI TA ERRADO
-            player,
-            angle,
-            ray,
-            tile,
-            wallCollisionList
-          )
-        )
+        let existeColisao = calcColisaoPrecisa(player,angle,ray,tile,wallCollisionList)
+        if (existeColisao)
           break;
       }
+      else if(tileCorner&&gameMap.checkTwoTileVertexCollision(ray))
+        break
+
       if (rayCastingSize < MAX_RAYCASTING_SIZE) {
         rayCastingSize += RAYCASTING_STEP_SIZE;
         continue;
       }
       break;
     }
+
+
   }
 
 
-  /*
+  
   for (const [pos, ray] of groundCollisionListTemp.entries()) {
     for (const [pos, tile] of gameMap.ground.entries()) {
       tile.atualizarFlagColisao(ray);
@@ -124,8 +124,8 @@ function calcRaycastingLoop(player, gameMap) {
     return distanciaB - distanciaA;
   });
 
-  //calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player);
-  */
+  calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player);
+  
   return [wallCollisionList, groundCollisionList];
 }
 
@@ -267,7 +267,6 @@ function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
       pontos.push(lados.baixo[0])
       pontos.push(lados.baixo[tamanhoBaixo-1])
     }
-
 
 
     if (tamanhoEsquerda > 0) {

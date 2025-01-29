@@ -16,6 +16,16 @@ export class GameMap {
         return tile;
     }
   }
+  checkTwoTileVertexCollision(pos) {
+    let count = 0
+    for (let [tilePos, tile] of this.tiles) {
+      if (tile.verificarVertices(pos)){
+        count++
+        if(count>1)
+          return true;
+      }  
+    }
+  }
   checkGroundCollision(pos) {
     for (let [tilePos, tile] of this.ground) {
       if (tile.verificarColisao(pos))

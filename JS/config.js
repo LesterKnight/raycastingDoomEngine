@@ -1,16 +1,16 @@
-export const ALT_TILE = 32;
-export const LARG_TILE =32;
+export const ALT_TILE = 16;
+export const LARG_TILE =16;
 
 export const ALT_TILE_PISO = 16;
 export const LARG_TILE_PISO = 16;
 
-export const COMP_SALA = 10;
-export const LARG_SALA = 10;
+export const COMP_SALA = 20;
+export const LARG_SALA = 20;
 
 export const DIST_TETO = 2;
 export const DIST_PISO = 1;
 
-export const RAYCASTING_RES = 360; //120 linhas na tela
+export const RAYCASTING_RES = 120   ; //120 linhas na tela
 export const RAYCASTING_POV = 60; //60 graus
 export const RAYCASTING_STEP_SIZE = 1;
 export const MAX_RAYCASTING_SIZE = 300;

@@ -38,8 +38,16 @@ export class Fisica {
             pos.x <= xFinal &&
             pos.y >= yInicial &&
             pos.y <= yFinal
-        )
+        ) 
     }
+    verificarVertices(pos) {
+        let intPos = new Posicao(parseInt(pos.x),parseInt(pos.y))
+        return (intPos.x == this.pos.x && intPos.y == this.pos.y) ||
+        (intPos.x == this.pos1.x && intPos.y == this.pos1.y) ||
+        (intPos.x == this.pos2.x && intPos.y == this.pos2.y) ||
+        (intPos.x == this.pos3.x && intPos.y == this.pos3.y);
+    }
+
     atualizarFlagColisao(ray) {
         if (this.pos.x == parseInt(ray.x) && this.pos.y == parseInt(ray.y))
             this.collisionFlags.p0 = ray

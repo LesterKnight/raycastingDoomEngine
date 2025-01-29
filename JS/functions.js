@@ -14,19 +14,27 @@ function renderInfo(player) {
   CTX_2D.fillText(texto, x, y);
 }
 export function initMap(gameMap) {
-  gameMap.addTile(new Tile(96, 32));
-  gameMap.addTile(new Tile(32, 160));
-  gameMap.addTile(new Tile(192, 32));
-  gameMap.addTile(new Tile(0, 288, 20, 1)); //coluna
-  gameMap.addTile(new Tile(0, 0, 20, 1)); //coluna
 
+
+
+
+for(let i=0; i<10; i++){
+  gameMap.addTile(new Tile(i*LARG_TILE, 0, )); //coluna
+  gameMap.addTile(new Tile(i*LARG_TILE, 144)); //coluna
+}
 
 
   
-  gameMap.addTile(new Tile(0, 32, 1, 16));
-  gameMap.addTile(new Tile(288, 32, 1, 16));
-  gameMap.addTile(new Tile(64, 96, 4, 2));
-  gameMap.addTile(new Tile(256, 96, 2, 2));
+
+for(let i=1; i<9; i++){
+  gameMap.addTile(new Tile(0, i*ALT_TILE));//linha
+  gameMap.addTile(new Tile(144, i*ALT_TILE))//linha
+}
+
+gameMap.addTile(new Tile(32, 32),2,2)//linha
+
+
+
   
   
   let mapAmmount = 0

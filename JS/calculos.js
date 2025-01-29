@@ -137,18 +137,6 @@ export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
   return true;
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
 export function calcularIndexEAngulo(player, relativeAngle) {
   // Normaliza o ângulo relativo para o intervalo [0, 360)
   relativeAngle = normalizarAngulo(relativeAngle);

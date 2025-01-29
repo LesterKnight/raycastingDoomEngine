@@ -96,6 +96,33 @@ export function desenharCeu3D(ceu) {
   }
 }
 
+export function desenharChao3D(chao) {
+  if (chao.length > 0) {
+    // Ordenar ceu por x
+    chao.sort((a, b) => a.inicial.inferior.x - b.inicial.inferior.x);
+
+    CTX_3D.beginPath();
+    CTX_3D.moveTo(chao[0].inicial.inferior.x, chao[0].inicial.inferior.y);
+
+    chao.forEach((chaoParcial) => {
+      CTX_3D.lineTo(
+        chaoParcial.inicial.inferior.x,
+        chaoParcial.inicial.inferior.y
+      );
+      CTX_3D.lineTo(chaoParcial.final.inferior.x, chaoParcial.final.inferior.y);
+    });
+
+    const ultimoChaoParcial = chao[chao.length - 1];
+    CTX_3D.lineTo(ultimoChaoParcial.final.inferior.x, ALT_CANVAS);
+    CTX_3D.lineTo(chao[0].inicial.inferior.x, ALT_CANVAS);
+    CTX_3D.lineTo(chao[0].inicial.inferior.x, chao[0].inicial.inferior.y);
+    CTX_3D.closePath();
+    CTX_3D.fillStyle = "grey";
+    CTX_3D.fill();
+  }
+}
+
+
 export function screenBlanking3D() {
   CTX_3D.clearRect(0, 0, CANVAS2D.width, CANVAS2D.height);
 }

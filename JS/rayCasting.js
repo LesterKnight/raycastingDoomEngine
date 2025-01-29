@@ -23,6 +23,7 @@ import {
   renderDot3D,
   desenharRetangulosParede3D,
   desenharCeu3D,
+  desenharChao3D
 } from "./Render/render3d.js";
 import {
   ALT_TILE,
@@ -67,37 +68,23 @@ function calcRaycastingLoop(player, gameMap) {
     while (rayCastingSize < MAX_RAYCASTING_SIZE) {
       ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize);
       
-      let tileCorner = false
-      if(parseInt(ray.x) % LARG_TILE == 0 && parseInt(ray.y) % ALT_TILE == 0){
-        tileCorner = true
-        groundCollisionListTemp.set(`${parseInt(ray.x)},${parseInt(ray.y)}`, ray);
-      }
-      else if((parseInt(ray.x) % LARG_TILE == LARG_TILE / 2 && parseInt(ray.y) % ALT_TILE == ALT_TILE / 2))
-        groundCollisionListTemp.set(`${parseInt(ray.x)},${parseInt(ray.y)}`, ray);
-        
       let tile = gameMap.checkTileCollision(ray);
 
-        
       if (tile) {
         let existeColisao = calcColisaoPrecisa(player,angle,ray,tile,wallCollisionList)
         if (existeColisao)
           break;
       }
-      else if(tileCorner&&gameMap.checkTwoTileVertexCollision(ray))
-        break
-
       if (rayCastingSize < MAX_RAYCASTING_SIZE) {
         rayCastingSize += RAYCASTING_STEP_SIZE;
         continue;
       }
       break;
     }
-
-
   }
 
 
-  
+  /*
   for (const [pos, ray] of groundCollisionListTemp.entries()) {
     for (const [pos, tile] of gameMap.ground.entries()) {
       tile.atualizarFlagColisao(ray);
@@ -125,32 +112,9 @@ function calcRaycastingLoop(player, gameMap) {
   });
 
   calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player);
-  
+  */
   return [wallCollisionList, groundCollisionList];
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
@@ -301,37 +265,7 @@ function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
       renderRay3D(zero, final, "yellow",3);
   }
   
-
-
-
-
-
-
-
-
-
-/*
-    let previous 
-    pontos.forEach(element => {
-
-      renderDot2D(element.posicao, "blue");
-      if(previous){
-        let ant = calcularReta3DPiso(player, previous.posicao);
-        let atual = calcularReta3DPiso(player, element.posicao);
-        renderRay3D(ant, atual, "green");
-      }
-      previous = element
-    });
-*/
-
-
-
-
   }
-
-
-
-
   vetParcial.forEach((tile) => {
     tile.resetAllFlags();
   });
@@ -437,10 +371,6 @@ function calcularRetangulosParede3D(wallCollisionList, player) {
       wallRectangles.get(collisionData.tile).cima.push(pos);
   }
 
-
-
-
-//if(1==2)
 wallRectangles.forEach((element,tile) => {
 
   let tamanhoDireito = element.direito.length
@@ -560,6 +490,40 @@ function calcularCeu(wallRectangles) {
   }
   return ceu;
 }
+
+function calcularChaoParcial(wallRectangle) {
+  let inicial;
+  let final;
+  wallRectangle.forEach((rayCasting) => {
+    if (rayCasting.inferior.y < ALT_CANVAS) {
+      if (!inicial) {
+        inicial = rayCasting;
+      }
+      final = rayCasting;
+    }
+  });
+  if (inicial && final) return { inicial, final };
+}
+
+function calcularChao(wallRectangles) {
+  let chao = [];
+  for (const [tile, wallRectangle] of wallRectangles.entries()) {
+    let baixo = calcularCeuParcial(wallRectangle.baixo);
+    if (baixo) chao.push(baixo);
+
+    let cima = calcularCeuParcial(wallRectangle.cima);
+    if (cima) chao.push(cima);
+
+    let esquerdo = calcularCeuParcial(wallRectangle.esquerdo);
+    if (esquerdo) chao.push(esquerdo);
+
+    let direito = calcularCeuParcial(wallRectangle.direito);
+    if (direito) chao.push(direito);
+  }
+  return chao;
+}
+
+
 export function calculateRaycastingPOV(player, gameMap) {
   //calcula o loop de raios de raycasting 2D, calcula as retas projetadas em 3D, usa as retas para formar retangulos em 3D na tela
   let [wallCollisionList, groundCollisionList] = calcRaycastingLoop(
@@ -569,8 +533,11 @@ export function calculateRaycastingPOV(player, gameMap) {
 
   let wallRectangles = calcularRetangulosParede3D(wallCollisionList, player);
 
-  //let ceu = calcularCeu(wallRectangles);
-  //desenharCeu3D(ceu);
+  let ceu = calcularCeu(wallRectangles);
+  desenharCeu3D(ceu);
+
+  let chao = calcularChao(wallRectangles);
+  desenharChao3D(ceu);
 
   desenharRetangulosParede3D(wallRectangles); //REMOVER
 

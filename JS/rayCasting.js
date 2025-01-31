@@ -57,7 +57,27 @@ function calcRaycastingLoop(player, gameMap) {
   let groundCollisionListTemp = new Map();
   let angle = player.angle;
   let ray;
-  let step = false
+
+
+
+
+
+
+
+//----------------------------------------------
+      const canvas = document.getElementById("3d-view");
+        const ctx = canvas.getContext("2d");
+        canvas.width = 500;
+        canvas.height = 500;
+
+       
+        const halfvres = canvas.height / 2; // Metade da altura do canvas
+        const FOV = RAYCASTING_POV * (Math.PI / 180); // Convertendo para radianos
+        let rotation = player.angle
+        let posx = player.pos.x
+        let posy = player.pos.y; // Posição inicial do jogador
+//----------------------------------------------
+  
 
   for (let i = 0; i < RAYCASTING_RES; i++) {
     let rayCastingSize = 0;
@@ -65,14 +85,92 @@ function calcRaycastingLoop(player, gameMap) {
       player.angle - RAYCASTING_POV / 2 + (RAYCASTING_POV / RAYCASTING_RES) * i
     );
 
+    
+
+
+    
+
+
+
+//----------------------------------------------
+let angleFloor = rotation + ((i / RAYCASTING_RES - 0.5) * FOV);
+let sin = Math.sin(angleFloor);
+let cos = Math.cos(angleFloor);
+let cos2 = Math.cos((i / RAYCASTING_RES - 0.5) * FOV); // Corrige fisheye
+//----------------------------------------------
+
+
+
+
+
     while (rayCastingSize < MAX_RAYCASTING_SIZE) {
       ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize);
       
       let tile = gameMap.checkTileCollision(ray);
+/*
+      let tileCorner = false
+      if(parseInt(ray.x) % LARG_TILE == 0 && parseInt(ray.y) % ALT_TILE == 0){
+        tileCorner = true
+        groundCollisionListTemp.set(`${parseInt(ray.x)},${parseInt(ray.y)}`, ray);
+      }
+      else if((parseInt(ray.x) % LARG_TILE == LARG_TILE / 2 && parseInt(ray.y) % ALT_TILE == ALT_TILE / 2))
+        groundCollisionListTemp.set(`${parseInt(ray.x)},${parseInt(ray.y)}`, ray);
+   */     
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
       if (tile) {
-        let existeColisao = calcColisaoPrecisa(player,angle,ray,tile,wallCollisionList)
-        if (existeColisao)
+        let colisao = calcColisaoPrecisa(player,angle,ray,tile,wallCollisionList)
+
+        if (colisao){
+        //----------------------------------------------
+        let test = calcularRetaParede3D(player,colisao,player.angle,i)
+
+  
+          // Desenhando os raios no chão, -20 corta o horizonte
+          for (let j = 0; j < test.superior.y; j+=2) {
+              let distance = halfvres / (halfvres - j) / cos2;
+              let x = posx + cos * distance;
+              let y = posy + sin * distance;
+
+              let color = (Math.floor(x) % 2 === Math.floor(y) % 2) ? "black" : "grey";
+              ctx.fillStyle = color;//250 no eixo y
+
+                      // Desmembrando o fillRect em variáveis
+              let rectX = i * (LARG_CANVAS / RAYCASTING_RES); // Posição X do retângulo
+
+              let rectY = ALT_CANVAS - (halfvres + j) + halfvres; // Posição Y do retângulo
+
+              let rectWidth = LARG_CANVAS / RAYCASTING_RES; // Largura do retângulo
+              let rectHeight = 1; // Altura do retângulo
+              ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+
+          }
+
+
+        //----------------------------------------------
+
+        }
           break;
       }
       if (rayCastingSize < MAX_RAYCASTING_SIZE) {
@@ -82,7 +180,6 @@ function calcRaycastingLoop(player, gameMap) {
       break;
     }
   }
-
 
   /*
   for (const [pos, ray] of groundCollisionListTemp.entries()) {
@@ -112,18 +209,29 @@ function calcRaycastingLoop(player, gameMap) {
   });
 
   calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player);
-  */
+  
+
+
+
+
+
+
+
+
+*/
   return [wallCollisionList, groundCollisionList];
 }
 
 
 function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
-  //USAR OS RAIOS JA EXISTENTES........
 
-  //proximos passos: unificar as funçoes
-  if (vetParcial.length > 0) {
-    let tile = vetParcial[0];
-    //renderTileGround(tile.pos, tile, false);
+  vetParcial.forEach(tile => {
+      
+
+
+
+
+
 
     let lados = {
       esquerda: [],
@@ -265,7 +373,14 @@ function calcularTilesParciais(vetParcial, wallCollisionList, gameMap, player) {
       renderRay3D(zero, final, "yellow",3);
   }
   
-  }
+})
+
+
+
+
+
+
+
   vetParcial.forEach((tile) => {
     tile.resetAllFlags();
   });
@@ -491,20 +606,6 @@ function calcularCeu(wallRectangles) {
   return ceu;
 }
 
-function calcularChaoParcial(wallRectangle) {
-  let inicial;
-  let final;
-  wallRectangle.forEach((rayCasting) => {
-    if (rayCasting.inferior.y < ALT_CANVAS) {
-      if (!inicial) {
-        inicial = rayCasting;
-      }
-      final = rayCasting;
-    }
-  });
-  if (inicial && final) return { inicial, final };
-}
-
 function calcularChao(wallRectangles) {
   let chao = [];
   for (const [tile, wallRectangle] of wallRectangles.entries()) {
@@ -535,10 +636,14 @@ export function calculateRaycastingPOV(player, gameMap) {
 
   let ceu = calcularCeu(wallRectangles);
   desenharCeu3D(ceu);
-
   let chao = calcularChao(wallRectangles);
   desenharChao3D(ceu);
 
+
+
+
   desenharRetangulosParede3D(wallRectangles); //REMOVER
+
+  
 
 }

@@ -117,7 +117,7 @@ export function desenharChao3D(chao) {
     CTX_3D.lineTo(chao[0].inicial.inferior.x, ALT_CANVAS);
     CTX_3D.lineTo(chao[0].inicial.inferior.x, chao[0].inicial.inferior.y);
     CTX_3D.closePath();
-    CTX_3D.fillStyle = "grey";
+    CTX_3D.fillStyle = "rgba(0,0,0,0.05)";
     CTX_3D.fill();
   }
 }

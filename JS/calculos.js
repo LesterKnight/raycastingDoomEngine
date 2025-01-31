@@ -134,7 +134,7 @@ export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
   }
     if(!colisao)
       return false;
-  return true;
+  return colisao;
 }
 
 export function calcularIndexEAngulo(player, relativeAngle) {

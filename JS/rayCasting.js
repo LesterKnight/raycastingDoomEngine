@@ -75,7 +75,7 @@ function calcRaycastingLoop(player, gameMap) {
         const FOV = RAYCASTING_POV * (Math.PI / 180); // Convertendo para radianos
         let rotation = player.angle * Math.PI / 180;
 
-        let nerfFactor = 0.05; // Fator de redução (ajuste conforme necessário)
+        let nerfFactor = 0.2; // Fator de redução (ajuste conforme necessário)
 
         let posx = player.pos.x * nerfFactor; // Posição X do jogador nerfada
         let posy = player.pos.y * nerfFactor; // Posição Y do jogador nerfada

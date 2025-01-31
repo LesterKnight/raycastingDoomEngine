@@ -20,19 +20,14 @@ export function initMap(gameMap) {
 
 for(let i=0; i<10; i++){
   gameMap.addTile(new Tile(i*LARG_TILE, 0, )); //coluna
-  gameMap.addTile(new Tile(i*LARG_TILE, 144)); //coluna
+  gameMap.addTile(new Tile(i*LARG_TILE, 36)); //coluna
 }
-
-
-  
-
 for(let i=1; i<9; i++){
   gameMap.addTile(new Tile(0, i*ALT_TILE));//linha
-  gameMap.addTile(new Tile(144, i*ALT_TILE))//linha
+  gameMap.addTile(new Tile(36, i*ALT_TILE))//linha
 }
 
 gameMap.addTile(new Tile(32, 32))//linha
-
 gameMap.addTile(new Tile(96, 96))//linha
 
 

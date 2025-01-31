@@ -1,5 +1,5 @@
-export const ALT_TILE = 16;
-export const LARG_TILE =16;
+export const ALT_TILE = 4;
+export const LARG_TILE =4;
 
 export const ALT_TILE_PISO = 16;
 export const LARG_TILE_PISO = 16;
@@ -10,14 +10,14 @@ export const LARG_SALA = 10;
 export const DIST_TETO = 2;
 export const DIST_PISO = 1;
 
-export const RAYCASTING_RES = 180   ; //120 linhas na tela
+export const RAYCASTING_RES = 120   ; //120 linhas na tela
 export const RAYCASTING_POV = 60; //60 graus
 export const RAYCASTING_STEP_SIZE = 1;
-export const MAX_RAYCASTING_SIZE = 250;
+export const MAX_RAYCASTING_SIZE = 50;
 
 export const CANVAS2D = document.getElementById("2d-view");
 export const CTX_2D = CANVAS2D.getContext("2d");
-CTX_2D.scale(2, 2);
+CTX_2D.scale(12, 12);
 
 export const CANVAS3D = document.getElementById("3d-view");
 export const CTX_3D = CANVAS3D.getContext("2d");

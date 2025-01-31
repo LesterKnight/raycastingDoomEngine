@@ -11,6 +11,7 @@ import { rayCasting } from "../calculos.js";
 export function renderMap2D() {
   for (let i = 0; i <= COMP_SALA * ALT_TILE; i += ALT_TILE) {
     CTX_2D.strokeStyle = "black";
+    CTX_2D.lineWidth = 0.1;
     CTX_2D.beginPath();
     CTX_2D.moveTo(0, i);
     CTX_2D.lineTo(LARG_SALA * LARG_TILE, i);
@@ -58,8 +59,8 @@ export function renderTileGround(pos,tile,lines = false, color="rgb(255, 123, 0)
     
 }
 export function renderPlayer2D(player) {
-  let radius = 15;
-  CTX_2D.lineWidth = 3;
+  let radius = 2;
+  CTX_2D.lineWidth = 0.5;
   CTX_2D.strokeStyle = "red";
   CTX_2D.beginPath();
   CTX_2D.arc(player.pos.x, player.pos.y, radius, 0, 2 * Math.PI, false);
@@ -101,6 +102,7 @@ export function renderColisao(colisao, color = "rgba(218, 28, 7, 2)") {
 }
 export function renderRay2D(a, b, color = "rgba(255, 123, 0, 0.3)") {
   CTX_2D.strokeStyle = color;
+  CTX_2D.lineWidth = 0.1;
   CTX_2D.beginPath();
   CTX_2D.moveTo(a.x, a.y);
   CTX_2D.lineTo(b.x, b.y);

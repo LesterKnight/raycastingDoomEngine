@@ -73,7 +73,7 @@ function calcRaycastingLoop(player, gameMap) {
        
         const halfvres = canvas.height / 2; // Metade da altura do canvas
         const FOV = RAYCASTING_POV * (Math.PI / 180); // Convertendo para radianos
-        let rotation = player.angle
+        let rotation = player.angle * Math.PI / 180;
         let posx = player.pos.x
         let posy = player.pos.y; // Posição inicial do jogador
 //----------------------------------------------

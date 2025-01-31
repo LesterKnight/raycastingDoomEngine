@@ -74,8 +74,11 @@ function calcRaycastingLoop(player, gameMap) {
         const halfvres = canvas.height / 2; // Metade da altura do canvas
         const FOV = RAYCASTING_POV * (Math.PI / 180); // Convertendo para radianos
         let rotation = player.angle * Math.PI / 180;
-        let posx = player.pos.x
-        let posy = player.pos.y; // Posição inicial do jogador
+
+        let nerfFactor = 0.05; // Fator de redução (ajuste conforme necessário)
+
+        let posx = player.pos.x * nerfFactor; // Posição X do jogador nerfada
+        let posy = player.pos.y * nerfFactor; // Posição Y do jogador nerfada
 //----------------------------------------------
   
 
@@ -144,16 +147,16 @@ let cos2 = Math.cos((i / RAYCASTING_RES - 0.5) * FOV); // Corrige fisheye
 
         if (colisao){
         //----------------------------------------------
-        let test = calcularRetaParede3D(player,colisao,player.angle,i)
-
+        //let test = calcularRetaParede3D(player,colisao,player.angle,i)
+        //test.superior.y//
   
           // Desenhando os raios no chão, -20 corta o horizonte
-          for (let j = 0; j < test.superior.y; j+=2) {
+          for (let j = 0; j < 220; j+=3) {
               let distance = halfvres / (halfvres - j) / cos2;
               let x = posx + cos * distance;
               let y = posy + sin * distance;
 
-              let color = (Math.floor(x) % 2 === Math.floor(y) % 2) ? "black" : "grey";
+              let color = (Math.floor(x) % 2 === Math.floor(y) % 2) ? "black" : "green";
               ctx.fillStyle = color;//250 no eixo y
 
                       // Desmembrando o fillRect em variáveis

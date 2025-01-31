@@ -16,6 +16,7 @@ import {
   RAYCASTING_POV,
   RAYCASTING_STEP_SIZE,
   MAX_RAYCASTING_SIZE,
+  GUN
 } from "../config.js";
 export function renderRay3D(a, b, color = "rgb(255, 123, 0)", strokeSize = 1) {
   // Save the current context state
@@ -125,4 +126,15 @@ export function desenharChao3D(chao) {
 
 export function screenBlanking3D() {
   CTX_3D.clearRect(0, 0, CANVAS2D.width, CANVAS2D.height);
+
+}
+export function renderGun(){
+  let originalWidth = GUN.width;
+  let originalHeight = GUN.height;
+
+  let scaledWidth = originalWidth * 0.7;
+  let scaledHeight = originalHeight * 0.7;
+
+
+  CTX_3D.drawImage(GUN, 60, 250,scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
 }

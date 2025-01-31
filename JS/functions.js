@@ -1,7 +1,7 @@
 import { ALT_TILE, CANVAS2D, CTX_2D, CTX_3D, LARG_SALA, LARG_TILE,COMP_SALA} from "./config.js";
 import { calculateRaycastingPOV } from "./rayCasting.js";
 import { renderMap2D, renderTiles, renderGround, renderPlayer2D,screenBlanking2D} from "./Render/render2d.js";
-import {screenBlanking3D} from "./Render/render3d.js"
+import {screenBlanking3D,renderGun} from "./Render/render3d.js"
 import { Tile } from "./Classes/Tile.js";
 function renderInfo(player) {
   CTX_2D.font = "20px Arial";
@@ -31,7 +31,9 @@ for(let i=1; i<9; i++){
   gameMap.addTile(new Tile(144, i*ALT_TILE))//linha
 }
 
-gameMap.addTile(new Tile(32, 32),2,2)//linha
+gameMap.addTile(new Tile(32, 32))//linha
+
+gameMap.addTile(new Tile(96, 96))//linha
 
 
 
@@ -64,5 +66,5 @@ export function renderGame(player, gameMap) {
 
   renderTiles(gameMap);
   calculateRaycastingPOV(player, gameMap);
-
+  renderGun()
 }

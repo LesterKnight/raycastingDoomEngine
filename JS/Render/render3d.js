@@ -20,7 +20,7 @@ import {
 } from "../config.js";
 export function renderRay3D(a, b, color = "rgb(255, 123, 0)", strokeSize = 1) {
   // Save the current context state
-  CTX_3D.save();
+  //CTX_3D.save();
 
   // Set the stroke style and line width
   CTX_3D.strokeStyle = color;
@@ -34,7 +34,7 @@ export function renderRay3D(a, b, color = "rgb(255, 123, 0)", strokeSize = 1) {
   CTX_3D.closePath();
 
   // Restore the context to its original state
-  CTX_3D.restore();
+  //CTX_3D.restore();
 }
 
 export function renderDot3D(a, color = "red") {
@@ -45,6 +45,10 @@ export function renderDot3D(a, color = "red") {
   CTX_3D.closePath();
 }
 
+export function screenBlanking3D(){
+  CTX_3D.fillStyle = 'black';
+  CTX_3D.fillRect(0, 0, LARG_CANVAS, ALT_CANVAS);
+}
 export function desenharRetangulosParede3D(wallRectangles) {
   //renderiza os trapezios, SEPARAR NO FUTURO
 
@@ -53,19 +57,30 @@ export function desenharRetangulosParede3D(wallRectangles) {
       const trapezio = trapezios[lado];
       let size = trapezio.length;
       if (size > 0) {
-        //COLUNAS HORIZONTAIS
-        renderRay3D(trapezio[0].superior, trapezio[size - 1].superior);
-        renderRay3D(trapezio[0].inferior, trapezio[size - 1].inferior);
-        //COLUNAS VERTICAIS
-        renderRay3D(trapezio[0].superior, trapezio[0].inferior);
-        renderRay3D(trapezio[size - 1].superior, trapezio[size - 1].inferior);
-        /*
-               //CRIA UM X NAS CAIXAS
-               if (tile.altura == ALT_TILE && tile.largura == LARG_TILE) {
-                 renderRay3D(trapezio[0].superior, trapezio[size - 1].inferior);
-                 renderRay3D(trapezio[0].inferior, trapezio[size - 1].superior);
-               }
-        */
+
+               CTX_3D.beginPath();
+               // Define os pontos do quadrado
+               CTX_3D.moveTo(trapezio[0].superior.x, trapezio[0].superior.y); // Ponto inicial
+               CTX_3D.lineTo(trapezio[size - 1].superior.x,trapezio[size - 1].superior.y)
+               CTX_3D.lineTo(trapezio[size - 1].inferior.x,trapezio[size - 1].inferior.y)
+               CTX_3D.lineTo(trapezio[0].inferior.x, trapezio[0].inferior.y)
+               CTX_3D.lineTo(trapezio[0].superior.x, trapezio[0].superior.y)  
+               CTX_3D.closePath(); // Fecha o caminho (volta ao ponto inicial)
+               // Preenche o quadrado com a cor especificada
+               CTX_3D.fillStyle = tile.cor;
+               CTX_3D.fill();
+
+
+               
+               let lineWidth = 3
+               let color = "black"
+               //COLUNAS HORIZONTAIS
+               renderRay3D(trapezio[0].superior, trapezio[size - 1].superior,color,lineWidth);
+               renderRay3D(trapezio[0].inferior, trapezio[size - 1].inferior,color,lineWidth);
+               //COLUNAS VERTICAIS
+               renderRay3D(trapezio[0].superior, trapezio[0].inferior,color,lineWidth);
+               renderRay3D(trapezio[size - 1].superior, trapezio[size - 1].inferior,color,lineWidth);
+
       }
     });
   }
@@ -124,10 +139,7 @@ export function desenharChao3D(chao) {
 }
 
 
-export function screenBlanking3D() {
-  CTX_3D.clearRect(0, 0, CANVAS2D.width, CANVAS2D.height);
 
-}
 export function renderGun(){
   let originalWidth = GUN.width;
   let originalHeight = GUN.height;

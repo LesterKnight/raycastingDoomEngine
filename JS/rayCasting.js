@@ -65,18 +65,11 @@ function calcRaycastingLoop(player, gameMap) {
 
 
 //----------------------------------------------
-      const canvas = document.getElementById("3d-view");
-        const ctx = canvas.getContext("2d");
-        canvas.width = 500;
-        canvas.height = 500;
-
        
-        const halfvres = canvas.height / 2; // Metade da altura do canvas
+        const halfvres = CANVAS3D.height / 2; // Metade da altura do canvas
         const FOV = RAYCASTING_POV * (Math.PI / 180); // Convertendo para radianos
         let rotation = player.angle * Math.PI / 180;
-
         let nerfFactor = 0.2; // Fator de redução (ajuste conforme necessário)
-
         let posx = player.pos.x * nerfFactor; // Posição X do jogador nerfada
         let posy = player.pos.y * nerfFactor; // Posição Y do jogador nerfada
 //----------------------------------------------
@@ -119,45 +112,22 @@ let cos2 = Math.cos((i / RAYCASTING_RES - 0.5) * FOV); // Corrige fisheye
       else if((parseInt(ray.x) % LARG_TILE == LARG_TILE / 2 && parseInt(ray.y) % ALT_TILE == ALT_TILE / 2))
         groundCollisionListTemp.set(`${parseInt(ray.x)},${parseInt(ray.y)}`, ray);
    */     
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
       if (tile) {
         let colisao = calcColisaoPrecisa(player,angle,ray,tile,wallCollisionList)
 
         if (colisao){
         //----------------------------------------------
-        //let test = calcularRetaParede3D(player,colisao,player.angle,i)
-        //test.superior.y//
+        let test = calcularRetaParede3D(player,colisao,angle,i)
+        test.superior.y//
   
           // Desenhando os raios no chão, -20 corta o horizonte
-          for (let j = 0; j < 220; j+=3) {
+          for (let j = 0; j < test.superior.y; j+=3) {
               let distance = halfvres / (halfvres - j) / cos2;
               let x = posx + cos * distance;
               let y = posy + sin * distance;
 
               let color = (Math.floor(x) % 2 === Math.floor(y) % 2) ? "black" : "green";
-              ctx.fillStyle = color;//250 no eixo y
+              CTX_3D.fillStyle = color;//250 no eixo y
 
                       // Desmembrando o fillRect em variáveis
               let rectX = i * (LARG_CANVAS / RAYCASTING_RES); // Posição X do retângulo
@@ -166,7 +136,7 @@ let cos2 = Math.cos((i / RAYCASTING_RES - 0.5) * FOV); // Corrige fisheye
 
               let rectWidth = LARG_CANVAS / RAYCASTING_RES; // Largura do retângulo
               let rectHeight = 1; // Altura do retângulo
-              ctx.fillRect(rectX, rectY, rectWidth, rectHeight);
+              CTX_3D.fillRect(rectX, rectY, rectWidth*3, rectHeight*3);
 
           }
 
@@ -636,17 +606,9 @@ export function calculateRaycastingPOV(player, gameMap) {
   );
 
   let wallRectangles = calcularRetangulosParede3D(wallCollisionList, player);
-
+  desenharRetangulosParede3D(wallRectangles); //REMOVER
   let ceu = calcularCeu(wallRectangles);
   desenharCeu3D(ceu);
-  let chao = calcularChao(wallRectangles);
-  desenharChao3D(ceu);
-
-
-
-
-  desenharRetangulosParede3D(wallRectangles); //REMOVER
-
-  
-
+  //let chao = calcularChao(wallRectangles);
+  //desenharChao3D(ceu);
 }

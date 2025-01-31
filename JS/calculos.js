@@ -102,7 +102,7 @@ export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
   angle,
   ray,
   tile,
-  wallCollisionList
+  wallCollisionList,
 ) {
 
   if(DEBUG_RAYCASTING_POS_2D)
@@ -126,11 +126,11 @@ export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
 
   if (orientacao.esquerda || orientacao.direita) {
     colisao = calcularIntersecaoLateral(tile,ray,angle, orientacao.esquerda);//é para saber se é a esquerda e deve inverter
-    wallCollisionList.set(angle, { colisao, tile, orientacao });
+      wallCollisionList.set(angle, { colisao, tile, orientacao });
   }
   if (!colisao && (orientacao.cima || orientacao.baixo)) {
     colisao = calcIntersecaoVertical(tile, ray, angle, orientacao.cima);
-    wallCollisionList.set(angle, { colisao, tile, orientacao });
+      wallCollisionList.set(angle, { colisao, tile, orientacao });
   }
     if(!colisao)
       return false;

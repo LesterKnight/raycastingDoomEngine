@@ -11,16 +11,15 @@ const gameMap = new GameMap(
   DIST_PISO,
   "mapa_inicial"
 );
-const player = new Player(12 , 12, 0);
+const player = new Player(16, 16, 0);
 initMap(gameMap);
 player.setGameMap(gameMap);
 
 let frameCount = 0;
-let lastTime = Date.now();
+let lastTime = performance.now();
 let fps = 0;
 
-function gameLoop() {
-  const currentTime = Date.now();
+function gameLoop(currentTime) {
   const deltaTime = currentTime - lastTime;
 
   // Atualiza o contador de frames
@@ -36,7 +35,9 @@ function gameLoop() {
   document.title = `FPS: ${fps}`;
   renderGame(player, gameMap);
 
+  // Chama o próximo frame
+  requestAnimationFrame(gameLoop);
 }
 
-// Chama gameLoop a cada 16 ms (~60 FPS)
-setInterval(gameLoop, 16);
+// Inicia o loop de animação
+requestAnimationFrame(gameLoop);

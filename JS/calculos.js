@@ -80,23 +80,6 @@ export function rayCasting(x0, y0, angulo, raio,int = false) {
 export function normalizarAngulo(angulo) {
   return ((angulo % 360) + 360) % 360;
 }
-export function calcularIndex(player, colisao) {
-  let relativeAngle = calcularAnguloAB(player, colisao); 
-  let fovStart = normalizarAngulo(player.angle - RAYCASTING_POV / 2); 
-  let diferenca = normalizarAngulo(relativeAngle - fovStart);
-  //if (diferenca > 180) diferenca -= 360; // Ajuste para ângulos negativos, se necessário
-  let index = diferenca / (RAYCASTING_POV / RAYCASTING_RES);
-  return index;
-}
-
-export function calcularAnguloAB(player, P) {
-  let deltaX = P.x - player.pos.x;
-  let deltaY = P.y - player.pos.y;
-  let angleToPoint = Math.atan2(deltaY, deltaX);
-  let angleToPointDegrees = (angleToPoint * 180) / Math.PI;
-  let relativeAngle = normalizarAngulo(angleToPointDegrees - player.angle);
-  return relativeAngle;
-}
 export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
   player,
   angle,
@@ -135,46 +118,4 @@ export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
     if(!colisao)
       return false;
   return colisao;
-}
-
-export function calcularIndexEAngulo(player, relativeAngle) {
-  // Normaliza o ângulo relativo para o intervalo [0, 360)
-  relativeAngle = normalizarAngulo(relativeAngle);
-
-  // Calcula o início e o fim do FOV principal
-  let fovStart = normalizarAngulo(player.angle - RAYCASTING_POV / 2);
-  let fovEnd = normalizarAngulo(fovStart + RAYCASTING_POV);
-  
-  let index;
-//QUANDO FINAL DO POV NAO ESTIVER NOS ANGULOS INICIAIS
-  if (fovStart < fovEnd) {
-    if (relativeAngle >= fovStart && relativeAngle <= fovEnd) {
-      index = ((relativeAngle - fovStart) / (RAYCASTING_POV / RAYCASTING_RES));
-    } else {
-      // Ajuste para valores fora do FOV
-      index = (relativeAngle < fovStart) 
-        ? (relativeAngle - fovStart) / (RAYCASTING_POV / RAYCASTING_RES)
-        : (relativeAngle - fovEnd) / (RAYCASTING_POV / RAYCASTING_RES) + RAYCASTING_RES;
-    }
-  }
-  //QUANDO FINAL DO POV ESTIVER NOS ANGULOS INICIAIS
-  else {
-    if (relativeAngle >= fovStart || relativeAngle <= fovEnd) {
-      if (relativeAngle >= fovStart) {
-        index = ((relativeAngle - fovStart) / (RAYCASTING_POV / RAYCASTING_RES));
-      } else {
-        index = ((relativeAngle + 360 - fovStart) / (RAYCASTING_POV / RAYCASTING_RES));
-      }
-    }
-    
-    else {
-      
-      index = (relativeAngle < fovStart) 
-        ? (relativeAngle - fovStart) / (RAYCASTING_POV / RAYCASTING_RES)
-        : (relativeAngle - fovEnd) / (RAYCASTING_POV / RAYCASTING_RES) + RAYCASTING_RES;
-    }
-  }
-  
-  // Retorna o índice, permitindo valores negativos para extrapolar o canvas 
-  return Math.floor(index);
 }

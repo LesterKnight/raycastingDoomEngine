@@ -1,9 +1,12 @@
 import { Fisica } from "./Fisica.js";
 export class Tile extends Fisica{
-  constructor(x, y, scaleX = 1, scaleY = 1) {
-    super(x,y,scaleX,scaleY)
-    this.cor = this.gerarCorRGBAleatoria();
+  constructor(x, y, ground = false) {
+    super(x,y)
+    this.id = Tile.lastId++,
+    this.ground = ground
+    this.cor = ground ? "rgba(0,0,0,0.1)" : this.gerarCorRGBAleatoria()
   }
+  static lastId = 1
   gerarCorRGBAleatoria() {
     const r = Math.floor(Math.random() * 256);
     const g = Math.floor(Math.random() * 256);

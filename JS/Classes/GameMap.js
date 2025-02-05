@@ -5,17 +5,56 @@ export class GameMap {
   constructor(largura, comprimento, distanciaTeto, distanciaPiso, mapName) {
     this.largura = largura,
     this.comprimento = comprimento,
-    this.tiles = new Map(),
-    this.ground = new Map(),
+
+    //this.tiles = new Map(),
+    this.tiles = new Array(),
+    this.tileLookupTable = new Array(comprimento*ALT_TILE).fill(-1).map(() => new Array(largura*LARG_TILE).fill(-1));
+
+    
+    this.ground = new Array(),
+    this.groundLookupTable = new Array(comprimento*ALT_TILE).fill(-1).map(() => new Array(largura*LARG_TILE).fill(-1));
+
     this.gameObjects = new Map();
     GameMap.gameMapCollection.set(mapName, this);
   }
+
+  findTileById(id) {
+    if(id>-1)
+      return this.tiles[id]
+  }
   checkTileCollision(pos) {
-    for (let [tilePos, tile] of this.tiles) {
-      if (tile.verificarColisao(pos))
-        return tile;
+    let x = parseInt(pos.x)
+    let y = parseInt(pos.y)
+    if(x>=0 && y>=0 &&this.tileLookupTable[y][x] >=0)
+      return this.findTileById(this.tileLookupTable[y][x])
+  }
+  checkGroundCollision(pos) {
+    let x = parseInt(pos.x)
+    let y = parseInt(pos.y)
+    if(x>=0 && y>=0 &&this.groundLookupTable[y][x] >=0){
+      let id =  this.groundLookupTable[y][x]
+      return this.ground[id]
     }
   }
+    //array[y][x]
+  addTile(tile) {
+    this.tiles[tile.id] = tile
+    for(let y=tile.pos.y;y<tile.pos.y+ALT_TILE;y++){
+      for(let x = tile.pos.x;x<tile.pos.x+LARG_TILE;x++){
+        this.tileLookupTable[y][x] = tile.id
+      }
+    }
+  }
+
+  addGround(tile) {
+    this.ground[tile.id] = tile
+    for(let y=tile.pos.y;y<tile.pos.y+ALT_TILE;y++){
+      for(let x = tile.pos.x;x<tile.pos.x+LARG_TILE;x++){
+        this.groundLookupTable[y][x] = tile.id
+      }
+    }
+  }
+
   checkTwoTileVertexCollision(pos) {
     let count = 0
     for (let [tilePos, tile] of this.tiles) {
@@ -26,29 +65,12 @@ export class GameMap {
       }  
     }
   }
-  checkGroundCollision(pos) {
-    for (let [tilePos, tile] of this.ground) {
-      if (tile.verificarColisao(pos))
-        return tile;
-    }
-  }
+
   existingTilePosCheck(pos) {
-    for (let [tilePos, tile] of this.tiles) {
-        for (let i = tilePos.y; i < tilePos.y + tile.altura; i += ALT_TILE) {
-            for (let j = tilePos.x; j < tilePos.x + tile.largura; j += LARG_TILE) {
-                if (pos.x == j && pos.y == i) {
-                    return true;
-                }
-            }
-        }
-    }
-    return false; // Adicionei um retorno falso caso a posição não seja encontrada
+    let x = parseInt(pos.x)
+    let y = parseInt(pos.y)
+    return this.tileLookupTable[y][x]>=0
 }
 
-  addTile(tile) {
-    this.tiles.set(tile.pos, tile);
-  }
-  addGround(tile) {
-    this.ground.set(tile.pos, tile);
-  }
+
 }

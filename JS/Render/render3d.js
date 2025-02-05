@@ -46,21 +46,24 @@ export function renderDot3D(a, color = "red") {
 }
 
 export function screenBlanking3D(){
-  CTX_3D.fillStyle = 'black';
+  CTX_3D.fillStyle = 'pink';
   CTX_3D.fillRect(0, 0, LARG_CANVAS, ALT_CANVAS);
 }
 export function desenharRetangulosParede3D(wallRectangles) {
   //renderiza os trapezios, SEPARAR NO FUTURO
-
   for (const [tile, trapezios] of wallRectangles.entries()) {
     Object.keys(trapezios).forEach((lado) => {
       const trapezio = trapezios[lado];
       let size = trapezio.length;
       if (size > 0) {
 
+
+        renderRay3D(trapezio[0].superior,trapezio[0].inferior,"red",3)
+
                CTX_3D.beginPath();
                // Define os pontos do quadrado
                CTX_3D.moveTo(trapezio[0].superior.x, trapezio[0].superior.y); // Ponto inicial
+               
                CTX_3D.lineTo(trapezio[size - 1].superior.x,trapezio[size - 1].superior.y)
                CTX_3D.lineTo(trapezio[size - 1].inferior.x,trapezio[size - 1].inferior.y)
                CTX_3D.lineTo(trapezio[0].inferior.x, trapezio[0].inferior.y)
@@ -72,7 +75,7 @@ export function desenharRetangulosParede3D(wallRectangles) {
 
 
                
-               let lineWidth = 3
+               let lineWidth = 1
                let color = "black"
                //COLUNAS HORIZONTAIS
                renderRay3D(trapezio[0].superior, trapezio[size - 1].superior,color,lineWidth);
@@ -80,6 +83,7 @@ export function desenharRetangulosParede3D(wallRectangles) {
                //COLUNAS VERTICAIS
                renderRay3D(trapezio[0].superior, trapezio[0].inferior,color,lineWidth);
                renderRay3D(trapezio[size - 1].superior, trapezio[size - 1].inferior,color,lineWidth);
+
 
       }
     });
@@ -137,16 +141,13 @@ export function desenharChao3D(chao) {
     CTX_3D.fill();
   }
 }
-
-
-
 export function renderGun(){
   let originalWidth = GUN.width;
   let originalHeight = GUN.height;
 
-  let scaledWidth = originalWidth * 0.7;
-  let scaledHeight = originalHeight * 0.7;
+  let scaledWidth = originalWidth * 0.8;
+  let scaledHeight = originalHeight * 0.8;
 
 
-  CTX_3D.drawImage(GUN, 60, 250,scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
+  CTX_3D.drawImage(GUN, 0, 200,scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
 }

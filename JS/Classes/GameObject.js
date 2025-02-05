@@ -9,8 +9,8 @@ export class GameObject extends Fisica{
     super()
     this.pos = new Posicao(x, y);
     this.angle = 0;
-    this.speed = 0.5 ;
-    this.altura = 0.5;
+    this.speed = 3 ;
+    this.altura = 3;
     this.gameMap = null
   }
  setGameMap(gameMap){

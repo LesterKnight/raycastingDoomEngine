@@ -29,34 +29,23 @@ export function renderMap2D() {
   }
 }
 export function renderTiles(gameMap) {
-  for (let [pos, tile] of gameMap.tiles) {
+  gameMap.tiles.forEach(tile => {
+    let pos = tile.pos
+    
     CTX_2D.fillStyle = tile.cor;
     CTX_2D.fillRect(pos.x, pos.y, tile.largura, tile.altura);
-  }
-}
-export function renderGround(groundCollisionList) {
-  for (let [pos, tile] of groundCollisionList) {
-    CTX_2D.fillStyle = "rgba(0,0,0,1)";
-    CTX_2D.fillRect(pos.x, pos.y, tile.largura, tile.altura);
-  }
-}
-export function renderTileGround(pos,tile,lines = false, color="rgb(255, 123, 0)") {
-  if(!lines){
-    CTX_2D.fillStyle = color
-    CTX_2D.fillRect(pos.x, pos.y, tile.largura, tile.altura);
-  }
-  else{
-    CTX_2D.beginPath();
-    CTX_2D.rect(pos.x, pos.y, tile.largura, tile.altura);
-    //CTX_2D.fillStyle = color;
-    //CTX_2D.fill();
-    CTX_2D.lineWidth = 1;
-    let oldStroke = CTX_2D.strokeStyle
-    CTX_2D.strokeStyle = color
-    CTX_2D.stroke();
-    CTX_2D.strokeStyle = oldStroke
-  }
-    
+
+    // Adicionar o texto das coordenadas x e y
+    CTX_2D.fillStyle = 'black'; // Cor do texto
+    CTX_2D.font = '10px Arial'; // Fonte do texto
+
+    CTX_2D.fillText(`x: ${pos.x}`, pos.x+0.5, pos.y+10 ); 
+    CTX_2D.fillText(`y: ${pos.y}`, pos.x+0.5, pos.y + 20);
+    CTX_2D.fillText(`id: ${tile.id}`, pos.x+0.5, pos.y + 30); 
+  });
+
+
+  
 }
 export function renderPlayer2D(player) {
   let radius = 2;

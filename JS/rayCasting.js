@@ -14,15 +14,15 @@ import {
   renderDot3D,
   desenharRetangulosParede3D,
   desenharCeu3D,
-  desenharChao3D
+  desenharChao3D,
+  renderPixel3D
 } from "./Render/render3d.js";
 import {
   ALT_TILE,
   LARG_TILE,
   COMP_SALA,
   LARG_SALA,
-  DIST_TETO,
-  DIST_PISO,
+  FOV_IN_RADIANS,
   CANVAS2D,
   CTX_2D,
   CANVAS3D,
@@ -55,7 +55,12 @@ function calcRaycastingLoop(player, gameMap) {
     let tile = gameMap.checkTileCollision(ray);
     if (tile) {
       let colisao = calcColisaoPrecisa(player, angle, ray, tile, wallCollisionList)
-      if (colisao) { break }
+      if (colisao) { 
+   
+        calcularGroundCasting(player, angle,colisao, rayCastingSize, ray,i,gameMap)
+        //ground casting pode ser calculado em paralelo!!!!!!!!!!!!!!!!!!!!!
+        break 
+      }
     }
     if (rayCastingSize < MAX_RAYCASTING_SIZE) {
       rayCastingSize += RAYCASTING_STEP_SIZE;
@@ -66,6 +71,44 @@ function calcRaycastingLoop(player, gameMap) {
 }
   return [wallCollisionList];
 }
+
+function calcularGroundCasting(player, angle,colisao, rayCastingSize, ray,i,gameMap){
+  let pos = calcularRetaParede3D(player,colisao,angle,i);
+
+
+for(let j=rayCastingSize+1;j>0;j-=2){
+ let g = rayCasting(player.pos.x, player.pos.y, angle, j,true);
+ let ground =  gameMap.checkGroundCollision(g)
+
+ if(ground){
+  let pos2 = calcularRetaParede3D(player,g,angle,i);
+  renderPixel3D(pos2.inferior,ground.cor,LARG_CANVAS/RAYCASTING_RES)
+ }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+
 
 export function calcularRetaParede3D(player, colisao, angle, index) {
   //calcula reta projetada de acordo com o angulo do jogador
@@ -85,12 +128,15 @@ export function calcularRetaParede3D(player, colisao, angle, index) {
     inferior: { x: posX, y: posYinf },
   };
 }
+
+
+
 function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
   let index = 0;
   const wallRectangles = new Map();
   for (const [angle, collisions] of wallCollisionList.entries()) {
     let collisionData = collisions;
-    let pos = calcularRetaParede3D(
+        let pos = calcularRetaParede3D(//DESACOPLAR CALCULAR RETAS
       player,
       collisionData.colisao,
       angle,

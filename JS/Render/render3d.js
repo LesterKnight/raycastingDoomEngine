@@ -3,8 +3,6 @@ import {
   LARG_TILE,
   COMP_SALA,
   LARG_SALA,
-  DIST_TETO,
-  DIST_PISO,
   CANVAS2D,
   CTX_2D,
   CANVAS3D,
@@ -37,12 +35,16 @@ export function renderRay3D(a, b, color = "rgb(255, 123, 0)", strokeSize = 1) {
   //CTX_3D.restore();
 }
 
-export function renderDot3D(a, color = "red") {
+export function renderDot3D(a, color = "red",size = 2) {
   CTX_3D.fillStyle = color;
   CTX_3D.beginPath();
-  CTX_3D.arc(a.x, a.y, 8, 0, 2 * Math.PI, false);
+  CTX_3D.arc(a.x, a.y, size, 0, 2 * Math.PI, false);
   CTX_3D.fill();
   CTX_3D.closePath();
+}
+export function renderPixel3D(a, color = "red",size = 1) {
+  CTX_3D.fillStyle = color;
+  CTX_3D.fillRect(a.x, a.y, size, size);
 }
 
 export function screenBlanking3D(){

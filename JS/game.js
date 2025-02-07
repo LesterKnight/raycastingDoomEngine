@@ -1,4 +1,4 @@
-import { COMP_SALA, LARG_SALA, DIST_TETO, DIST_PISO } from "./config.js";
+import { COMP_SALA, LARG_SALA,  } from "./config.js";
 import { Player } from "./Classes/Player.js";
 import { GameMap } from "./Classes/GameMap.js";
 import { calculateRaycastingPOV } from "./rayCasting.js";
@@ -7,8 +7,6 @@ import { renderGame, initMap } from "./functions.js";
 const gameMap = new GameMap(
   LARG_SALA,
   COMP_SALA,
-  DIST_TETO,
-  DIST_PISO,
   "mapa_inicial"
 );
 const player = new Player(64, 64, 339);

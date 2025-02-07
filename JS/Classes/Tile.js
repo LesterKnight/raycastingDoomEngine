@@ -4,7 +4,7 @@ export class Tile extends Fisica{
     super(x,y)
     this.id = Tile.lastId++,
     this.ground = ground
-    this.cor = ground ? "rgba(0,0,0,0.1)" : this.gerarCorRGBAleatoria()
+    this.cor = ground ? this.gerarCorRGBAleatoriaChao() : this.gerarCorRGBAleatoria()
   }
   static lastId = 1
   gerarCorRGBAleatoria() {
@@ -12,5 +12,11 @@ export class Tile extends Fisica{
     const g = Math.floor(Math.random() * 256);
     const b = Math.floor(Math.random() * 256);
     return `rgb(${r}, ${g}, ${b})`;
+  }
+  gerarCorRGBAleatoriaChao() {
+    const r = Math.floor(Math.random() * 128 + 128);
+    const g = Math.floor(Math.random() * 128 + 128);
+    const b = Math.floor(Math.random() * 128 + 128);
+    return `rgba(${r}, ${g}, ${b},1)`;
   }
 }

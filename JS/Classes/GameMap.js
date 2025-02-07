@@ -22,6 +22,10 @@ export class GameMap {
     if(id>-1)
       return this.tiles[id]
   }
+  findGroundById(id) {
+    if(id>-1)
+      return this.ground[id]
+  }
   checkTileCollision(pos) {
     let x = parseInt(pos.x)
     let y = parseInt(pos.y)

@@ -38,6 +38,7 @@ export class GameObject extends Fisica{
       this.angle,
       this.speed
     );
+    
     if (this.movimentoValido(stroke)) {
       this.pos.x = stroke.x;
       this.pos.y = stroke.y;

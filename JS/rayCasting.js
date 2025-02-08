@@ -6,16 +6,14 @@ import {
   calcDistanciaProjetada,
   calcColisaoPrecisa,
 } from "./calculos.js";
-import {
-
-} from "./Render/render2d.js";
+import {} from "./Render/render2d.js";
 import {
   renderRay3D,
   renderDot3D,
   desenharRetangulosParede3D,
   desenharCeu3D,
   desenharChao3D,
-  renderPixel3D
+  renderPixel3D,
 } from "./Render/render3d.js";
 import {
   ALT_TILE,
@@ -50,98 +48,113 @@ function calcRaycastingLoop(player, gameMap) {
     angle = normalizarAngulo(
       player.angle - RAYCASTING_POV / 2 + (RAYCASTING_POV / RAYCASTING_RES) * i
     );
-  while (rayCastingSize < MAX_RAYCASTING_SIZE) {
-    ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize);
-    let tile = gameMap.checkTileCollision(ray);
-    if (tile) {
-      let colisao = calcColisaoPrecisa(player, angle, ray, tile, wallCollisionList)
-      if (colisao) { 
-   
-        calcularGroundCasting(player, angle,colisao, rayCastingSize, ray,i,gameMap)
-        //ground casting pode ser calculado em paralelo!!!!!!!!!!!!!!!!!!!!!
-        break 
+    while (rayCastingSize < MAX_RAYCASTING_SIZE) {
+      ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize);
+      let tile = gameMap.checkTileCollision(ray);
+      if (tile) {
+        let colisao = calcColisaoPrecisa(
+          player,
+          angle,
+          ray,
+          tile,
+          wallCollisionList
+        );
+        if (colisao) {
+          calcularGroundCasting(
+            player,
+            angle,
+            colisao,
+            rayCastingSize,
+            ray,
+            i,
+            gameMap
+          );
+          //ground casting pode ser calculado em paralelo!!!!!!!!!!!!!!!!!!!!!
+          break;
+        }
       }
+      if (rayCastingSize < MAX_RAYCASTING_SIZE) {
+        rayCastingSize += RAYCASTING_STEP_SIZE;
+        continue;
+      }
+      break;
     }
-    if (rayCastingSize < MAX_RAYCASTING_SIZE) {
-      rayCastingSize += RAYCASTING_STEP_SIZE;
-      continue;
-    }
-    break;
   }
-}
   return [wallCollisionList];
 }
 
-function calcularGroundCasting(player, angle,colisao, rayCastingSize, ray,i,gameMap){
+function calcularGroundCasting(
+  player,
+  angle,
+  colisao,
+  rayCastingSize,
+  ray,
+  i,
+  gameMap
+) {
   //let pos = calcularRetaParede3D(player,colisao,angle,i);
   let groundCasting = {
-    lastGround:null,
-    firstPos:null,
-    lastPos:null
-  } 
-  
+    lastGround: null,
+    firstPos: null,
+    lastPos: null,
+  };
 
-for(let j=rayCastingSize+1;j>0;j-=2){
- let g = rayCasting(player.pos.x, player.pos.y, angle, j,true);
- let ground =  gameMap.checkGroundCollision(g)
+  for (let j = rayCastingSize + 1; j > 0; j--) {
+    let g = rayCasting(player.pos.x, player.pos.y, angle, j);
+    let ground = gameMap.checkGroundCollision(g);
 
- if(ground){
-    if(groundCasting.lastGround && groundCasting.lastGround!=ground){//calcula first last e renderiza
-      
-    //ajustar somente o first pos GERA BURACO 3D, ALTERAR SOMENTE O LAST POS GERA RELEVO!!!!!!!!!!!!!!!!!!!
+    if (ground) {
+      if (groundCasting.lastGround && groundCasting.lastGround != ground) {
+        //calcula first last e renderiza
 
-      let firstPos= calcularRetaParede3D(player,groundCasting.firstPos,angle,i);
-      //GERA ALTERACAO DE RELEVO INTERESSANTE
-      let firstPosCorrigido = firstPos.inferior.y + (ALT_TILE*DIST_FOCAL)/rayCastingSize
-      //firstPos.inferior.y = firstPosCorrigido
-      let lastPos= calcularRetaParede3D(player,groundCasting.lastPos,angle,i);
-      //corrige a perspectiva do last position em relação a tamanho perspectivo
-      let lastPosCorrigido = lastPos.inferior.y + (ALT_TILE*DIST_FOCAL)/rayCastingSize
-      //lastPos.inferior.y = lastPosCorrigido
-      //lastPos.inferior.y +=5
+        //ajustar somente o first pos GERA BURACO 3D, ALTERAR SOMENTE O LAST POS GERA RELEVO!!!!!!!!!!!!!!!!!!!
 
-      renderRay3D(firstPos.inferior,lastPos.inferior,groundCasting.lastGround.cor,3)//render ground
-  
+        let firstPos = calcularRetaParede3D(
+          player,
+          groundCasting.firstPos,
+          angle,
+          i
+        );
+        //GERA ALTERACAO DE RELEVO INTERESSANTE
+        let firstPosCorrigido =
+          firstPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
+        //firstPos.inferior.y = firstPosCorrigido
+        let lastPos = calcularRetaParede3D(
+          player,
+          groundCasting.lastPos,
+          angle,
+          i
+        );
+        //corrige a perspectiva do last position em relação a tamanho perspectivo
+        let lastPosCorrigido =
+          lastPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
+        //lastPos.inferior.y = lastPosCorrigido
+        lastPos.inferior.y += 2;
 
+        renderRay3D(
+          firstPos.inferior,
+          lastPos.inferior,
+          groundCasting.lastGround.cor,
+          3
+        ); //render ground
 
-      groundCasting.lastGround = ground
-      groundCasting.firstPos = g
-      groundCasting.lastPos = g
-      }
-      else if(groundCasting.lastGround && groundCasting.lastGround==ground){//atualiza o last
-       groundCasting.lastPos = g
-      }
-      else{
-        groundCasting.lastGround = ground
-        groundCasting.firstPos = g
-        groundCasting.lastPos = g
+        groundCasting.lastGround = ground;
+        groundCasting.firstPos = g;
+        groundCasting.lastPos = g;
+      } else if (
+        groundCasting.lastGround &&
+        groundCasting.lastGround == ground
+      ) {
+        //atualiza o last
+        groundCasting.lastPos = g;
+      } else {
+        groundCasting.lastGround = ground;
+        groundCasting.firstPos = g;
+        groundCasting.lastPos = g;
       }
     }
+  }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
-
 
 export function calcularRetaParede3D(player, colisao, angle, index) {
   //calcula reta projetada de acordo com o angulo do jogador
@@ -162,20 +175,19 @@ export function calcularRetaParede3D(player, colisao, angle, index) {
   };
 }
 
-
-
 function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
   let index = 0;
   const wallRectangles = new Map();
   for (const [angle, collisions] of wallCollisionList.entries()) {
     let collisionData = collisions;
-        let pos = calcularRetaParede3D(//DESACOPLAR CALCULAR RETAS
+    let pos = calcularRetaParede3D(
+      //DESACOPLAR CALCULAR RETAS
       player,
       collisionData.colisao,
       angle,
       index++
     );
-    
+
     if (DEBUG_RAYCASTING_POS_3D)
       renderRay3D(pos.superior, pos.inferior, collisionData.tile.cor);
     if (!wallRectangles.get(collisionData.tile)) {
@@ -185,24 +197,36 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
         cima: [],
         baixo: [],
       });
-    } 
+    }
 
-
-//VERIFICA SE HA TILE ACIMA
-    let esquerda = new Posicao(collisionData.tile.pos.x - LARG_TILE / 2, collisionData.tile.pos.y + ALT_TILE / 2);
-    let direita = new Posicao(collisionData.tile.pos.x + LARG_TILE + LARG_TILE / 2,collisionData.tile.pos.y + ALT_TILE / 2);
-    let baixo = new Posicao(collisionData.tile.pos.x + LARG_TILE / 2, collisionData.tile.pos.y + ALT_TILE + ALT_TILE / 2);
-    let cima = new Posicao(collisionData.tile.pos.x + LARG_TILE / 2,collisionData.tile.pos.y - ALT_TILE / 2);
-
+    //VERIFICA SE HA TILE ACIMA
+    let esquerda = new Posicao(
+      collisionData.tile.pos.x - LARG_TILE / 2,
+      collisionData.tile.pos.y + ALT_TILE / 2
+    );
+    let direita = new Posicao(
+      collisionData.tile.pos.x + LARG_TILE + LARG_TILE / 2,
+      collisionData.tile.pos.y + ALT_TILE / 2
+    );
+    let baixo = new Posicao(
+      collisionData.tile.pos.x + LARG_TILE / 2,
+      collisionData.tile.pos.y + ALT_TILE + ALT_TILE / 2
+    );
+    let cima = new Posicao(
+      collisionData.tile.pos.x + LARG_TILE / 2,
+      collisionData.tile.pos.y - ALT_TILE / 2
+    );
 
     if (collisionData.tile.colisaoVerticeEsquerdo(collisionData.colisao)) {
       if (!gameMap.checkTileCollision(esquerda)) {
         wallRectangles.get(collisionData.tile).esquerdo.push(pos);
-      }
-      else{
-        if(collisionData.colisao.y > collisionData.tile.pos.y + ALT_TILE/2){
+      } else {
+        //normaliza o raio que estava na lateral para cima ou para baixo
+        if (collisionData.colisao.y > collisionData.tile.pos.y + ALT_TILE / 2) {
+          pos.y = collisionData.tile.pos.y +ALT_TILE
           wallRectangles.get(collisionData.tile).baixo.push(pos);
-        }else{
+        } else {
+          pos.y = collisionData.tile.pos.y
           wallRectangles.get(collisionData.tile).cima.push(pos);
         }
       }
@@ -211,11 +235,12 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
     if (collisionData.tile.colisaoVerticeDireito(collisionData.colisao)) {
       if (!gameMap.checkTileCollision(direita)) {
         wallRectangles.get(collisionData.tile).direito.push(pos);
-      }
-      else{
-        if(collisionData.colisao.y > collisionData.tile.pos.y + ALT_TILE/2){
+      } else {
+        if (collisionData.colisao.y > collisionData.tile.pos.y + ALT_TILE / 2) {
+          pos.y = collisionData.tile.pos.y +ALT_TILE
           wallRectangles.get(collisionData.tile).baixo.push(pos);
-        }else{
+        } else {
+          pos.y = collisionData.tile.pos.y
           wallRectangles.get(collisionData.tile).cima.push(pos);
         }
       }
@@ -224,11 +249,15 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
     if (collisionData.tile.colisaoVerticeInferior(collisionData.colisao)) {
       if (!gameMap.checkTileCollision(baixo)) {
         wallRectangles.get(collisionData.tile).baixo.push(pos);
-      }
-      else{
-        if(collisionData.colisao.x > collisionData.tile.pos.x + LARG_TILE/2){
+      } else {
+        if (
+          collisionData.colisao.x >
+          collisionData.tile.pos.x + LARG_TILE / 2
+        ) {
+          pos.x = collisionData.tile.pos.x + LARG_TILE
           wallRectangles.get(collisionData.tile).direito.push(pos);
-        }else{
+        } else {
+          pos.x = collisionData.tile.pos.x
           wallRectangles.get(collisionData.tile).esquerdo.push(pos);
         }
       }
@@ -237,11 +266,15 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
     if (collisionData.tile.colisaoVerticeSuperior(collisionData.colisao)) {
       if (!gameMap.checkTileCollision(cima)) {
         wallRectangles.get(collisionData.tile).cima.push(pos);
-      }
-      else{
-        if(collisionData.colisao.x > collisionData.tile.pos.x + LARG_TILE/2){
+      } else {
+        if (
+          collisionData.colisao.x >
+          collisionData.tile.pos.x + LARG_TILE / 2
+        ) {
+          pos.x = collisionData.tile.pos.x + LARG_TILE
           wallRectangles.get(collisionData.tile).direito.push(pos);
-        }else{
+        } else {
+          pos.x = collisionData.tile.pos.x
           wallRectangles.get(collisionData.tile).esquerdo.push(pos);
         }
       }
@@ -282,12 +315,13 @@ function calcularCeu(wallRectangles) {
 }
 
 export function calculateRaycastingPOV(player, gameMap) {
-  let [wallCollisionList] = calcRaycastingLoop(
+  let [wallCollisionList] = calcRaycastingLoop(player, gameMap);
+
+  let wallRectangles = calcularRetangulosParede3D(
+    wallCollisionList,
     player,
     gameMap
   );
-
-  let wallRectangles = calcularRetangulosParede3D(wallCollisionList, player, gameMap);
   desenharRetangulosParede3D(wallRectangles); //REMOVER
   let ceu = calcularCeu(wallRectangles);
   desenharCeu3D(ceu);

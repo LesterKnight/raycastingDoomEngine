@@ -87,18 +87,26 @@ for(let j=rayCastingSize+1;j>0;j-=2){
 
  if(ground){
     if(groundCasting.lastGround && groundCasting.lastGround!=ground){//calcula first last e renderiza
-      //render ground
       
+    //ajustar somente o first pos GERA BURACO 3D, ALTERAR SOMENTE O LAST POS GERA RELEVO!!!!!!!!!!!!!!!!!!!
+
       let firstPos= calcularRetaParede3D(player,groundCasting.firstPos,angle,i);
+      //GERA ALTERACAO DE RELEVO INTERESSANTE
+      let firstPosCorrigido = firstPos.inferior.y + (ALT_TILE*DIST_FOCAL)/rayCastingSize
+      //firstPos.inferior.y = firstPosCorrigido
       let lastPos= calcularRetaParede3D(player,groundCasting.lastPos,angle,i);
-      renderRay3D(firstPos.inferior,lastPos.inferior,groundCasting.lastGround.cor,2)
+      //corrige a perspectiva do last position em relação a tamanho perspectivo
+      let lastPosCorrigido = lastPos.inferior.y + (ALT_TILE*DIST_FOCAL)/rayCastingSize
+      //lastPos.inferior.y = lastPosCorrigido
+      //lastPos.inferior.y +=5
+
+      renderRay3D(firstPos.inferior,lastPos.inferior,groundCasting.lastGround.cor,3)//render ground
+  
+
 
       groundCasting.lastGround = ground
       groundCasting.firstPos = g
       groundCasting.lastPos = g
-        //let pos= calcularRetaParede3D(player,g,angle,i);
-        //let yChao = pos.inferior.y + (ALT_TILE*DIST_FOCAL)/rayCastingSize
-        //renderPixel3D(pos.inferior, ground.gerarCorRGBAleatoriaChao(), (LARG_CANVAS/RAYCASTING_RES)+1,yChao)
       }
       else if(groundCasting.lastGround && groundCasting.lastGround==ground){//atualiza o last
        groundCasting.lastPos = g

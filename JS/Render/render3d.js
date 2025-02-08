@@ -42,9 +42,9 @@ export function renderDot3D(a, color = "red",size = 2) {
   CTX_3D.fill();
   CTX_3D.closePath();
 }
-export function renderPixel3D(a, color = "red",size = 1) {
+export function renderPixel3D(a, color = "red",size_x = 1, size_y=1) {
   CTX_3D.fillStyle = color;
-  CTX_3D.fillRect(a.x, a.y, size, size);
+  CTX_3D.fillRect(a.x, a.y, size_x, size_y);
 }
 
 export function screenBlanking3D(){

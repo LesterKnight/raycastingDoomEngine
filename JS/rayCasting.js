@@ -73,17 +73,42 @@ function calcRaycastingLoop(player, gameMap) {
 }
 
 function calcularGroundCasting(player, angle,colisao, rayCastingSize, ray,i,gameMap){
-  let pos = calcularRetaParede3D(player,colisao,angle,i);
-
+  //let pos = calcularRetaParede3D(player,colisao,angle,i);
+  let groundCasting = {
+    lastGround:null,
+    firstPos:null,
+    lastPos:null
+  } 
+  
 
 for(let j=rayCastingSize+1;j>0;j-=2){
  let g = rayCasting(player.pos.x, player.pos.y, angle, j,true);
  let ground =  gameMap.checkGroundCollision(g)
 
  if(ground){
-  let pos2 = calcularRetaParede3D(player,g,angle,i);
-  renderPixel3D(pos2.inferior,ground.cor,LARG_CANVAS/RAYCASTING_RES)
- }
+    if(groundCasting.lastGround && groundCasting.lastGround!=ground){//calcula first last e renderiza
+      //render ground
+      
+      let firstPos= calcularRetaParede3D(player,groundCasting.firstPos,angle,i);
+      let lastPos= calcularRetaParede3D(player,groundCasting.lastPos,angle,i);
+      renderRay3D(firstPos.inferior,lastPos.inferior,groundCasting.lastGround.cor,2)
+
+      groundCasting.lastGround = ground
+      groundCasting.firstPos = g
+      groundCasting.lastPos = g
+        //let pos= calcularRetaParede3D(player,g,angle,i);
+        //let yChao = pos.inferior.y + (ALT_TILE*DIST_FOCAL)/rayCastingSize
+        //renderPixel3D(pos.inferior, ground.gerarCorRGBAleatoriaChao(), (LARG_CANVAS/RAYCASTING_RES)+1,yChao)
+      }
+      else if(groundCasting.lastGround && groundCasting.lastGround==ground){//atualiza o last
+       groundCasting.lastPos = g
+      }
+      else{
+        groundCasting.lastGround = ground
+        groundCasting.firstPos = g
+        groundCasting.lastPos = g
+      }
+    }
 }
 
 

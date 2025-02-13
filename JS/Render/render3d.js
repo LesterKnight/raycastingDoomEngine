@@ -39,31 +39,40 @@ export function renderRay3D(a, b, color = "rgb(255, 123, 0)", strokeSize = 1) {
   //CTX_3D.restore();
 }
 
-export function renderIMG3D(a, b, image, numberOfParts, part) {
-  const newWidth = numberOfParts * (LARG_CANVAS / RAYCASTING_RES);
-  const newHeight = b.y - a.y;
-  const currentPart = part % numberOfParts;
-  const imgHeight = image.height;
-  const sliceWidth = image.width / numberOfParts; // Largura de cada fatia
-  const sliceHeight = imgHeight; // Altura total da imagem
+export function renderIMG3D(a, b, image, size, part) {
 
-  // Calculando a posição x da fatia atual
-  const sx = currentPart * sliceWidth;
-  const sy = 0;
+const partSize = (LARG_CANVAS / RAYCASTING_RES); // Largura da fatia no canvas
+const sliceWidth = (image.width / (partSize*size))*2; // Largura da fatia da textura
+const sliceHeight = image.height; // Altura total da textura
 
-  CTX_3D.drawImage(
-    image,
-    sx,
-    sy,
-    sliceWidth,
-    sliceHeight,
-    currentPart * sliceWidth,
-    0,
-    sliceWidth,
-    sliceHeight
-  );
+const sx = part * sliceWidth; // Posição X da fatia na textura
+const sy = 0; // Sempre do topo da textura
 
-  
+CTX_3D.drawImage(
+  image,
+  sx,
+  sy,
+  sliceWidth,
+  sliceHeight, // Fatia original da textura
+  a.x,
+  a.y, // Posição correta da fatia no canvas (altura da projeção 3D)
+  partSize+1,
+  b.y - a.y // Altura total da fatia no plano 3D
+);
+
+/*
+CTX_3D.drawImage(
+  image,    // 1º: Imagem fonte
+  sx,       // 2º: Posição X na imagem original (de onde cortar)
+  sy,       // 3º: Posição Y na imagem original (de onde cortar)
+  sWidth,   // 4º: Largura da fatia na imagem original
+  sHeight,  // 5º: Altura da fatia na imagem original
+  dx,       // 6º: Posição X no canvas (onde desenhar)
+  dy,       // 7º: Posição Y no canvas (onde desenhar)
+  dWidth,   // 8º: Largura da fatia no canvas
+  dHeight   // 9º: Altura da fatia no canvas
+);
+*/
 }
 
 export function renderDot3D(a, color = "red", size = 2) {
@@ -88,6 +97,8 @@ export function desenharRetangulosParede3D(wallRectangles) {
     Object.keys(trapezios).forEach((lado) => {
       const trapezio = trapezios[lado];
       let size = trapezio.length;
+      debugger
+      //identificar a parte nao usada do objeto na matriz
       if (size > 0) {
         if (DEBUG_FILL_WALL) {
           CTX_3D.beginPath();
@@ -142,6 +153,7 @@ export function desenharRetangulosParede3D(wallRectangles) {
         }
 
         if (DEBUG_DIVIDE_WALL) {
+
           //renderRay3D(trapezio[0].superior,trapezio[0].inferior,"red",2)
           for (let i = 0; i < size; i++)
             renderIMG3D(
@@ -212,8 +224,8 @@ export function renderGun() {
   let originalWidth = GUN.width;
   let originalHeight = GUN.height;
 
-  let scaledWidth = originalWidth * 0.8;
-  let scaledHeight = originalHeight * 0.8;
+  let scaledWidth = originalWidth * 0.45;
+  let scaledHeight = originalHeight * 0.45;
 
-  CTX_3D.drawImage(GUN, 0, 200, scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
+  CTX_3D.drawImage(GUN, 80, 300, scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
 }

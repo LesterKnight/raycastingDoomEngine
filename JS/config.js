@@ -37,6 +37,6 @@ export const DEBUG_GROUND_POS_3D = false
 export const DEBUG_RAYCASTING_POS_2D = true
 export const DEBUG_RAYCASTING_POS_3D = false
 
-export const DEBUG_FILL_WALL = true
+export const DEBUG_FILL_WALL = false
 export const DEBUG_WALL_RECTS = false
 export const DEBUG_DIVIDE_WALL = true

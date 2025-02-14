@@ -9,7 +9,7 @@ const gameMap = new GameMap(
   COMP_SALA,
   "mapa_inicial"
 );
-const player = new Player(64, 64, 339);
+const player = new Player(257, 58, 325);
 initMap(gameMap);
 player.setGameMap(gameMap);
 

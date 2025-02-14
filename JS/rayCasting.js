@@ -135,7 +135,7 @@ function calcularGroundCasting(
           firstPos.inferior,
           lastPos.inferior,
           groundCasting.lastGround.cor,
-          3
+          5
         ); //render ground
 
         groundCasting.lastGround = ground;
@@ -217,16 +217,22 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
       collisionData.tile.pos.y - ALT_TILE / 2
     );
 
+    let percentY = (collisionData.colisao.y - collisionData.tile.pos.y) / ALT_TILE
+    let percentX = (collisionData.colisao.x - collisionData.tile.pos.x) / LARG_TILE
+
     if (collisionData.tile.colisaoVerticeEsquerdo(collisionData.colisao)) {
       if (!gameMap.checkTileCollision(esquerda)) {
-        wallRectangles.get(collisionData.tile).esquerdo.push(pos);
+        pos.percent = percentY
+        wallRectangles.get(collisionData.tile).esquerdo.push(pos);//aqui eu verifico o x inicial e o x final e a porcentagem disso no tile
       } else {
         //normaliza o raio que estava na lateral para cima ou para baixo
         if (collisionData.colisao.y > collisionData.tile.pos.y + ALT_TILE / 2) {
           pos.y = collisionData.tile.pos.y +ALT_TILE
+          pos.percent = percentX
           wallRectangles.get(collisionData.tile).baixo.push(pos);
         } else {
           pos.y = collisionData.tile.pos.y
+          pos.percent = percentX
           wallRectangles.get(collisionData.tile).cima.push(pos);
         }
       }
@@ -234,13 +240,16 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
 
     if (collisionData.tile.colisaoVerticeDireito(collisionData.colisao)) {
       if (!gameMap.checkTileCollision(direita)) {
+        pos.percent = percentY
         wallRectangles.get(collisionData.tile).direito.push(pos);
       } else {
         if (collisionData.colisao.y > collisionData.tile.pos.y + ALT_TILE / 2) {
           pos.y = collisionData.tile.pos.y +ALT_TILE
+          pos.percent = percentX
           wallRectangles.get(collisionData.tile).baixo.push(pos);
         } else {
           pos.y = collisionData.tile.pos.y
+          pos.percentX = percentX
           wallRectangles.get(collisionData.tile).cima.push(pos);
         }
       }
@@ -248,6 +257,7 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
 
     if (collisionData.tile.colisaoVerticeInferior(collisionData.colisao)) {
       if (!gameMap.checkTileCollision(baixo)) {
+        pos.percent = percentX
         wallRectangles.get(collisionData.tile).baixo.push(pos);
       } else {
         if (
@@ -255,9 +265,11 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
           collisionData.tile.pos.x + LARG_TILE / 2
         ) {
           pos.x = collisionData.tile.pos.x + LARG_TILE
+          pos.percent = percentY
           wallRectangles.get(collisionData.tile).direito.push(pos);
         } else {
           pos.x = collisionData.tile.pos.x
+          pos.percent = percentY
           wallRectangles.get(collisionData.tile).esquerdo.push(pos);
         }
       }
@@ -265,6 +277,7 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
 
     if (collisionData.tile.colisaoVerticeSuperior(collisionData.colisao)) {
       if (!gameMap.checkTileCollision(cima)) {
+        pos.percent = percentX
         wallRectangles.get(collisionData.tile).cima.push(pos);
       } else {
         if (
@@ -272,9 +285,11 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
           collisionData.tile.pos.x + LARG_TILE / 2
         ) {
           pos.x = collisionData.tile.pos.x + LARG_TILE
+          pos.percent = percentY
           wallRectangles.get(collisionData.tile).direito.push(pos);
         } else {
           pos.x = collisionData.tile.pos.x
+          pos.percent = percentY
           wallRectangles.get(collisionData.tile).esquerdo.push(pos);
         }
       }

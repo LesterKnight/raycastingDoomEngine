@@ -90,7 +90,7 @@ function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMap) {
     LastGroundLastPos: null,
   };
 
-  for (let j = rayCastingSize + 1; j > 0; j--) {
+  for (let j = rayCastingSize + RAYCASTING_STEP_SIZE; j > 0; j--) {
   
     let g = rayCasting(player.pos.x, player.pos.y, angle, j);//raio vai em direção ao player raio 2D
 
@@ -118,9 +118,9 @@ function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMap) {
           i
         );
         //corrige a perspectiva do last position em relação a tamanho perspectivo
-        //let lastPosCorrigido = lastPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
+        let lastPosCorrigido = lastPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
         //lastPos.inferior.y = lastPosCorrigido
-        lastPos.inferior.y += 2;
+        //lastPos.inferior.y += 2;
 
         renderRay3D(
           firstPos.inferior,
@@ -130,8 +130,8 @@ function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMap) {
         ); //render ground
 
         groundCasting.lastGround = ground;
-        groundCasting.lastGroundFirstPos = groundCasting.LastGroundLastPos//era g mas mudei para se alinhar com o ultimo anterior, no gaps
-        
+        groundCasting.lastGroundFirstPos = g//groundCasting.LastGroundLastPos//era g mas mudei para se alinhar com o ultimo anterior, no gaps
+
         groundCasting.LastGroundLastPos = g;
       } else if (groundCasting.lastGround && groundCasting.lastGround == ground ) {
         //atualiza o last SE CONTINUA NO MESMO PISO

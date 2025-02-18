@@ -85,6 +85,22 @@ export function desenharRetangulosParede3D(wallRectangles) {
       
       //identificar a parte nao usada do objeto na matriz
       if (size > 0) {
+        if (DEBUG_DIVIDE_WALL) {
+          //debugger
+          for (let i = 0; i < size; i++){
+            let pontoAnterior = i==0 ? 0 : trapezio[i-1].percent
+            let ponto = trapezio[i].percent
+            let diff = (ponto-pontoAnterior)/LARG_TILE
+            renderIMG3D(
+              trapezio[i].superior,
+              trapezio[i].inferior,
+              WALL,
+              diff,
+              ponto
+            );
+          }  
+        }
+
         if (DEBUG_FILL_WALL) {
           CTX_3D.beginPath();
           // Define os pontos do quadrado
@@ -135,21 +151,7 @@ export function desenharRetangulosParede3D(wallRectangles) {
             lineWidth
           );
         }
-        if (DEBUG_DIVIDE_WALL) {
-          //debugger
-          for (let i = 0; i < size; i++){
-            let pontoAnterior = i==0 ? 0 : trapezio[i-1].percent
-            let ponto = trapezio[i].percent
-            let diff = (ponto-pontoAnterior)/LARG_TILE
-            renderIMG3D(
-              trapezio[i].superior,
-              trapezio[i].inferior,
-              WALL,
-              diff,
-              ponto
-            );
-          }  
-        }
+
       }
     });
   }
@@ -168,7 +170,7 @@ export function renderPixel3D(a, color = "red", size_x = 1, size_y = 1) {
 }
 
 export function screenBlanking3D() {
-  CTX_3D.fillStyle = "black";
+  CTX_3D.fillStyle = "white";
   CTX_3D.fillRect(0, 0, LARG_CANVAS, ALT_CANVAS);
 }
 

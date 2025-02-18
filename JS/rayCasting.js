@@ -126,11 +126,12 @@ function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMap) {
           firstPos.inferior,
           lastPos.inferior,
           groundCasting.lastGround.cor,
-          5
+          1
         ); //render ground
 
         groundCasting.lastGround = ground;
-        groundCasting.lastGroundFirstPos = g;
+        groundCasting.lastGroundFirstPos = groundCasting.LastGroundLastPos//era g mas mudei para se alinhar com o ultimo anterior, no gaps
+        
         groundCasting.LastGroundLastPos = g;
       } else if (groundCasting.lastGround && groundCasting.lastGround == ground ) {
         //atualiza o last SE CONTINUA NO MESMO PISO
@@ -155,7 +156,7 @@ function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMap) {
             firstPos.inferior,
             lastPos.inferior,
             groundCasting.lastGround.cor,
-            5
+            1
           ); //render ground
         }
       } else {//para o primeiro ground, nao existe lastGround ainda

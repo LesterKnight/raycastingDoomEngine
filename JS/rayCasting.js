@@ -12,7 +12,7 @@ import {
   renderDot3D,
   desenharRetangulosParede3D,
   desenharCeu3D,
-  desenharChao3D,
+
   renderPixel3D,
 } from "./Render/render3d.js";
 import {
@@ -60,12 +60,11 @@ function calcRaycastingLoop(player, gameMap) {
           wallCollisionList
         );
         if (colisao) {
+
           calcularGroundCasting(
             player,
             angle,
-            colisao,
             rayCastingSize,
-            ray,
             i,
             gameMap
           );
@@ -83,51 +82,43 @@ function calcRaycastingLoop(player, gameMap) {
   return [wallCollisionList];
 }
 
-function calcularGroundCasting(
-  player,
-  angle,
-  colisao,
-  rayCastingSize,
-  ray,
-  i,
-  gameMap
-) {
+function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMap) {
   //let pos = calcularRetaParede3D(player,colisao,angle,i);
   let groundCasting = {
     lastGround: null,
-    firstPos: null,
-    lastPos: null,
+    lastGroundFirstPos: null,
+    LastGroundLastPos: null,
   };
 
   for (let j = rayCastingSize + 1; j > 0; j--) {
-    let g = rayCasting(player.pos.x, player.pos.y, angle, j);
+  
+    let g = rayCasting(player.pos.x, player.pos.y, angle, j);//raio vai em direção ao player raio 2D
+
     let ground = gameMap.checkGroundCollision(g);
 
     if (ground) {
-      if (groundCasting.lastGround && groundCasting.lastGround != ground) {
+      if (groundCasting.lastGround && groundCasting.lastGround != ground) {//renderiza o traço durante a mudança de traço
         //calcula first last e renderiza
 
         //ajustar somente o first pos GERA BURACO 3D, ALTERAR SOMENTE O LAST POS GERA RELEVO!!!!!!!!!!!!!!!!!!!
 
         let firstPos = calcularRetaParede3D(
           player,
-          groundCasting.firstPos,
+          groundCasting.lastGroundFirstPos,
           angle,
           i
         );
         //GERA ALTERACAO DE RELEVO INTERESSANTE
-        let firstPosCorrigido =
-          firstPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
+        //let firstPosCorrigido = firstPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
         //firstPos.inferior.y = firstPosCorrigido
         let lastPos = calcularRetaParede3D(
           player,
-          groundCasting.lastPos,
+          groundCasting.LastGroundLastPos,
           angle,
           i
         );
         //corrige a perspectiva do last position em relação a tamanho perspectivo
-        let lastPosCorrigido =
-          lastPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
+        //let lastPosCorrigido = lastPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
         //lastPos.inferior.y = lastPosCorrigido
         lastPos.inferior.y += 2;
 
@@ -139,18 +130,38 @@ function calcularGroundCasting(
         ); //render ground
 
         groundCasting.lastGround = ground;
-        groundCasting.firstPos = g;
-        groundCasting.lastPos = g;
-      } else if (
-        groundCasting.lastGround &&
-        groundCasting.lastGround == ground
-      ) {
-        //atualiza o last
-        groundCasting.lastPos = g;
-      } else {
+        groundCasting.lastGroundFirstPos = g;
+        groundCasting.LastGroundLastPos = g;
+      } else if (groundCasting.lastGround && groundCasting.lastGround == ground ) {
+        //atualiza o last SE CONTINUA NO MESMO PISO
+        groundCasting.LastGroundLastPos = g;
+        if(j==1){//printa o ultimo elemento
+          
+          let firstPos = calcularRetaParede3D(
+            player,
+            groundCasting.lastGroundFirstPos,
+            angle,
+            i
+          );
+
+          let lastPos = calcularRetaParede3D(
+            player,
+            groundCasting.LastGroundLastPos,
+            angle,
+            i
+          );
+
+          renderRay3D(
+            firstPos.inferior,
+            lastPos.inferior,
+            groundCasting.lastGround.cor,
+            5
+          ); //render ground
+        }
+      } else {//para o primeiro ground, nao existe lastGround ainda
         groundCasting.lastGround = ground;
-        groundCasting.firstPos = g;
-        groundCasting.lastPos = g;
+        groundCasting.lastGroundFirstPos = g;
+        groundCasting.LastGroundLastPos = g;
       }
     }
   }
@@ -169,6 +180,7 @@ export function calcularRetaParede3D(player, colisao, angle, index) {
   posX = (index / RAYCASTING_RES) * LARG_CANVAS; //entender melhor
   posYtop = ALT_CANVAS / 2 - comprimentoVertical;
   posYinf = ALT_CANVAS / 2 + comprimentoVertical;
+  renderDot3D(posYtop,"green",5)
   return {
     superior: { x: posX, y: posYtop },
     inferior: { x: posX, y: posYinf },

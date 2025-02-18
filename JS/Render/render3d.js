@@ -199,31 +199,7 @@ export function desenharCeu3D(ceu) {
   }
 }
 
-export function desenharChao3D(chao) {
-  if (chao.length > 0) {
-    // Ordenar ceu por x
-    chao.sort((a, b) => a.inicial.inferior.x - b.inicial.inferior.x);
 
-    CTX_3D.beginPath();
-    CTX_3D.moveTo(chao[0].inicial.inferior.x, chao[0].inicial.inferior.y);
-
-    chao.forEach((chaoParcial) => {
-      CTX_3D.lineTo(
-        chaoParcial.inicial.inferior.x,
-        chaoParcial.inicial.inferior.y
-      );
-      CTX_3D.lineTo(chaoParcial.final.inferior.x, chaoParcial.final.inferior.y);
-    });
-
-    const ultimoChaoParcial = chao[chao.length - 1];
-    CTX_3D.lineTo(ultimoChaoParcial.final.inferior.x, ALT_CANVAS);
-    CTX_3D.lineTo(chao[0].inicial.inferior.x, ALT_CANVAS);
-    CTX_3D.lineTo(chao[0].inicial.inferior.x, chao[0].inicial.inferior.y);
-    CTX_3D.closePath();
-    CTX_3D.fillStyle = "rgba(0,0,0,0.05)";
-    CTX_3D.fill();
-  }
-}
 export function renderGun() {
   let originalWidth = GUN.width;
   let originalHeight = GUN.height;
@@ -231,5 +207,5 @@ export function renderGun() {
   let scaledWidth = originalWidth * 0.6;
   let scaledHeight = originalHeight * 0.6;
 
-  CTX_3D.drawImage(GUN, 120, 320, scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
+  //CTX_3D.drawImage(GUN, 120, 320, scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
 }

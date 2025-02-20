@@ -5,6 +5,7 @@ import {
   calcDistanciaReal,
   calcDistanciaProjetada,
   calcColisaoPrecisa,
+  calcularAngulo
 } from "./calculos.js";
 import {} from "./Render/render2d.js";
 import {
@@ -18,12 +19,6 @@ import {
 import {
   ALT_TILE,
   LARG_TILE,
-  COMP_SALA,
-  LARG_SALA,
-  FOV_IN_RADIANS,
-  CANVAS2D,
-  CTX_2D,
-  CANVAS3D,
   CTX_3D,
   ALT_CANVAS,
   LARG_CANVAS,
@@ -32,12 +27,11 @@ import {
   RAYCASTING_POV,
   RAYCASTING_STEP_SIZE,
   MAX_RAYCASTING_SIZE,
-  DEBUG_GROUND_POS_2D,
-  DEBUG_GROUND_POS_3D,
+
   DEBUG_RAYCASTING_POS_3D,
-  DEBUG_RAYCASTING_POS_2D,
+
 } from "./config.js";
-import { Tile } from "./Classes/Tile.js";
+
 
 function calcRaycastingLoop(player, gameMap) {
   let wallCollisionList = new Map();
@@ -48,10 +42,12 @@ function calcRaycastingLoop(player, gameMap) {
     angle = normalizarAngulo(
       player.angle - RAYCASTING_POV / 2 + (RAYCASTING_POV / RAYCASTING_RES) * i
     );
+
     while (rayCastingSize < MAX_RAYCASTING_SIZE) {
       ray = rayCasting(player.pos.x, player.pos.y, angle, rayCastingSize);
       let tile = gameMap.checkTileCollision(ray);
       if (tile) {
+        
         let colisao = calcColisaoPrecisa(
           player,
           angle,
@@ -60,7 +56,6 @@ function calcRaycastingLoop(player, gameMap) {
           wallCollisionList
         );
         if (colisao) {
-
           calcularGroundCasting(
             player,
             angle,
@@ -169,13 +164,17 @@ function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMap) {
 }
 
 export function calcularRetaParede3D(player, colisao, angle, index) {
+  
   //calcula reta projetada de acordo com o angulo do jogador
+  //a distancia entre o angulo central do jogador e o angle inicial é de 30
   let distanciaReal = calcDistanciaReal(player.pos, colisao);
   let distanciaProjetada = calcDistanciaProjetada(
     distanciaReal,
     angle,
     player.angle
   );
+
+
   let posX, posYtop, posYinf;
   let comprimentoVertical = (ALT_TILE * DIST_FOCAL) / distanciaProjetada;
   posX = (index / RAYCASTING_RES) * LARG_CANVAS; //entender melhor
@@ -200,6 +199,13 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
       angle,
       index++
     );
+
+
+      let real = calcDistanciaReal(collisionData.colisao,player.pos)
+      let dist = (real/DIST_FOCAL*0.4)
+      pos.deb = dist
+    
+
 
     if (DEBUG_RAYCASTING_POS_3D)
       renderRay3D(pos.superior, pos.inferior, collisionData.tile.cor);
@@ -232,11 +238,29 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
 
     let percentY = (collisionData.colisao.y - collisionData.tile.pos.y) / ALT_TILE
     let percentX = (collisionData.colisao.x - collisionData.tile.pos.x) / LARG_TILE
+    
 
     if (collisionData.tile.colisaoVerticeEsquerdo(collisionData.colisao)) {
       if (!gameMap.checkTileCollision(esquerda)) {
         pos.percent = percentY
         wallRectangles.get(collisionData.tile).esquerdo.push(pos);//aqui eu verifico o x inicial e o x final e a porcentagem disso no tile
+
+        CTX_3D.font = "7px Arial";
+        CTX_3D.fillStyle = "red";
+
+        
+        //let real = calcDistanciaReal(collisionData.colisao,player.pos)
+        //let proj = calcDistanciaProjetada(real, angle, player.angle)
+        
+        //pos.deb = calcularAngulo(collisionData.colisao,player.pos).toFixed(2)
+        //CTX_3D.fillText(pos.deb, pos.inferior.x, pos.inferior.y+10);
+        //console.log(real)
+
+        
+
+        
+
+
       } else {
         //normaliza o raio que estava na lateral para cima ou para baixo
         if (collisionData.colisao.y > collisionData.tile.pos.y + ALT_TILE / 2) {
@@ -262,7 +286,7 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
           wallRectangles.get(collisionData.tile).baixo.push(pos);
         } else {
           pos.y = collisionData.tile.pos.y
-          pos.percentX = percentX
+          pos.percent = percentX
           wallRectangles.get(collisionData.tile).cima.push(pos);
         }
       }
@@ -307,6 +331,8 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
         }
       }
     }
+    
+    
   }
   return wallRectangles;
 }

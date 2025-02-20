@@ -1,5 +1,5 @@
 import { Posicao } from "./Classes/Posicao.js";
-import{RAYCASTING_POV,RAYCASTING_RES,DEBUG_RAYCASTING_POS_2D } from "./config.js"
+import{RAYCASTING_POV,RAYCASTING_RES,DEBUG_RAYCASTING_POS_2D, LARG_TILE } from "./config.js"
 import { renderRay2D } from "./Render/render2d.js";
 //calcula intersecção lateral entre o tile e o raycasting
 export function calcularIntersecaoLateral(
@@ -88,6 +88,8 @@ export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
   wallCollisionList,
 ) {
 
+  
+
   if(DEBUG_RAYCASTING_POS_2D)
           renderRay2D(player.pos,ray, "rgba(0,0,0,0.3)")
 
@@ -112,10 +114,12 @@ export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
       wallCollisionList.set(angle, { colisao, tile, orientacao });
   }
   if (!colisao && (orientacao.cima || orientacao.baixo)) {
+    
     colisao = calcIntersecaoVertical(tile, ray, angle, orientacao.cima);
       wallCollisionList.set(angle, { colisao, tile, orientacao });
   }
     if(!colisao)
       return false;
+    
   return colisao;
 }

@@ -1,7 +1,6 @@
 import { COMP_SALA, LARG_SALA,  } from "./config.js";
 import { Player } from "./Classes/Player.js";
 import { GameMap } from "./Classes/GameMap.js";
-import { calculateRaycastingPOV } from "./rayCasting.js";
 import { renderGame, initMap } from "./functions.js";
 
 const gameMap = new GameMap(
@@ -9,7 +8,7 @@ const gameMap = new GameMap(
   COMP_SALA,
   "mapa_inicial"
 );
-const player = new Player(257, 58, 325);
+const player = new Player(201, 207, 139);
 initMap(gameMap);
 player.setGameMap(gameMap);
 

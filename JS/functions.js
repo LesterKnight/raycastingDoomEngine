@@ -1,11 +1,7 @@
 import {
   ALT_TILE,
-  CANVAS2D,
   CTX_2D,
-  CTX_3D,
-  LARG_SALA,
   LARG_TILE,
-  COMP_SALA,
 } from "./config.js";
 import { calculateRaycastingPOV } from "./rayCasting.js";
 import {
@@ -20,13 +16,13 @@ import { Tile } from "./Classes/Tile.js";
 import { screenBlanking3D } from "./Render/render3d.js";
 
 function renderInfo(player) {
-  CTX_2D.font = "20px Arial";
+  CTX_2D.font = "10px Arial";
   CTX_2D.fillStyle = "black";
   const texto = `X:${Math.round(player.pos.x)} Y:${Math.round(
     player.pos.y
   )} angle: ${player.angle}`;
   const x = 100; // Posição horizontal
-  const y = 315; // Posição vertical
+  const y = 330; // Posição vertical
   CTX_2D.fillText(texto, x, y);
 }
 
@@ -44,6 +40,7 @@ export function initMap(gameMap) {
   }
 
   // Adicionando o canto inferior direito
+  gameMap.addTile(new Tile(5 * LARG_TILE, 5 * ALT_TILE));
   gameMap.addTile(new Tile(8 * LARG_TILE, 8 * ALT_TILE));
 
   // Preenchendo o restante do quadrado com tiles de chão

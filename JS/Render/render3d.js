@@ -1,19 +1,9 @@
 import {
-  ALT_TILE,
   LARG_TILE,
-  COMP_SALA,
-  LARG_SALA,
-  CANVAS2D,
-  CTX_2D,
-  CANVAS3D,
   CTX_3D,
   ALT_CANVAS,
   LARG_CANVAS,
-  DIST_FOCAL,
   RAYCASTING_RES,
-  RAYCASTING_POV,
-  RAYCASTING_STEP_SIZE,
-  MAX_RAYCASTING_SIZE,
   GUN,
   WALL,
   DEBUG_FILL_WALL,
@@ -38,11 +28,10 @@ export function renderRay3D(a, b, color = "rgb(255, 123, 0)", strokeSize = 1) {
   // Restore the context to its original state
   //CTX_3D.restore();
 }
-
-export function renderIMG3D(a, b, image, size, part) {
+export function renderIMG3D(a, b, image, size, part,shadow = 0) {
 
 const partSize = (LARG_CANVAS / RAYCASTING_RES); // Largura da fatia no canvas
-let partSizeExtra = 1
+let partSizeExtra = 0
 
 const sliceHeight = image.height; // Altura total da textura
 
@@ -60,6 +49,10 @@ CTX_3D.drawImage(
   partSize+partSizeExtra,
   b.y - a.y // Altura total da fatia no plano 3D
 );
+if(shadow>0){
+  CTX_3D.fillStyle = `rgba(0, 0, 0, ${shadow})`;
+  CTX_3D.fillRect(a.x, a.y, partSize, b.y - a.y); // (x, y, largura, altura)
+}
 
 /*
 CTX_3D.drawImage(
@@ -75,33 +68,46 @@ CTX_3D.drawImage(
 );
 */
 }
-
 export function desenharRetangulosParede3D(wallRectangles) {
+
   //renderiza os trapezios, SEPARAR NO FUTURO
   for (const [tile, trapezios] of wallRectangles.entries()) {
+    
     Object.keys(trapezios).forEach((lado) => {
       const trapezio = trapezios[lado];
-      let size = trapezio.length;
+      let size = trapezio.length; //quantidade de itens em cada trapezio
       
       //identificar a parte nao usada do objeto na matriz
       if (size > 0) {
         if (DEBUG_DIVIDE_WALL) {
-          //debugger
+          
           for (let i = 0; i < size; i++){
             let pontoAnterior = i==0 ? 0 : trapezio[i-1].percent
             let ponto = trapezio[i].percent
+            if(ponto == 0)
+              ponto = 0.05
+            if(ponto == 1)
+              ponto = 0.95
+            //console.log(`%c ${ponto}`, `color: ${tile.cor}`);
             let diff = (ponto-pontoAnterior)/LARG_TILE
+            //renderDot3D(trapezio[i].inferior,tile.cor,5)
+            
+            
+            
+           //console.log(trapezio[i].closeAngle)
             renderIMG3D(
               trapezio[i].superior,
               trapezio[i].inferior,
               WALL,
               diff,
-              ponto
+              ponto,
+              trapezio[i].deb
             );
-          }  
+          }
         }
 
         if (DEBUG_FILL_WALL) {
+
           CTX_3D.beginPath();
           // Define os pontos do quadrado
           CTX_3D.moveTo(trapezio[0].superior.x, trapezio[0].superior.y); // Ponto inicial
@@ -122,8 +128,8 @@ export function desenharRetangulosParede3D(wallRectangles) {
           CTX_3D.fill();
         }
         if (DEBUG_WALL_RECTS) {
-          let lineWidth = 1;
-          let color = "black";
+          let lineWidth = 1
+          let color = tile.cor;
           //COLUNAS HORIZONTAIS
           renderRay3D(
             trapezio[0].superior,
@@ -156,7 +162,6 @@ export function desenharRetangulosParede3D(wallRectangles) {
     });
   }
 }
-
 export function renderDot3D(a, color = "red", size = 2) {
   CTX_3D.fillStyle = color;
   CTX_3D.beginPath();
@@ -168,13 +173,10 @@ export function renderPixel3D(a, color = "red", size_x = 1, size_y = 1) {
   CTX_3D.fillStyle = color;
   CTX_3D.fillRect(a.x, a.y, size_x, size_y);
 }
-
 export function screenBlanking3D() {
   CTX_3D.fillStyle = "white";
   CTX_3D.fillRect(0, 0, LARG_CANVAS, ALT_CANVAS);
 }
-
-
 export function desenharCeu3D(ceu) {
   if (ceu.length > 0) {
     // Ordenar ceu por x
@@ -200,8 +202,6 @@ export function desenharCeu3D(ceu) {
     CTX_3D.fill();
   }
 }
-
-
 export function renderGun() {
   let originalWidth = GUN.width;
   let originalHeight = GUN.height;

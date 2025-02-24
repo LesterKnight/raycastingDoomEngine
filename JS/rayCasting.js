@@ -5,8 +5,8 @@ import {
   calcDistanciaReal,
   calcDistanciaProjetada,
   calcColisaoPrecisa,
-  calcularAngulo
 } from "./calculos.js";
+import{calcularGroundCasting} from "./groundCasting.js"
 import {} from "./Render/render2d.js";
 import {
   renderRay3D,
@@ -77,92 +77,6 @@ function calcRaycastingLoop(player, gameMap) {
   return [wallCollisionList];
 }
 
-function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMap) {
-  //let pos = calcularRetaParede3D(player,colisao,angle,i);
-  let groundCasting = {
-    lastGround: null,
-    lastGroundFirstPos: null,
-    LastGroundLastPos: null,
-  };
-
-  for (let j = rayCastingSize + RAYCASTING_STEP_SIZE; j > 0; j--) {
-  
-    let g = rayCasting(player.pos.x, player.pos.y, angle, j);//raio vai em direção ao player raio 2D
-
-    let ground = gameMap.checkGroundCollision(g);
-
-    if (ground) {
-      if (groundCasting.lastGround && groundCasting.lastGround != ground) {//renderiza o traço durante a mudança de traço
-        //calcula first last e renderiza
-
-        //ajustar somente o first pos GERA BURACO 3D, ALTERAR SOMENTE O LAST POS GERA RELEVO!!!!!!!!!!!!!!!!!!!
-
-        let firstPos = calcularRetaParede3D(
-          player,
-          groundCasting.lastGroundFirstPos,
-          angle,
-          i
-        );
-        //GERA ALTERACAO DE RELEVO INTERESSANTE
-        //let firstPosCorrigido = firstPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
-        //firstPos.inferior.y = firstPosCorrigido
-        let lastPos = calcularRetaParede3D(
-          player,
-          groundCasting.LastGroundLastPos,
-          angle,
-          i
-        );
-        //corrige a perspectiva do last position em relação a tamanho perspectivo
-        let lastPosCorrigido = lastPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
-        //lastPos.inferior.y = lastPosCorrigido
-        //lastPos.inferior.y += 2;
-
-        renderRay3D(
-          firstPos.inferior,
-          lastPos.inferior,
-          groundCasting.lastGround.cor,
-          1
-        ); //render ground
-
-        groundCasting.lastGround = ground;
-        groundCasting.lastGroundFirstPos = g//groundCasting.LastGroundLastPos//era g mas mudei para se alinhar com o ultimo anterior, no gaps
-
-        groundCasting.LastGroundLastPos = g;
-      } else if (groundCasting.lastGround && groundCasting.lastGround == ground ) {
-        //atualiza o last SE CONTINUA NO MESMO PISO
-        groundCasting.LastGroundLastPos = g;
-        if(j==1){//printa o ultimo elemento
-          
-          let firstPos = calcularRetaParede3D(
-            player,
-            groundCasting.lastGroundFirstPos,
-            angle,
-            i
-          );
-
-          let lastPos = calcularRetaParede3D(
-            player,
-            groundCasting.LastGroundLastPos,
-            angle,
-            i
-          );
-
-          renderRay3D(
-            firstPos.inferior,
-            lastPos.inferior,
-            groundCasting.lastGround.cor,
-            1
-          ); //render ground
-        }
-      } else {//para o primeiro ground, nao existe lastGround ainda
-        groundCasting.lastGround = ground;
-        groundCasting.lastGroundFirstPos = g;
-        groundCasting.LastGroundLastPos = g;
-      }
-    }
-  }
-}
-
 export function calcularRetaParede3D(player, colisao, angle, index) {
   
   //calcula reta projetada de acordo com o angulo do jogador
@@ -203,7 +117,7 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
 
       let real = calcDistanciaReal(collisionData.colisao,player.pos)
       let dist = (real/DIST_FOCAL*0.4)
-      pos.deb = dist
+      pos.shadow = dist//?????????????????????????????????????
     
 
 
@@ -252,8 +166,8 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
         //let real = calcDistanciaReal(collisionData.colisao,player.pos)
         //let proj = calcDistanciaProjetada(real, angle, player.angle)
         
-        //pos.deb = calcularAngulo(collisionData.colisao,player.pos).toFixed(2)
-        //CTX_3D.fillText(pos.deb, pos.inferior.x, pos.inferior.y+10);
+        //pos.shadow = calcularAngulo(collisionData.colisao,player.pos).toFixed(2)
+        //CTX_3D.fillText(pos.shadow, pos.inferior.x, pos.inferior.y+10);
         //console.log(real)
 
         

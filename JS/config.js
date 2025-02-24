@@ -20,16 +20,26 @@ export const CANVAS3D = document.getElementById("3d-view");
 export const CTX_3D = CANVAS3D.getContext("2d");
 
 
+
 export const GUN = new Image();
 GUN.src = 'gun.png';
 
 export const WALL = new Image();
 WALL.src = 'wall.png';
 
+export const GND = new Image();
+GND.src = 'demoground.png';
 
 export const ALT_CANVAS = CANVAS3D.height;
 export const LARG_CANVAS = CANVAS3D.width;
 export const DIST_FOCAL = LARG_CANVAS / 2;
+
+export const CANVASTEMP = document.getElementById("canvas");
+export const CTX_TMP = CANVASTEMP.getContext("2d");
+CANVASTEMP.width = LARG_CANVAS;
+CANVASTEMP.height = ALT_CANVAS;
+
+
 
 export const DEBUG_GROUND_POS_2D = true
 export const DEBUG_GROUND_POS_3D = false

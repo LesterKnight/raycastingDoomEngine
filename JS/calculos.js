@@ -123,3 +123,58 @@ export function calcColisaoPrecisa(//NOTA: ORIENTACAO É REFERENTE AO PLAYER
     
   return colisao;
 }
+
+export function calcularEscala(anguloEmGraus) {
+  // Converte o ângulo de graus para radianos
+  const anguloNormalizado = anguloEmGraus % 90;
+  const anguloEmRadianos = anguloNormalizado * (Math.PI / 180);
+  
+  // Calcula o fator de escala usando a fórmula
+  const escala = 1 / (Math.cos(anguloEmRadianos) + Math.sin(anguloEmRadianos));
+  
+  return Math.min(escala, 1);;
+}
+
+export function calculateRotationAngle(a, b) {
+  const dx = b.x - a.x;
+  const dy = b.y - a.y    ;
+  const angle = Math.atan2(dy, dx);
+  const targetAngle = Math.PI / 2; // 90 graus em radianos
+  return targetAngle - angle;
+}
+
+export function rotacionarPontos(a, b, anguloEmGraus, pontoReferencia = {x:250,y:250}) {
+
+  const anguloEmRadianos = anguloEmGraus * (Math.PI / 180);
+  function rotacionar(x, y, angulo, px, py) {
+    // Translação para o ponto de referência
+    const xDeslocado = x - px;
+    const yDeslocado = y - py;
+    // Rotação
+    const xNovo = xDeslocado * Math.cos(angulo) - yDeslocado * Math.sin(angulo);
+    const yNovo = xDeslocado * Math.sin(angulo) + yDeslocado * Math.cos(angulo);
+
+    // Translação de volta para o ponto de referência
+    return { x: xNovo + px, y: yNovo + py };
+  }
+
+  // 3. Rotaciona os pontos a e b em relação ao ponto de referência
+  const pontoARotacionado = rotacionar(a.x, a.y, anguloEmRadianos, pontoReferencia.x, pontoReferencia.y);
+  const pontoBRotacionado = rotacionar(b.x, b.y, anguloEmRadianos, pontoReferencia.x, pontoReferencia.y);
+
+  return { a: pontoARotacionado, b: pontoBRotacionado };
+}
+
+export function recalcularComZoom(ponto,zoomFactor){
+  let canvasWidth = 500
+  let canvasHeight = 500
+
+  let newCanvasWidth = canvasWidth*zoomFactor
+  let newCanvasHeight = canvasHeight*zoomFactor
+  let offset = (canvasWidth-newCanvasWidth)/2
+  let percentX = ponto.x/canvasWidth
+  let percentY = ponto.y/canvasHeight
+  let newX = (percentX*newCanvasWidth) + offset
+  let newY =(percentY*newCanvasHeight)+offset
+  return {x:newX,y:newY}
+}

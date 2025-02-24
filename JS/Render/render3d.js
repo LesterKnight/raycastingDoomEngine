@@ -9,7 +9,18 @@ import {
   DEBUG_FILL_WALL,
   DEBUG_WALL_RECTS,
   DEBUG_DIVIDE_WALL,
+  ALT_TILE,
+  GND,
+  CTX_TMP
 } from "../config.js";
+
+import{calcularEscala,
+  recalcularComZoom,
+  calculateRotationAngle,
+  rotacionarPontos
+
+} from "../calculos.js"
+
 export function renderRay3D(a, b, color = "rgb(255, 123, 0)", strokeSize = 1) {
   // Save the current context state
   //CTX_3D.save();
@@ -95,13 +106,14 @@ export function desenharRetangulosParede3D(wallRectangles) {
             
             
            //console.log(trapezio[i].closeAngle)
+           
             renderIMG3D(
               trapezio[i].superior,
               trapezio[i].inferior,
               WALL,
               diff,
               ponto,
-              trapezio[i].deb
+              trapezio[i].shadow
             );
           }
         }
@@ -209,5 +221,65 @@ export function renderGun() {
   let scaledWidth = originalWidth * 0.6;
   let scaledHeight = originalHeight * 0.6;
 
-  //CTX_3D.drawImage(GUN, 120, 320, scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
+  CTX_3D.drawImage(GUN, 120, 320, scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
+}
+export function drawImageWithTransformations(a,b) {
+
+  let zoom = 0
+
+  let ctx = CTX_TMP
+  let img = GND
+
+  let rotateRad = calculateRotationAngle(a,b)
+  let rotateGradius = rotateRad / (Math.PI / 180)
+  rotateGradius = rotateGradius<0 ? rotateGradius+360 : rotateGradius
+  zoom = calcularEscala(rotateGradius)
+
+  // Calcula o centro do canvas
+  const centerX = LARG_CANVAS / 2;
+  const centerY = ALT_CANVAS / 2;
+  // Move a origem para o centro do canvas
+
+  ctx.clearRect(0, 0, LARG_CANVAS, ALT_CANVAS);
+
+  ctx.translate(centerX, centerY); // Mover a origem para o centro
+  ctx.rotate(rotateRad); // Aplica a rotação em radianos
+  ctx.scale(zoom, zoom); // Aplica o zoom
+  ctx.drawImage(img, -img.width / 2, -img.height / 2); // Coloca a imagem centralizada
+
+  ctx.setTransform(1, 0, 0, 1, 0, 0); // Reseta qualquer transformação anterior
+
+/*
+  ctx.strokeStyle = "red";
+  ctx.beginPath();
+  ctx.moveTo(a.x, a.y);
+  ctx.lineTo(b.x, b.y);
+  ctx.stroke();
+
+
+  ctx.strokeStyle = "blue";
+  //const newPos = recalcularComZoom(a, b, zoom)
+*/
+  const newA = recalcularComZoom(a,zoom)
+  const newB = recalcularComZoom(b,zoom)
+/*
+  ctx.beginPath();
+  ctx.moveTo(newA.x, newA.y);
+  ctx.lineTo(newB.x, newB.y);
+  ctx.stroke();
+
+  
+  ctx.strokeStyle = "green";
+
+  
+  ctx.beginPath();
+  ctx.moveTo(newPosRotated.a.x, newPosRotated.a.y);
+  ctx.lineTo(newPosRotated.b.x, newPosRotated.b.y);
+  ctx.stroke();
+  */
+  const newPosRotated = rotacionarPontos(newA, newB, rotateGradius)
+
+  //var imageData = ctx.getImageData(newA.x,newA.y,2,newB.y-newA.y);
+
+  //return imageData
 }

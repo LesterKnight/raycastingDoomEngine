@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<canvas id="myCanvas" width="500" height="500" style="border:1px solid grey"></canvas>
+
+<script>
+  const c = document.getElementById("myCanvas");
+  const ctx = c.getContext("2d");
+
+
+  const img = new Image();
+  img.src = 'demoground.png';
+  let zoom = 0;
+
+  function calcularEscala(anguloEmGraus) {
+    // Converte o ângulo de graus para radianos
+    const anguloNormalizado = anguloEmGraus % 90;
+    const anguloEmRadianos = anguloNormalizado * (Math.PI / 180);
+    
+    // Calcula o fator de escala usando a fórmula
+    const escala = 1 / (Math.cos(anguloEmRadianos) + Math.sin(anguloEmRadianos));
+    
+    return Math.min(escala, 1);;
+  }
+
+  function calculateRotationAngle(a, b) {
+    const dx = b.x - a.x;
+    const dy = b.y - a.y    ;
+    const angle = Math.atan2(dy, dx);
+    const targetAngle = Math.PI / 2; // 90 graus em radianos
+    return targetAngle - angle;
+  }
+
+  function recalcularComZoom(a, b, zoom) {
+    const margem = ((1-zoom)/2)*500
+    const distanciaOriginal = Math.sqrt(Math.pow(b.x - a.x, 2) + Math.pow(b.y - a.y, 2));
+    const distanciaComZoom = distanciaOriginal * zoom;
+    const pontoMedio = {
+      x: (a.x + b.x) / 2,
+      y: (a.y + b.y) / 2
+    };
+    const vetorDirecao = {
+      x: (b.x - a.x) / distanciaOriginal,
+      y: (b.y - a.y) / distanciaOriginal
+    };
+    const novaDistanciaMeia = distanciaComZoom / 2;
+    const novoPontoA = {
+      x: margem/2 + pontoMedio.x - vetorDirecao.x * novaDistanciaMeia,
+      y: pontoMedio.y - vetorDirecao.y * novaDistanciaMeia
+    };
+    const novoPontoB = {
+      x: margem/2 + pontoMedio.x + vetorDirecao.x * novaDistanciaMeia,
+      y: pontoMedio.y + vetorDirecao.y * novaDistanciaMeia
+    };
+  
+    return { a: novoPontoA, b: novoPontoB };
+  }
+  
+  function rotacionarPontos(a, b, anguloEmGraus, pontoReferencia = {x:250,y:250}) {
+
+    const anguloEmRadianos = anguloEmGraus * (Math.PI / 180);
+    function rotacionar(x, y, angulo, px, py) {
+      // Translação para o ponto de referência
+      const xDeslocado = x - px;
+      const yDeslocado = y - py;
+      // Rotação
+      const xNovo = xDeslocado * Math.cos(angulo) - yDeslocado * Math.sin(angulo);
+      const yNovo = xDeslocado * Math.sin(angulo) + yDeslocado * Math.cos(angulo);
+  
+      // Translação de volta para o ponto de referência
+      return { x: xNovo + px, y: yNovo + py };
+    }
+  
+    // 3. Rotaciona os pontos a e b em relação ao ponto de referência
+    const pontoARotacionado = rotacionar(a.x, a.y, anguloEmRadianos, pontoReferencia.x, pontoReferencia.y);
+    const pontoBRotacionado = rotacionar(b.x, b.y, anguloEmRadianos, pontoReferencia.x, pontoReferencia.y);
+  
+    return { a: pontoARotacionado, b: pontoBRotacionado };
+  }
+  
+  function drawImageWithTransformations() {
+    let a = {x:120,y:0}
+    let b = {x:500,y:Math.floor(Math.random() * 500)}
+
+
+
+
+    let rotateRad = calculateRotationAngle(a,b)
+
+    let rotateGradius = rotateRad / (Math.PI / 180)
+    rotateGradius = rotateGradius<0 ? rotateGradius+360 : rotateGradius
+
+    zoom = calcularEscala(rotateGradius)
+
+    // Calcula o centro do canvas
+    const centerX = c.width / 2;
+    const centerY = c.height / 2;
+    // Move a origem para o centro do canvas
+
+    ctx.clearRect(0, 0, c.width, c.height);
+
+    ctx.translate(centerX, centerY); // Mover a origem para o centro
+    ctx.rotate(rotateRad); // Aplica a rotação em radianos
+    ctx.scale(zoom, zoom); // Aplica o zoom
+    ctx.drawImage(img, -img.width / 2, -img.height / 2); // Coloca a imagem centralizada
+
+    ctx.setTransform(1, 0, 0, 1, 0, 0); // Reseta qualquer transformação anterior
+    //chatgpt, favor inserir o calculo da matriz de rotação aqui e desenhar o movimento do ponto a ao ponto b após a rotacao
+
+    ctx.lineWidth = 5;
+
+
+    ctx.strokeStyle = "red";
+    ctx.beginPath();
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+
+
+    ctx.strokeStyle = "blue";
+    //const newPos = recalcularComZoom(a, b, zoom)
+
+    const newA = recalcularComZoom2(a,zoom)
+    const newB = recalcularComZoom2(b,zoom)
+/*
+    ctx.beginPath();
+    ctx.moveTo(newA.x, newA.y);
+    ctx.lineTo(newB.x, newB.y);
+    ctx.stroke();
+*/
+    
+    ctx.strokeStyle = "green";
+    const newPosRotated = rotacionarPontos(newA, newB, rotateGradius)
+    ctx.beginPath();
+    ctx.moveTo(newPosRotated.a.x, newPosRotated.a.y);
+    ctx.lineTo(newPosRotated.b.x, newPosRotated.b.y);
+    ctx.stroke();
+
+  }
+
+  function recalcularComZoom2(ponto,zoomFactor){
+    let canvasWidth = 500
+    let canvasHeight = 500
+
+    let newCanvasWidth = canvasWidth*zoomFactor
+    let newCanvasHeight = canvasHeight*zoomFactor
+    let offset = (canvasWidth-newCanvasWidth)/2
+    let percentX = ponto.x/canvasWidth
+    let percentY = ponto.y/canvasHeight
+    let newX = (percentX*newCanvasWidth) + offset
+    let newY =(percentY*newCanvasHeight)+offset
+    return {x:newX,y:newY}
+  }
+
+
+  img.onload = drawImageWithTransformations
+  
+  s.onchange = drawImageWithTransformations
+</script>
+
+</body>
+</html>

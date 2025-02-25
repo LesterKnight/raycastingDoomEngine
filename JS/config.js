@@ -4,7 +4,7 @@ export const LARG_TILE =32;
 export const COMP_SALA = 10;
 export const LARG_SALA = 10;
 
-export const RAYCASTING_RES = 360    ; //120 linhas na tela
+export const RAYCASTING_RES = 120
 export const RAYCASTING_POV = 60; //60 graus
 export const FOV_IN_RADIANS = RAYCASTING_POV * (Math.PI / 180);//POV RAD
 

@@ -161,20 +161,6 @@ function calcularRetangulosParede3D(wallCollisionList, player, gameMap) {
 
         CTX_3D.font = "7px Arial";
         CTX_3D.fillStyle = "red";
-
-        
-        //let real = calcDistanciaReal(collisionData.colisao,player.pos)
-        //let proj = calcDistanciaProjetada(real, angle, player.angle)
-        
-        //pos.shadow = calcularAngulo(collisionData.colisao,player.pos).toFixed(2)
-        //CTX_3D.fillText(pos.shadow, pos.inferior.x, pos.inferior.y+10);
-        //console.log(real)
-
-        
-
-        
-
-
       } else {
         //normaliza o raio que estava na lateral para cima ou para baixo
         if (collisionData.colisao.y > collisionData.tile.pos.y + ALT_TILE / 2) {

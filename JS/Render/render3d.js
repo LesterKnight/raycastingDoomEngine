@@ -39,16 +39,15 @@ export function renderRay3D(a, b, color = "rgb(255, 123, 0)", strokeSize = 1) {
   // Restore the context to its original state
   //CTX_3D.restore();
 }
-export function renderIMG3D(a, b, image, size, part,shadow = 0) {
+export function renderIMG3D(a, b, image, size, part,shadow = 0,imgHeight = 0) {
 
 const partSize = (LARG_CANVAS / RAYCASTING_RES); // Largura da fatia no canvas
 let partSizeExtra = 0
 
-const sliceHeight = image.height; // Altura total da textura
+const sliceHeight = imgHeight>0 ? imgHeight : image.height; // Altura total da textura
 
 const sx = (part * image.height); // Posição X da fatia na textura
 const sy = 0; // Sempre do topo da textura
-
 CTX_3D.drawImage(
   image,
   sx,
@@ -64,7 +63,6 @@ if(shadow>0){
   CTX_3D.fillStyle = `rgba(0, 0, 0, ${shadow})`;
   CTX_3D.fillRect(a.x, a.y, partSize, b.y - a.y); // (x, y, largura, altura)
 }
-
 /*
 CTX_3D.drawImage(
   image,    // 1º: Imagem fonte
@@ -99,14 +97,8 @@ export function desenharRetangulosParede3D(wallRectangles) {
               ponto = 0.05
             if(ponto == 1)
               ponto = 0.95
-            //console.log(`%c ${ponto}`, `color: ${tile.cor}`);
             let diff = (ponto-pontoAnterior)/LARG_TILE
-            //renderDot3D(trapezio[i].inferior,tile.cor,5)
-            
-            
-            
-           //console.log(trapezio[i].closeAngle)
-           
+
             renderIMG3D(
               trapezio[i].superior,
               trapezio[i].inferior,
@@ -188,6 +180,11 @@ export function renderPixel3D(a, color = "red", size_x = 1, size_y = 1) {
 export function screenBlanking3D() {
   CTX_3D.fillStyle = "white";
   CTX_3D.fillRect(0, 0, LARG_CANVAS, ALT_CANVAS);
+
+
+  //CTX_TMP.setTransform(1, 0, 0, 1, 0, 0); // Reseta qualquer transformação anterior CAGA PERFORMANCE
+  //CTX_TMP.fillStyle = "white";
+  //CTX_TMP.fillRect(0, 0, LARG_CANVAS, ALT_CANVAS);//ESSENCIAL
 }
 export function desenharCeu3D(ceu) {
   if (ceu.length > 0) {
@@ -221,65 +218,45 @@ export function renderGun() {
   let scaledWidth = originalWidth * 0.6;
   let scaledHeight = originalHeight * 0.6;
 
-  CTX_3D.drawImage(GUN, 120, 320, scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
+  //CTX_3D.drawImage(GUN, 120, 320, scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
 }
 export function drawImageWithTransformations(a,b) {
+  let scale = LARG_CANVAS/LARG_TILE
+
+  let scaled_ax = (a.x%LARG_TILE) * scale
+  let scaled_ay = (a.y%ALT_TILE) * scale
+  let scaled_bx = (b.x%LARG_TILE) * scale
+  let scaled_by = (b.y%ALT_TILE) * scale
+
+  let _a = {x:scaled_ax, y: scaled_ay}
+  let _b = {x:scaled_bx,y: scaled_by}
 
   let zoom = 0
-
   let ctx = CTX_TMP
   let img = GND
-
-  let rotateRad = calculateRotationAngle(a,b)
+  let rotateRad = calculateRotationAngle(_a,_b)
   let rotateGradius = rotateRad / (Math.PI / 180)
   rotateGradius = rotateGradius<0 ? rotateGradius+360 : rotateGradius
   zoom = calcularEscala(rotateGradius)
-
-  // Calcula o centro do canvas
   const centerX = LARG_CANVAS / 2;
   const centerY = ALT_CANVAS / 2;
-  // Move a origem para o centro do canvas
 
-  ctx.clearRect(0, 0, LARG_CANVAS, ALT_CANVAS);
-
+  ctx.setTransform(1, 0, 0, 1, 0, 0); // Reseta qualquer transformação anterior CAGA PERFORMANCE
   ctx.translate(centerX, centerY); // Mover a origem para o centro
   ctx.rotate(rotateRad); // Aplica a rotação em radianos
   ctx.scale(zoom, zoom); // Aplica o zoom
   ctx.drawImage(img, -img.width / 2, -img.height / 2); // Coloca a imagem centralizada
-
-  ctx.setTransform(1, 0, 0, 1, 0, 0); // Reseta qualquer transformação anterior
-
-/*
-  ctx.strokeStyle = "red";
-  ctx.beginPath();
-  ctx.moveTo(a.x, a.y);
-  ctx.lineTo(b.x, b.y);
-  ctx.stroke();
-
-
-  ctx.strokeStyle = "blue";
-  //const newPos = recalcularComZoom(a, b, zoom)
-*/
-  const newA = recalcularComZoom(a,zoom)
-  const newB = recalcularComZoom(b,zoom)
-/*
-  ctx.beginPath();
-  ctx.moveTo(newA.x, newA.y);
-  ctx.lineTo(newB.x, newB.y);
-  ctx.stroke();
-
+  const newA = recalcularComZoom(_a,zoom)
+  const newB = recalcularComZoom(_b,zoom)
   
+  let r = rotacionarPontos(newA, newB, rotateGradius)
+/* CORTA PERFORMANCE CARALHOSAMENTE 
   ctx.strokeStyle = "green";
-
-  
+  ctx.lineWidth = 5
   ctx.beginPath();
-  ctx.moveTo(newPosRotated.a.x, newPosRotated.a.y);
-  ctx.lineTo(newPosRotated.b.x, newPosRotated.b.y);
+  ctx.moveTo(r.a.x, r.a.y);
+  ctx.lineTo(r.b.x, r.b.y);
   ctx.stroke();
   */
-  const newPosRotated = rotacionarPontos(newA, newB, rotateGradius)
-
-  //var imageData = ctx.getImageData(newA.x,newA.y,2,newB.y-newA.y);
-
-  //return imageData
+  return r
 }

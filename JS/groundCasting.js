@@ -34,8 +34,6 @@ import {
 } from "./config.js";
 import{calcularRetaParede3D} from "./rayCasting.js"
 
-
-
 export function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMap) {
   //let pos = calcularRetaParede3D(player,colisao,angle,i);
   let groundCasting = {
@@ -44,74 +42,43 @@ export function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMa
     LastGroundLastPos: null,
   };
 
-  for (let j = rayCastingSize + RAYCASTING_STEP_SIZE; j > 0; j--) {
-  
+  for (let j = rayCastingSize + RAYCASTING_STEP_SIZE; j > 0; j = j-RAYCASTING_STEP_SIZE) {
+ 
     let g = rayCasting(player.pos.x, player.pos.y, angle, j);//raio vai em direção ao player raio 2D
-
     let ground = gameMap.checkGroundCollision(g);
-
     if (ground) {
-      if (groundCasting.lastGround && groundCasting.lastGround != ground) {//renderiza o traço durante a mudança de traço
-//parametros 2D
-        
-        //renderizar no canvas3d
-        //drawImageWithTransformations(groundCasting.lastGroundFirstPos, groundCasting.LastGroundLastPos)
+      if (groundCasting.lastGround && groundCasting.lastGround != ground /*&& groundCasting.lastGround.id == 76*/) {//renderiza o traço durante a mudança de traço
+          let r =  drawImageWithTransformations(groundCasting.lastGroundFirstPos, groundCasting.LastGroundLastPos)
 
-
-        //calcula first last e renderiza
-
-        //ajustar somente o first pos GERA BURACO 3D, ALTERAR SOMENTE O LAST POS GERA RELEVO!!!!!!!!!!!!!!!!!!!
-
-        let firstPos = calcularRetaParede3D( //raycasting
-          player,
-          groundCasting.lastGroundFirstPos,
-          angle,
-          i
+          let firstPos = calcularRetaParede3D( player, groundCasting.lastGroundFirstPos, angle, i );
+          let lastPos = calcularRetaParede3D( player, groundCasting.LastGroundLastPos, angle, i   );
+          CTX_3D.drawImage(
+          CANVASTEMP,//source
+          r.a.x,//x - DESTINO
+          r.a.y,//y
+          LARG_CANVAS/RAYCASTING_RES,//largura origem
+          r.b.y - r.a.y, // altura origem
+          firstPos.inferior.x,//x destino
+          firstPos.inferior.y, // Posição correta da fatia no canvas (altura da projeção 3D)
+          LARG_CANVAS/RAYCASTING_RES,// OKlargura destino
+          lastPos.inferior.y - firstPos.inferior.y // Altura destino
         );
-        //GERA ALTERACAO DE RELEVO INTERESSANTE
-        //let firstPosCorrigido = firstPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
-        //firstPos.inferior.y = firstPosCorrigido
-        let lastPos = calcularRetaParede3D(
-          player,
-          groundCasting.LastGroundLastPos,
-          angle,
-          i
-        );
-        //corrige a perspectiva do last position em relação a tamanho perspectivo
-        //let lastPosCorrigido = lastPos.inferior.y + (ALT_TILE * DIST_FOCAL) / rayCastingSize;
-        //lastPos.inferior.y = lastPosCorrigido
-        //lastPos.inferior.y += 2;
-
-        /*
+/*
         renderRay3D(
           firstPos.inferior,
           lastPos.inferior,
           groundCasting.lastGround.cor,
           1
         ); //render ground
-      */
-  /*
-        renderIMG3D(
-          firstPos.inferior,
-          lastPos.inferior,
-          CANVASTEMP,
-          2,//
-          0,
-          0//SHADOW
-        );
 */
-     
-        CTX_TMP.beginPath();
-        CTX_TMP.moveTo(firstPos.inferior.x, firstPos.inferior.y);
-        CTX_TMP.lineTo(lastPos.inferior.x, lastPos.inferior.y);
-        CTX_TMP.stroke();
-        CTX_TMP.closePath();
-
+        //renderDot3D(firstPos.inferior)
+        //renderDot3D(lastPos.inferior)
 
         groundCasting.lastGround = ground;
         groundCasting.lastGroundFirstPos = g//groundCasting.LastGroundLastPos//era g mas mudei para se alinhar com o ultimo anterior, no gaps
-
         groundCasting.LastGroundLastPos = g;
+
+
       } else if (groundCasting.lastGround && groundCasting.lastGround == ground ) {
         //atualiza o last SE CONTINUA NO MESMO PISO
         groundCasting.LastGroundLastPos = g;
@@ -145,4 +112,6 @@ export function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMa
       }
     }
   }
+  
+
 }

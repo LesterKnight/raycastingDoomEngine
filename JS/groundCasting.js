@@ -49,11 +49,11 @@ export function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMa
     if (ground) {
       if (groundCasting.lastGround && groundCasting.lastGround != ground /*&& groundCasting.lastGround.id == 76*/) {//renderiza o traço durante a mudança de traço
           
-        let rotatedTempCanvasCoordenadas =  drawImageWithTransformations(groundCasting.lastGroundFirstPos, groundCasting.LastGroundLastPos)
+       // let rotatedTempCanvasCoordenadas =  drawImageWithTransformations(groundCasting.lastGroundFirstPos, groundCasting.LastGroundLastPos)
 
           let firstPos = calcularRetaParede3D( player, groundCasting.lastGroundFirstPos, angle, i );
           let lastPos = calcularRetaParede3D( player, groundCasting.LastGroundLastPos, angle, i   );
-          
+          /*
           CTX_3D.drawImage(
           CANVASTEMP,//source image
           rotatedTempCanvasCoordenadas.a.x,//x source
@@ -64,15 +64,16 @@ export function calcularGroundCasting( player, angle, rayCastingSize, i,  gameMa
           firstPos.inferior.y, // Posição correta da fatia no canvas (altura da projeção 3D)
           LARG_CANVAS/RAYCASTING_RES,// OK largura destino
           lastPos.inferior.y - firstPos.inferior.y // Altura destino
-        );
-/*
+        );*/
+
+
         renderRay3D(
           firstPos.inferior,
           lastPos.inferior,
           groundCasting.lastGround.cor,
           1
         ); //render ground
-*/
+
         //renderDot3D(firstPos.inferior)
         //renderDot3D(lastPos.inferior)
 

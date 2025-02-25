@@ -179,7 +179,7 @@ export function renderPixel3D(a, color = "red", size_x = 1, size_y = 1) {
   CTX_3D.fillRect(a.x, a.y, size_x, size_y);
 }
 export function screenBlanking3D() {
-  CTX_3D.fillStyle = "white";
+  CTX_3D.fillStyle = "rgb(157,148,141)";
   CTX_3D.fillRect(0, 0, LARG_CANVAS, ALT_CANVAS);
 
 
@@ -212,14 +212,20 @@ export function desenharCeu3D(ceu) {
     CTX_3D.fill();
   }
 }
-export function renderGun() {
+export function renderGun(player) {
   let originalWidth = GUN.width;
   let originalHeight = GUN.height;
 
   let scaledWidth = originalWidth * 0.6;
   let scaledHeight = originalHeight * 0.6;
 
-  //CTX_3D.drawImage(GUN, 120, 320, scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
+let posX = 0
+let posY = 230
+  posX += Math.sin(player.pos.x * 0.2);;
+  posY += Math.cos(player.pos.y * 0.3)
+
+
+  CTX_3D.drawImage(GUN,posX, posY, scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
 }
 export function drawImageWithTransformations(a,b) {
   let scale = 125/LARG_TILE

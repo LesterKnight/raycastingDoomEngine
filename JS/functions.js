@@ -70,5 +70,5 @@ export function renderGame(player, gameMap) {
 
   screenBlanking3D();
   calculateRaycastingPOV(player, gameMap);
-  renderGun();
+  renderGun(player);
 }

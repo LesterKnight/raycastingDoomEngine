@@ -4,7 +4,7 @@ export const LARG_TILE =32;
 export const COMP_SALA = 10;
 export const LARG_SALA = 10;
 
-export const RAYCASTING_RES = 60
+export const RAYCASTING_RES = 240
 export const RAYCASTING_POV = 60; //60 graus
 export const FOV_IN_RADIANS = RAYCASTING_POV * (Math.PI / 180);//POV RAD
 
@@ -28,7 +28,7 @@ export const WALL = new Image();
 WALL.src = 'wall.png';
 
 export const GND = new Image();
-GND.src = 'demoground.png';
+GND.src = 'ground.png';
 
 export const ALT_CANVAS = CANVAS3D.height;
 export const LARG_CANVAS = CANVAS3D.width;

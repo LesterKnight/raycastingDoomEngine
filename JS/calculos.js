@@ -1,5 +1,5 @@
 import { Posicao } from "./Classes/Posicao.js";
-import{RAYCASTING_POV,RAYCASTING_RES,DEBUG_RAYCASTING_POS_2D, LARG_TILE } from "./config.js"
+import{RAYCASTING_POV,RAYCASTING_RES,DEBUG_RAYCASTING_POS_2D, LARG_TILE, CANVASTEMP } from "./config.js"
 import { renderRay2D } from "./Render/render2d.js";
 //calcula intersecção lateral entre o tile e o raycasting
 export function calcularIntersecaoLateral(
@@ -143,7 +143,7 @@ export function calculateRotationAngle(a, b) {
   return targetAngle - angle;
 }
 
-export function rotacionarPontos(a, b, anguloEmGraus, pontoReferencia = {x:250,y:250}) {
+export function rotacionarPontos(a, b, anguloEmGraus, pontoReferencia = {x:CANVASTEMP.width/2,y:CANVASTEMP.height/2}) {
 
   const anguloEmRadianos = anguloEmGraus * (Math.PI / 180);
   function rotacionar(x, y, angulo, px, py) {
@@ -166,8 +166,8 @@ export function rotacionarPontos(a, b, anguloEmGraus, pontoReferencia = {x:250,y
 }
 
 export function recalcularComZoom(ponto,zoomFactor){
-  let canvasWidth = 500
-  let canvasHeight = 500
+  let canvasWidth = CANVASTEMP.width
+  let canvasHeight = CANVASTEMP.height
 
   let newCanvasWidth = canvasWidth*zoomFactor
   let newCanvasHeight = canvasHeight*zoomFactor

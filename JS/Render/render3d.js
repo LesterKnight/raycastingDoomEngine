@@ -11,7 +11,8 @@ import {
   DEBUG_DIVIDE_WALL,
   ALT_TILE,
   GND,
-  CTX_TMP
+  CTX_TMP,
+  CANVASTEMP
 } from "../config.js";
 
 import{calcularEscala,
@@ -221,7 +222,8 @@ export function renderGun() {
   //CTX_3D.drawImage(GUN, 120, 320, scaledWidth, scaledHeight); // Draw the image at coordinates (0, 0)
 }
 export function drawImageWithTransformations(a,b) {
-  let scale = LARG_CANVAS/LARG_TILE
+  let scale = 125/LARG_TILE
+//125
 
   let scaled_ax = (a.x%LARG_TILE) * scale
   let scaled_ay = (a.y%ALT_TILE) * scale
@@ -235,11 +237,12 @@ export function drawImageWithTransformations(a,b) {
   let ctx = CTX_TMP
   let img = GND
   let rotateRad = calculateRotationAngle(_a,_b)
+  
   let rotateGradius = rotateRad / (Math.PI / 180)
   rotateGradius = rotateGradius<0 ? rotateGradius+360 : rotateGradius
   zoom = calcularEscala(rotateGradius)
-  const centerX = LARG_CANVAS / 2;
-  const centerY = ALT_CANVAS / 2;
+  const centerX = CANVASTEMP.width / 2;
+  const centerY = CANVASTEMP.height / 2;
 
   ctx.setTransform(1, 0, 0, 1, 0, 0); // Reseta qualquer transformação anterior CAGA PERFORMANCE
   ctx.translate(centerX, centerY); // Mover a origem para o centro
